@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda - Sistema de Gestão de Mídia</title>
+    <link rel="stylesheet" href="dagenda.css">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Menu Lateral -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>MÍDIA</h2>
+        </div>
+
+        <ul>
+            <li><a href="index.html">🏠 Dashboard</a></li>
+            <li><a href="solicitacoes.html">📝 Solicitações</a></li>
+            <li class="active"><a href="#">📅 Agenda</a></li>
+            <li><a href="#">📸 Galeria</a></li>
+            <li><a href="#">📊 Relatórios</a></li>
+            <li><a href="#">⚙️ Configurações</a></li>
+        </ul>
+
+    </aside>
+
+    <!-- Conteúdo -->
+    <main class="content">
+
+        <header class="topbar">
+            <h1>Agenda de Eventos</h1>
+
+            <button class="novo-evento">
+                + Novo Evento
+            </button>
+        </header>
+
+        <!-- Cards Resumo -->
+        <section class="cards">
+
+            <div class="card">
+                <h3>Hoje</h3>
+                <p>05 Eventos</p>
+            </div>
+
+            <div class="card">
+                <h3>Semana</h3>
+                <p>18 Eventos</p>
+            </div>
+
+            <div class="card">
+                <h3>Mês</h3>
+                <p>42 Eventos</p>
+            </div>
+
+        </section>
+
+        <!-- Agenda -->
+        <section class="agenda-box">
+
+            <h2>Próximos Eventos</h2>
+
+            <div class="evento">
+
+                <div class="data">
+                    <span>26</span>
+                    <small>MAI</small>
+                </div>
+
+                <div class="info">
+                    <h3>Mutirão de Saúde</h3>
+                    <p>08:00 • UBS Maresia</p>
+                </div>
+
+                <span class="status confirmado">
+                    Confirmado
+                </span>
+
+            </div>
+
+            <div class="evento">
+
+                <div class="data">
+                    <span>28</span>
+                    <small>MAI</small>
+                </div>
+
+                <div class="info">
+                    <h3>Entrega de Equipamentos</h3>
+                    <p>10:00 • Prefeitura</p>
+                </div>
+
+                <span class="status andamento">
+                    Planejamento
+                </span>
+
+            </div>
+
+            <div class="evento">
+
+                <div class="data">
+                    <span>30</span>
+                    <small>MAI</small>
+                </div>
+
+                <div class="info">
+                    <h3>Ação Educacional</h3>
+                    <p>14:00 • Escola Municipal</p>
+                </div>
+
+                <span class="status pendente">
+                    Pendente
+                </span>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

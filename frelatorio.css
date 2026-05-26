@@ -1,0 +1,276 @@
+/* ==========================
+   PÁGINA DE RELATÓRIO
+========================== */
+
+body{
+    margin:0;
+    padding:0;
+    background:#f4f6f9;
+    font-family:'Segoe UI', sans-serif;
+    color:#333;
+}
+
+/* Botão de impressão */
+
+.report-actions{
+    text-align:center;
+    margin:20px 0;
+}
+
+.report-actions button{
+
+    background:#003b8f;
+    color:#fff;
+
+    border:none;
+    border-radius:10px;
+
+    padding:12px 24px;
+
+    cursor:pointer;
+
+    font-size:15px;
+    font-weight:600;
+
+    transition:.3s;
+}
+
+.report-actions button:hover{
+    background:#002b68;
+}
+
+/* Folha */
+
+.report-page{
+
+    width:210mm;
+    min-height:297mm;
+
+    margin:20px auto;
+
+    background:white;
+
+    padding:20mm;
+
+    border-radius:10px;
+
+    box-shadow:
+    0 5px 20px rgba(0,0,0,.12);
+}
+
+/* Cabeçalho */
+
+.report-header{
+
+    text-align:center;
+
+    border-bottom:2px solid #003b8f;
+
+    padding-bottom:15px;
+
+    margin-bottom:25px;
+}
+
+.report-header h1{
+
+    margin:0;
+
+    color:#003b8f;
+
+    font-size:28px;
+}
+
+.report-header p{
+
+    margin:4px 0;
+
+    color:#666;
+}
+
+/* Dados da atividade */
+
+.report-info{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(250px,1fr));
+
+    gap:12px;
+
+    margin-bottom:30px;
+}
+
+.report-info div{
+
+    background:#f8fafc;
+
+    border-left:4px solid #003b8f;
+
+    padding:12px;
+
+    border-radius:8px;
+}
+
+/* Texto principal */
+
+.report-body{
+
+    margin-top:20px;
+}
+
+.report-body p{
+
+    text-align:justify;
+
+    line-height:1.9;
+
+    margin-bottom:18px;
+
+    font-size:15px;
+}
+
+/* Estatísticas */
+
+.report-table{
+
+    margin-top:30px;
+}
+
+.report-table table{
+
+    width:100%;
+
+    border-collapse:collapse;
+}
+
+.report-table th{
+
+    background:#003b8f;
+
+    color:white;
+
+    padding:12px;
+}
+
+.report-table td{
+
+    padding:12px;
+
+    border:1px solid #d1d5db;
+}
+
+.report-table tr:nth-child(even){
+    background:#f8fafc;
+}
+
+/* Observações */
+
+.observacoes{
+
+    margin-top:35px;
+}
+
+.observacoes h3{
+
+    color:#003b8f;
+
+    margin-bottom:10px;
+}
+
+.observacoes textarea{
+
+    width:100%;
+
+    min-height:120px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:8px;
+
+    padding:12px;
+
+    resize:vertical;
+}
+
+/* Assinaturas */
+
+.signatures{
+
+    margin-top:90px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:20px;
+}
+
+.signature{
+
+    width:100%;
+
+    text-align:center;
+
+    padding-top:12px;
+
+    border-top:1px solid #000;
+
+    font-size:14px;
+}
+
+/* Responsivo */
+
+@media(max-width:768px){
+
+    .report-page{
+
+        width:100%;
+
+        min-height:auto;
+
+        margin:0;
+
+        border-radius:0;
+
+        padding:20px;
+    }
+
+    .signatures{
+
+        flex-direction:column;
+
+        gap:40px;
+    }
+}
+
+/* Impressão */
+
+@media print{
+
+    body{
+        background:white;
+    }
+
+    .report-actions{
+        display:none;
+    }
+
+    .report-page{
+
+        width:100%;
+        min-height:auto;
+
+        margin:0;
+
+        padding:0;
+
+        border-radius:0;
+
+        box-shadow:none;
+    }
+
+    textarea{
+        border:none;
+    }
+}

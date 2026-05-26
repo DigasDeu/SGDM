@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitações - Sistema de Mídia</title>
+    <link rel="stylesheet" href="csolicitacoes.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Mídia</h2>
+            </div>
+
+            <nav>
+                <ul>
+                    <li><a href="index.html">🏠 Dashboard</a></li>
+                    <li class="active"><a href="#">📝 Solicitações</a></li>
+                    <li><a href="#">📅 Agenda</a></li>
+                    <li><a href="#">📸 Galeria</a></li>
+                    <li><a href="#">📊 Relatórios</a></li>
+                    <li><a href="#">⚙️ Configurações</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Conteúdo -->
+        <main class="content">
+
+            <header class="topbar">
+                <h1>Solicitações</h1>
+
+                <button class="nova-btn">
+                    + Nova Solicitação
+                </button>
+            </header>
+
+            <!-- Filtros -->
+            <section class="filtros">
+
+                <input type="text"
+                       placeholder="Pesquisar solicitação...">
+
+                <select>
+                    <option>Todos os status</option>
+                    <option>Pendente</option>
+                    <option>Em andamento</option>
+                    <option>Concluído</option>
+                </select>
+
+            </section>
+
+            <!-- Tabela -->
+            <section class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Solicitante</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>#001</td>
+                            <td>Criação de Banner</td>
+                            <td>Secretaria de Saúde</td>
+                            <td>26/05/2026</td>
+                            <td>
+                                <span class="status pendente">
+                                    Pendente
+                                </span>
+                            </td>
+                            <td>
+                                <button class="acao">Ver</button>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>#002</td>
+                            <td>Post para Redes Sociais</td>
+                            <td>Educação</td>
+                            <td>25/05/2026</td>
+                            <td>
+                                <span class="status andamento">
+                                    Em andamento
+                                </span>
+                            </td>
+                            <td>
+                                <button class="acao">Ver</button>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>#003</td>
+                            <td>Cobertura de Evento</td>
+                            <td>Cultura</td>
+                            <td>24/05/2026</td>
+                            <td>
+                                <span class="status concluido">
+                                    Concluído
+                                </span>
+                            </td>
+                            <td>
+                                <button class="acao">Ver</button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+</html>
