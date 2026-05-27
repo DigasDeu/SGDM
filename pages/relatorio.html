@@ -4,184 +4,219 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Relatórios - Departamento de Mídia</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="../assets/css/relatorio.css">
+<title>
+Relatório Institucional
+</title>
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet"
+href="../assets/css/relatorio.css">
 
 </head>
 
 <body>
 
-<section class="report-container">
+<div class="print-button">
 
-    <div class="report-actions">
+    <button onclick="window.print()">
 
-        <button onclick="window.print()">
+        Imprimir Relatório
 
-            <i class="fas fa-print"></i>
+    </button>
 
-            Imprimir Relatório
+</div>
 
-        </button>
+<section class="documento">
 
-    </div>
+    <!-- CABEÇALHO -->
 
-    <div class="report-page">
+    <header class="cabecalho-imagem">
 
-        <header class="report-header">
+        <img
+        src="../assets/img/cabecalho-semsa.png"
+        alt="Cabeçalho SEMSA">
 
-            <h1>RELATÓRIO DE ATIVIDADE</h1>
+    </header>
 
-            <p>Secretaria Municipal de Saúde</p>
+    <!-- TÍTULO -->
 
-            <p>Departamento de Mídia</p>
+    <section class="titulo-documento">
 
-        </header>
+        <h1>
+        RELATÓRIO DE COBERTURA INSTITUCIONAL
+        </h1>
 
-        <section class="report-info">
+    </section>
 
-            <div>
-                <strong>Atividade:</strong>
-                <span id="relTitulo"></span>
-            </div>
+    <!-- IDENTIFICAÇÃO -->
 
-            <div>
-                <strong>Data:</strong>
-                <span id="relData"></span>
-            </div>
+    <section class="identificacao">
 
-            <div>
-                <strong>Horário:</strong>
-                <span id="relHora"></span>
-            </div>
+        <p>
 
-            <div>
-                <strong>Local:</strong>
-                <span id="relLocal"></span>
-            </div>
+            <strong>Evento:</strong>
+            Ação UBS Jorge Brito
 
-            <div>
-                <strong>Responsável:</strong>
-                Departamento de Mídia
-            </div>
+        </p>
 
-        </section>
+        <p>
 
-        <section class="report-body">
+            <strong>Data:</strong>
+            28 de Maio de 2026
 
-            <p id="textoRelatorio"></p>
+        </p>
+
+        <p>
+
+            <strong>Horário:</strong>
+            08h00
+
+        </p>
+
+        <p>
+
+            <strong>Local:</strong>
+            UBS Jorge Brito
+
+        </p>
+
+    </section>
+
+    <!-- TEXTO -->
+
+    <section class="texto-relatorio">
+
+        <p>
+
+            Aos vinte e oito dias do mês de maio
+            do ano de dois mil e vinte e seis,
+            às oito horas,
+            foi realizada cobertura institucional
+            da ação promovida pela Secretaria Municipal
+            de Saúde no UBS Jorge Brito.
+
+        </p>
+
+        <p>
+
+            A equipe do Departamento de Mídia realizou
+            registros fotográficos,
+            cobertura audiovisual,
+            captação de imagens institucionais
+            e produção de conteúdo para divulgação
+            oficial das ações executadas pela SEMSA.
+
+        </p>
+
+        <p>
+
+            A cobertura teve como objetivo
+            fortalecer a comunicação institucional,
+            promover transparência pública
+            e ampliar o acesso às informações
+            relacionadas às atividades desenvolvidas
+            pela Secretaria Municipal de Saúde.
+
+        </p>
+
+    </section>
+
+    <!-- TABELA -->
+
+    <section class="tabela-atividades">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                    Atividade
+                    </th>
+
+                    <th>
+                    Quantidade
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                <tr>
+
+                    <td>
+                    Fotografias
+                    </td>
+
+                    <td>
+                    56
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>
+                    Vídeos
+                    </td>
+
+                    <td>
+                    12
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>
+                    Artes Produzidas
+                    </td>
+
+                    <td>
+                    04
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </section>
+
+    <!-- ASSINATURAS -->
+
+    <section class="assinaturas">
+
+        <div>
+
+            ____________________________________
 
             <p>
-
-                Foram realizados registros fotográficos,
-                produção audiovisual, elaboração de materiais
-                gráficos e acompanhamento institucional das
-                atividades promovidas pela Secretaria Municipal
-                de Saúde.
-
+            Responsável pela Cobertura
             </p>
+
+        </div>
+
+        <div>
+
+            ____________________________________
 
             <p>
-
-                O conteúdo produzido foi destinado aos canais
-                oficiais de comunicação, contribuindo para a
-                divulgação das ações desenvolvidas junto à população.
-
+            Coordenação do Departamento de Mídia
             </p>
 
-        </section>
+        </div>
 
-        <section class="report-table">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>Atividade</th>
-
-                        <th>Quantidade</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    <tr>
-
-                        <td>Fotografias</td>
-
-                        <td>48</td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>Vídeos</td>
-
-                        <td>12</td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>Artes</td>
-
-                        <td>3</td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </section>
-
-        <section class="signatures">
-
-            <div class="signature">
-
-                ___________________________
-
-                <br>
-
-                Responsável pela Cobertura
-
-            </div>
-
-            <div class="signature">
-
-                ___________________________
-
-                <br>
-
-                Coordenação de Mídia
-
-            </div>
-
-            <div class="signature">
-
-                ___________________________
-
-                <br>
-
-                Secretário(a) Municipal de Saúde
-
-            </div>
-
-        </section>
-
-    </div>
+    </section>
 
 </section>
-
-<script src="../assets/js/relatorio.js"></script>
 
 </body>
 
