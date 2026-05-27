@@ -2,167 +2,351 @@
 <html lang="pt-BR">
 
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <link rel="stylesheet" href="bmain.css">
+
 <title>Sistema de Gestão do Departamento de Mídia</title>
 
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/dashboard.css">
-<link rel="stylesheet" href="css/responsive.css">
+<link rel="stylesheet" href="assets/css/style.css">
+
+<link rel="stylesheet" href="assets/css/dashboard-extra.css">
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
 </head>
 
 <body>
 
 <header class="top-header">
 
-<div class="menu-btn">
-<i class="fas fa-bars"></i>
-</div>
+    <div class="menu-btn">
+        <i class="fas fa-bars"></i>
+    </div>
 
-<div class="logo-area">
-<img src="assets/logo.png" alt="Logo">
-<div>
-<span>Sistema de Gestão do</span>
-<h1>Departamento de Mídia</h1>
-</div>
-</div>
+    <div class="logo-area">
 
-<div class="user-area">
+        <div>
+            <span>Sistema de Gestão do</span>
+            <h1>Departamento de Mídia</h1>
+        </div>
 
-<div class="notification">
-<i class="far fa-bell"></i>
-<span class="badge">3</span>
-</div>
+    </div>
 
-<img src="assets/avatar.png" class="avatar">
+    <div class="user-area">
 
-</div>
+        <div class="notification">
+
+            <i class="far fa-bell"></i>
+
+            <span class="badge">3</span>
+
+        </div>
+
+    </div>
 
 </header>
 
 <section class="welcome">
 
-<div>
-<h2>Olá, Diego</h2>
-<p>Equipe de Mídia</p>
-</div>
+    <div>
+
+        <h2>Olá, Diego</h2>
+
+        <p>Equipe de Mídia</p>
+
+    </div>
 
 </section>
+
+<!-- DASHBOARD -->
 
 <main class="dashboard">
 
-<div class="card orange">
+    <!-- Solicitações -->
 
-<div class="icon">
-<i class="fas fa-clipboard-list"></i>
-</div>
+    <a href="solicitacoes.html" class="card-link">
 
-<div class="content">
-<h3>Solicitações Pendentes</h3>
-<span>12</span>
-<p>Aguardando atendimento</p>
-</div>
+        <div class="card orange">
 
-</div>
+            <div class="icon">
 
-<div class="card blue">
+                <i class="fas fa-clipboard-list"></i>
 
-<div class="icon">
-<i class="fas fa-calendar-days"></i>
-</div>
+            </div>
 
-<div class="content">
-<h3>Coberturas Agendadas</h3>
-<span>8</span>
-<p>Eventos confirmados</p>
-</div>
+            <div class="content">
 
-</div>
+                <h3>Solicitações Pendentes</h3>
 
-<div class="card green">
+                <span id="solicitacoes-count">0</span>
 
-<div class="icon">
-<i class="fas fa-bullhorn"></i>
-</div>
+                <p>Aguardando atendimento</p>
 
-<div class="content">
-<h3>Publicações no Mês</h3>
-<span>24</span>
-<p>Publicações realizadas</p>
-</div>
+            </div>
 
-</div>
+        </div>
 
-<div class="card purple">
+    </a>
 
-<div class="icon">
-<i class="fas fa-video"></i>
-</div>
+    <!-- Agenda -->
 
-<div class="content">
-<h3>Produções em Andamento</h3>
-<span>5</span>
-<p>Produções ativas</p>
-</div>
+    <a href="agenda.html" class="card-link">
 
-</div>
+        <div class="card blue">
+
+            <div class="icon">
+
+                <i class="fas fa-calendar-days"></i>
+
+            </div>
+
+            <div class="content">
+
+                <h3>Coberturas Agendadas</h3>
+
+                <span id="coberturas-count">0</span>
+
+                <p>Eventos confirmados</p>
+
+            </div>
+
+        </div>
+
+    </a>
+
+    <!-- Publicações -->
+
+    <a href="publicacoes.html" class="card-link">
+
+        <div class="card green">
+
+            <div class="icon">
+
+                <i class="fas fa-bullhorn"></i>
+
+            </div>
+
+            <div class="content">
+
+                <h3>Publicações no Mês</h3>
+
+                <span id="publicacoes-count">0</span>
+
+                <p>Publicações realizadas</p>
+
+            </div>
+
+        </div>
+
+    </a>
+
+    <!-- Produções -->
+
+    <a href="producoes.html" class="card-link">
+
+        <div class="card purple">
+
+            <div class="icon">
+
+                <i class="fas fa-video"></i>
+
+            </div>
+
+            <div class="content">
+
+                <h3>Produções em Andamento</h3>
+
+                <span id="producoes-count">0</span>
+
+                <p>Produções ativas</p>
+
+            </div>
+
+        </div>
+
+    </a>
 
 </main>
 
-<section class="events">
+<!-- AÇÕES RÁPIDAS -->
 
-<div class="section-header">
-<h2>Próximos Eventos</h2>
-<a href="#">Ver Agenda</a>
-</div>
+<section class="quick-actions">
 
-<div class="event-card">
+    <h2>Ações Rápidas</h2>
 
-<div class="date">
-<strong>28</strong>
-<span>MAI</span>
-</div>
+    <div class="actions-grid">
 
-<div class="info">
-<h3>Campanha de Vacinação</h3>
-<p>08:00 • UBS Maresia</p>
-</div>
+        <a href="solicitacoes.html" class="action-btn">
 
-</div>
+            <i class="fas fa-plus-circle"></i>
+
+            <span>Nova Solicitação</span>
+
+        </a>
+
+        <a href="agenda.html" class="action-btn">
+
+            <i class="fas fa-calendar-plus"></i>
+
+            <span>Novo Evento</span>
+
+        </a>
+
+        <a href="relatorio.html" class="action-btn">
+
+            <i class="fas fa-file-alt"></i>
+
+            <span>Gerar Relatório</span>
+
+        </a>
+
+        <a href="publicacoes.html" class="action-btn">
+
+            <i class="fas fa-bullhorn"></i>
+
+            <span>Nova Publicação</span>
+
+        </a>
+
+    </div>
 
 </section>
 
+<!-- EVENTOS -->
+
+<section class="dashboard-section">
+
+    <div class="section-header">
+
+        <h2>Próximos Eventos</h2>
+
+        <a href="agenda.html">
+            Ver Agenda
+        </a>
+
+    </div>
+
+    <div id="listaEventos">
+
+        <p>Nenhum evento cadastrado.</p>
+
+    </div>
+
+</section>
+
+<!-- DEMANDAS -->
+
+<section class="dashboard-section">
+
+    <div class="section-header">
+
+        <h2>Demandas de Hoje</h2>
+
+    </div>
+
+    <div id="demandasHoje">
+
+        <p>Nenhuma demanda registrada.</p>
+
+    </div>
+
+</section>
+
+<!-- NOTIFICAÇÕES -->
+
+<section class="dashboard-section">
+
+    <div class="section-header">
+
+        <h2>Notificações</h2>
+
+    </div>
+
+    <div id="notificacoesSistema">
+
+        <p>Nenhuma notificação.</p>
+
+    </div>
+
+</section>
+
+<!-- ATIVIDADES -->
+
+<section class="dashboard-section">
+
+    <div class="section-header">
+
+        <h2>Atividades Recentes</h2>
+
+    </div>
+
+    <div id="atividadesRecentes">
+
+        <p>Nenhuma atividade registrada.</p>
+
+    </div>
+
+</section>
+
+<!-- BARRA INFERIOR -->
+
 <nav class="bottom-nav">
 
-<a href="#" class="active">
-<i class="fas fa-house"></i>
-<span>Início</span>
-</a>
+    <a href="index.html" class="active">
 
-<a href="solicitacoes.html">
-<i class="fas fa-file-lines"></i>
-<span>Solicitações</span>
-</a>
+        <i class="fas fa-house"></i>
 
-<a href="agenda.html">
-<i class="fas fa-calendar"></i>
-<span>Agenda</span>
-</a>
+        <span>Início</span>
 
-<a href="relatorio.html">
-<i class="fas fa-folder-open"></i>
-<span>Relatorio</span>
-</a>
+    </a>
 
-<a href="#">
-<i class="fas fa-ellipsis"></i>
-<span>Mais</span>
-</a>
+    <a href="pages/solicitacoes.html">
+
+        <i class="fas fa-file-lines"></i>
+
+        <span>Solicitações</span>
+
+    </a>
+
+    <a href="pages/agenda.html">
+
+        <i class="fas fa-calendar"></i>
+
+        <span>Agenda</span>
+
+    </a>
+
+    <a href="pages/relatorio.html">
+
+        <i class="fas fa-chart-line"></i>
+
+        <span>Relatórios</span>
+
+    </a>
+
+    <a href="pages/mais.html">
+
+        <i class="fas fa-ellipsis"></i>
+
+        <span>Mais</span>
+
+    </a>
 
 </nav>
 
+<!-- JAVASCRIPT -->
+
+<script src="assets/js/cards.js"></script>
+
+<script src="assets/js/events.js"></script>
+
+<script src="assets/js/notifications.js"></script>
+
+<script src="assets/js/recent.js"></script>
+
+<script src="assets/js/dashboard.js"></script>
+
 </body>
+
 </html>

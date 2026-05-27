@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Agenda - Departamento de Mídia</title>
+
+<link rel="stylesheet" href="assets/css/agenda.css">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<header class="top-header">
+
+    <h1>📅 Agenda</h1>
+
+    <button id="novoEventoBtn">
+        <i class="fas fa-plus"></i>
+        Novo Evento
+    </button>
+
+</header>
+
+<main class="agenda-container">
+
+    <div class="calendar-header">
+
+        <button id="prevMonth">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <h2 id="monthYear"></h2>
+
+        <button id="nextMonth">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+    </div>
+
+    <div class="weekdays">
+
+        <div>Dom</div>
+        <div>Seg</div>
+        <div>Ter</div>
+        <div>Qua</div>
+        <div>Qui</div>
+        <div>Sex</div>
+        <div>Sáb</div>
+
+    </div>
+
+    <div id="calendar" class="calendar"></div>
+
+    <section class="event-list">
+
+        <h3>Eventos do Dia</h3>
+
+        <div id="eventosDia">
+
+            <p>Nenhum evento selecionado.</p>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- MODAL -->
+
+<div class="modal" id="modalEvento">
+
+    <div class="modal-content">
+
+        <h2>Novo Evento</h2>
+
+        <form id="eventoForm">
+
+            <input
+                type="text"
+                id="titulo"
+                placeholder="Título do evento"
+                required
+            >
+
+            <select id="tipo">
+
+                <option>Cobertura Fotográfica</option>
+                <option>Cobertura Audiovisual</option>
+                <option>Produção de Vídeo</option>
+                <option>Arte Gráfica</option>
+                <option>Publicação</option>
+                <option>Evento Institucional</option>
+                <option>Reunião</option>
+
+            </select>
+
+            <input type="date" id="data" required>
+
+            <input type="time" id="hora" required>
+
+            <input
+                type="text"
+                id="local"
+                placeholder="Local"
+                required
+            >
+
+            <textarea
+                id="descricao"
+                placeholder="Descrição"
+            ></textarea>
+
+            <div class="modal-buttons">
+
+                <button type="button" id="cancelar">
+                    Cancelar
+                </button>
+
+                <button type="submit">
+                    Salvar Evento
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="assets/js/agenda.js"></script>
+
+</body>
+</html>

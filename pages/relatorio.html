@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Relatórios - Departamento de Mídia</title>
+
+<link rel="stylesheet" href="assets/css/relatorio.css">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<section class="report-container">
+
+    <div class="report-actions">
+
+        <button onclick="window.print()">
+
+            <i class="fas fa-print"></i>
+
+            Imprimir Relatório
+
+        </button>
+
+    </div>
+
+    <div class="report-page">
+
+        <header class="report-header">
+
+            <h1>RELATÓRIO DE ATIVIDADE</h1>
+
+            <p>Secretaria Municipal de Saúde</p>
+
+            <p>Departamento de Mídia</p>
+
+        </header>
+
+        <section class="report-info">
+
+            <div>
+                <strong>Atividade:</strong>
+                <span id="relTitulo"></span>
+            </div>
+
+            <div>
+                <strong>Data:</strong>
+                <span id="relData"></span>
+            </div>
+
+            <div>
+                <strong>Horário:</strong>
+                <span id="relHora"></span>
+            </div>
+
+            <div>
+                <strong>Local:</strong>
+                <span id="relLocal"></span>
+            </div>
+
+            <div>
+                <strong>Responsável:</strong>
+                Departamento de Mídia
+            </div>
+
+        </section>
+
+        <section class="report-body">
+
+            <p id="textoRelatorio"></p>
+
+            <p>
+
+                Foram realizados registros fotográficos,
+                produção audiovisual, elaboração de materiais
+                gráficos e acompanhamento institucional das
+                atividades promovidas pela Secretaria Municipal
+                de Saúde.
+
+            </p>
+
+            <p>
+
+                O conteúdo produzido foi destinado aos canais
+                oficiais de comunicação, contribuindo para a
+                divulgação das ações desenvolvidas junto à população.
+
+            </p>
+
+        </section>
+
+        <section class="report-table">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Atividade</th>
+
+                        <th>Quantidade</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>Fotografias</td>
+
+                        <td>48</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Vídeos</td>
+
+                        <td>12</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Artes</td>
+
+                        <td>3</td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+        <section class="signatures">
+
+            <div class="signature">
+
+                ___________________________
+
+                <br>
+
+                Responsável pela Cobertura
+
+            </div>
+
+            <div class="signature">
+
+                ___________________________
+
+                <br>
+
+                Coordenação de Mídia
+
+            </div>
+
+            <div class="signature">
+
+                ___________________________
+
+                <br>
+
+                Secretário(a) Municipal de Saúde
+
+            </div>
+
+        </section>
+
+    </div>
+
+</section>
+
+<script src="assets/js/relatorio.js"></script>
+
+</body>
+
+</html>
