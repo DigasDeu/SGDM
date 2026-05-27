@@ -9,14 +9,110 @@
 <title>Sistema de Gestão do Departamento de Mídia</title>
 
 <link rel="stylesheet" href="assets/css/style.css">
-
-<link rel="stylesheet" href="assets/css/dashboard-extra.css">
+<link rel="stylesheet" href="assets/css/sidebar.css">
+<link rel="stylesheet" href="assets/css/dashboard_extra.css">
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
 </head>
 
 <body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-header">
+
+        <img
+        src="assets/img/user.png"
+        alt="Usuário">
+
+        <h3>Diego</h3>
+
+        <p>
+        Departamento de Mídia
+        </p>
+
+    </div>
+
+    <nav class="sidebar-menu">
+
+        <a href="index.html">
+
+            <i class="fas fa-house"></i>
+
+            Dashboard
+
+        </a>
+
+        <a href="pages/agenda.html">
+
+            <i class="fas fa-calendar"></i>
+
+            Agenda
+
+        </a>
+
+        <a href="pages/solicitacoes.html">
+
+            <i class="fas fa-file-lines"></i>
+
+            Solicitações
+
+        </a>
+
+        <a href="pages/publicacoes.html">
+
+            <i class="fas fa-bullhorn"></i>
+
+            Publicações
+
+        </a>
+
+        <a href="pages/producoes.html">
+
+            <i class="fas fa-video"></i>
+
+            Produções
+
+        </a>
+
+        <a href="pages/relatorio.html">
+
+            <i class="fas fa-chart-line"></i>
+
+            Relatórios
+
+        </a>
+
+        <a href="pages/configs.html">
+
+            <i class="fas fa-gear"></i>
+
+            Configurações
+
+        </a>
+
+        <a href="#">
+
+            <i class="fas fa-right-from-bracket"></i>
+
+            Sair
+
+        </a>
+
+    </nav>
+
+</aside>
+
+<!-- OVERLAY -->
+
+<div
+class="overlay"
+id="overlay">
+</div>
+
+<!-- FIM SIDEBAR/OVERLAY -->
 
 <header class="top-header">
 
@@ -35,17 +131,47 @@
 
     <div class="user-area">
 
-        <div class="notification">
+        <div class="notification" id="notificationBtn">
 
             <i class="far fa-bell"></i>
 
-            <span class="badge">3</span>
+            <span
+            class="badge"
+            id="notificationCount">
+            0
+            </span>
 
         </div>
 
     </div>
 
 </header>
+
+<!-- DROPDOWN -->
+
+<div
+class="notification-dropdown"
+id="notificationDropdown">
+
+    <div class="notification-header">
+
+        <h3>Notificações</h3>
+
+    </div>
+
+    <div
+    class="notification-list"
+    id="notificationList">
+
+        <p class="empty-notification">
+
+            Nenhuma notificação.
+
+        </p>
+
+    </div>
+
+</div>
 
 <section class="welcome">
 
@@ -65,7 +191,7 @@
 
     <!-- Solicitações -->
 
-    <a href="solicitacoes.html" class="card-link">
+    <a href="pages/solicitacoes.html" class="card-link">
 
         <div class="card orange">
 
@@ -91,7 +217,7 @@
 
     <!-- Agenda -->
 
-    <a href="agenda.html" class="card-link">
+    <a href="pages/agenda.html" class="card-link">
 
         <div class="card blue">
 
@@ -117,7 +243,7 @@
 
     <!-- Publicações -->
 
-    <a href="publicacoes.html" class="card-link">
+    <a href="pages/publicacoes.html" class="card-link">
 
         <div class="card green">
 
@@ -143,7 +269,7 @@
 
     <!-- Produções -->
 
-    <a href="producoes.html" class="card-link">
+    <a href="pages/producoes.html" class="card-link">
 
         <div class="card purple">
 
@@ -177,7 +303,7 @@
 
     <div class="actions-grid">
 
-        <a href="solicitacoes.html" class="action-btn">
+        <a href="pages/solicitacoes.html" class="action-btn">
 
             <i class="fas fa-plus-circle"></i>
 
@@ -185,7 +311,7 @@
 
         </a>
 
-        <a href="agenda.html" class="action-btn">
+        <a href="pages/agenda.html" class="action-btn">
 
             <i class="fas fa-calendar-plus"></i>
 
@@ -193,7 +319,7 @@
 
         </a>
 
-        <a href="relatorio.html" class="action-btn">
+        <a href="pages/relatorio.html" class="action-btn">
 
             <i class="fas fa-file-alt"></i>
 
@@ -201,7 +327,7 @@
 
         </a>
 
-        <a href="publicacoes.html" class="action-btn">
+        <a href="pages/publicacoes.html" class="action-btn">
 
             <i class="fas fa-bullhorn"></i>
 
@@ -221,7 +347,7 @@
 
         <h2>Próximos Eventos</h2>
 
-        <a href="agenda.html">
+        <a href="pages/agenda.html">
             Ver Agenda
         </a>
 
@@ -346,6 +472,8 @@
 <script src="assets/js/recent.js"></script>
 
 <script src="assets/js/dashboard.js"></script>
+
+<script src="assets/js/sidebar.js"></script>
 
 </body>
 
