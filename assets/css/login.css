@@ -1,0 +1,135 @@
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+    font-family:Arial;
+}
+
+body{
+
+    background:#f4f6f9;
+
+    height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+}
+
+.login-container{
+
+    width:90%;
+
+    max-width:400px;
+
+    background:white;
+
+    padding:30px;
+
+    border-radius:20px;
+
+    box-shadow:0 5px 20px rgba(0,0,0,0.1);
+
+    text-align:center;
+}
+
+.logo{
+
+    width:180px;
+
+    margin-bottom:20px;
+}
+
+.login-container h1{
+
+    margin-bottom:30px;
+
+    color:#003b8e;
+}
+
+.login-box{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+}
+
+.login-box input{
+
+    padding:15px;
+
+    border:1px solid #ddd;
+
+    border-radius:12px;
+}
+
+.login-box button{
+
+    background:#003b8e;
+
+    color:white;
+
+    border:none;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:16px;
+}
+
+.google-btn{
+
+    margin-top:20px;
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:white;
+
+    border:1px solid #ddd;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    cursor:pointer;
+}
+
+.google-btn img{
+
+    width:22px;
+}
+
+.cadastro-link{
+
+    margin-top:20px;
+
+    font-size:14px;
+}
+
+.cadastro-link a{
+
+    color:#003b8e;
+
+    font-weight:bold;
+
+    text-decoration:none;
+}

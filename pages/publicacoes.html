@@ -11,13 +11,16 @@ content="width=device-width, initial-scale=1.0">
 <title>Publicações</title>
 
 <link rel="stylesheet"
-href="assets/css/style.css">
+href="../assets/css/style.css">
 
 <link rel="stylesheet"
-href="assets/css/sidebar.css">
+href="../assets/css/publicacoes.css">
 
 <link rel="stylesheet"
-href="assets/css/responsive.css">
+href="../assets/css/sidebar.css">
+
+<link rel="stylesheet"
+href="../assets/css/responsive.css">
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 rel="stylesheet">
@@ -33,7 +36,7 @@ rel="stylesheet">
     <div class="sidebar-header">
 
         <img
-        src="assets/img/user.png">
+        src="../assets/img/user.png">
 
         <h3>Diego</h3>
 
@@ -43,7 +46,7 @@ rel="stylesheet">
 
     <nav class="sidebar-menu">
 
-        <a href="index.html">
+        <a href="../index.html">
 
             <i class="fas fa-house"></i>
 
@@ -59,11 +62,19 @@ rel="stylesheet">
 
         </a>
 
-        <a href="producoes.html">
+        <a href="solicitacoes.html">
 
-            <i class="fas fa-video"></i>
+            <i class="fas fa-file-lines"></i>
 
-            Produções
+            Solicitações
+
+        </a>
+
+        <a href="relatorio.html">
+
+            <i class="fas fa-chart-line"></i>
+
+            Relatórios
 
         </a>
 
@@ -95,11 +106,18 @@ rel="stylesheet">
 
 <section class="page-content">
 
-    <div class="section-header">
+    <!-- TOPO -->
 
-        <h2>Publicações do Mês</h2>
+    <div class="publicacoes-top">
 
-        <button class="primary-btn">
+        <input
+        type="text"
+        id="pesquisaPublicacao"
+        placeholder="Pesquisar publicação...">
+
+        <button
+        class="primary-btn"
+        id="abrirModal">
 
             Nova Publicação
 
@@ -107,25 +125,135 @@ rel="stylesheet">
 
     </div>
 
+    <!-- FILTROS -->
+
+    <div class="filtros">
+
+        <button class="filtro-btn active"
+        data-status="Todos">
+
+            Todos
+
+        </button>
+
+        <button class="filtro-btn"
+        data-status="Agendado">
+
+            Agendados
+
+        </button>
+
+        <button class="filtro-btn"
+        data-status="Publicado">
+
+            Publicados
+
+        </button>
+
+        <button class="filtro-btn"
+        data-status="Rascunho">
+
+            Rascunhos
+
+        </button>
+
+    </div>
+
+    <!-- LISTA -->
+
     <div id="listaPublicacoes">
-
-        <div class="event-card">
-
-            <strong>Postagem Campanha Saúde</strong>
-
-            <p>Instagram • Facebook</p>
-
-        </div>
 
     </div>
 
 </section>
 
+<!-- MODAL -->
+
+<div class="modal" id="modalPublicacao">
+
+    <div class="modal-content">
+
+        <h2>Nova Publicação</h2>
+
+        <input
+        type="text"
+        id="titulo"
+        placeholder="Título da publicação">
+
+        <textarea
+        id="descricao"
+        placeholder="Descrição da publicação">
+        </textarea>
+
+        <select id="tipo">
+
+            <option>Arte Institucional</option>
+
+            <option>Vídeo</option>
+
+            <option>Banner</option>
+
+            <option>Campanha</option>
+
+            <option>Comunicado</option>
+
+        </select>
+
+        <select id="plataforma">
+
+            <option>Instagram</option>
+
+            <option>Facebook</option>
+
+            <option>Site Oficial</option>
+
+            <option>WhatsApp</option>
+
+        </select>
+
+        <input
+        type="date"
+        id="data">
+
+        <input
+        type="time"
+        id="hora">
+
+        <select id="status">
+
+            <option>Agendado</option>
+
+            <option>Publicado</option>
+
+            <option>Rascunho</option>
+
+        </select>
+
+        <div class="modal-actions">
+
+            <button id="salvarPublicacao">
+
+                Salvar
+
+            </button>
+
+            <button id="fecharModal">
+
+                Cancelar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 <!-- MENU INFERIOR -->
 
 <nav class="bottom-nav">
 
-    <a href="index.html">
+    <a href="../index.html">
 
         <i class="fas fa-house"></i>
 
@@ -151,7 +279,9 @@ rel="stylesheet">
 
 </nav>
 
-<script src="assets/js/sidebar.js"></script>
+<script src="../assets/js/sidebar.js"></script>
+
+<script src="../assets/js/publicacoes.js"></script>
 
 </body>
 

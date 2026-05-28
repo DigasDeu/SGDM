@@ -1,130 +1,266 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitações - Sistema de Mídia</title>
-    <link rel="stylesheet" href="../assets/css/solicitacoes.css">
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Solicitações</title>
+
+<link rel="stylesheet"
+href="../assets/css/style.css">
+
+<link rel="stylesheet"
+href="../assets/css/solicitacoes.css">
+
+<link rel="stylesheet"
+href="../assets/css/sidebar.css">
+
+<link rel="stylesheet"
+href="../assets/css/responsive.css">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+rel="stylesheet">
+
 </head>
+
 <body>
 
-    <div class="container">
+<!-- SIDEBAR -->
 
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo">
-                <h2>Mídia</h2>
-            </div>
+<aside class="sidebar" id="sidebar">
 
-            <nav>
-                <ul>
-                    <li><a href="../index.html">🏠 Dashboard</a></li>
-                    <li class="active"><a href="#">📝 Solicitações</a></li>
-                    <li><a href="../pages/agenda.html">📅 Agenda</a></li>
-                    <li><a href="../pages/relatorio.html">📊 Relatórios</a></li>
-                    <li><a href="../pages/configs.html">⚙️ Configurações</a></li>
-                </ul>
-            </nav>
-        </aside>
+    <div class="sidebar-header">
 
-        <!-- Conteúdo -->
-        <main class="content">
+        <img
+        src="../assets/img/user.png">
 
-            <header class="topbar">
-                <h1>Solicitações</h1>
+        <h3>Diego</h3>
 
-                <button class="nova-btn">
-                    + Nova Solicitação
-                </button>
-            </header>
-
-            <!-- Filtros -->
-            <section class="filtros">
-
-                <input type="text"
-                       placeholder="Pesquisar solicitação...">
-
-                <select>
-                    <option>Todos os status</option>
-                    <option>Pendente</option>
-                    <option>Em andamento</option>
-                    <option>Concluído</option>
-                </select>
-
-            </section>
-
-            <!-- Tabela -->
-            <section class="table-container">
-
-                <table>
-
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Título</th>
-                            <th>Solicitante</th>
-                            <th>Data</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        <tr>
-                            <td>#001</td>
-                            <td>Criação de Banner</td>
-                            <td>Secretaria de Saúde</td>
-                            <td>26/05/2026</td>
-                            <td>
-                                <span class="status pendente">
-                                    Pendente
-                                </span>
-                            </td>
-                            <td>
-                                <button class="acao">Ver</button>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>#002</td>
-                            <td>Post para Redes Sociais</td>
-                            <td>Educação</td>
-                            <td>25/05/2026</td>
-                            <td>
-                                <span class="status andamento">
-                                    Em andamento
-                                </span>
-                            </td>
-                            <td>
-                                <button class="acao">Ver</button>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>#003</td>
-                            <td>Cobertura de Evento</td>
-                            <td>Cultura</td>
-                            <td>24/05/2026</td>
-                            <td>
-                                <span class="status concluido">
-                                    Concluído
-                                </span>
-                            </td>
-                            <td>
-                                <button class="acao">Ver</button>
-                            </td>
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </section>
-
-        </main>
+        <p>Departamento de Mídia</p>
 
     </div>
+
+    <nav class="sidebar-menu">
+
+        <a href="../index.html">
+
+            <i class="fas fa-house"></i>
+
+            Dashboard
+
+        </a>
+
+        <a href="agenda.html">
+
+            <i class="fas fa-calendar"></i>
+
+            Agenda
+
+        </a>
+
+        <a href="relatorio.html">
+
+            <i class="fas fa-chart-line"></i>
+
+            Relatórios
+
+        </a>
+
         
+
+    </nav>
+
+</aside>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- HEADER -->
+
+<header class="top-header">
+
+    <div class="menu-btn">
+
+        <i class="fas fa-bars"></i>
+
+    </div>
+
+    <div class="logo-area">
+
+        <h1>Solicitações</h1>
+
+    </div>
+
+</header>
+
+<!-- CONTEÚDO -->
+
+<section class="page-content">
+
+    <!-- TOPO -->
+
+    <div class="solicitacoes-top">
+
+        <input
+        type="text"
+        id="pesquisaSolicitacao"
+        placeholder="Pesquisar solicitação...">
+
+        <button
+        class="primary-btn"
+        id="abrirModal">
+
+            Nova Solicitação
+
+        </button>
+
+    </div>
+
+    <!-- FILTROS -->
+
+    <div class="filtros">
+
+        <button class="filtro-btn active"
+        data-status="Todos">
+
+            Todos
+
+        </button>
+
+        <button class="filtro-btn"
+        data-status="Pendente">
+
+            Pendentes
+
+        </button>
+
+        <button class="filtro-btn"
+        data-status="Andamento">
+
+            Andamento
+
+        </button>
+
+        <button class="filtro-btn"
+        data-status="Concluído">
+
+            Concluídos
+
+        </button>
+
+    </div>
+
+    <!-- LISTA -->
+
+    <div id="listaSolicitacoes">
+
+    </div>
+
+</section>
+
+<!-- MODAL -->
+
+<div class="modal" id="modalSolicitacao">
+
+    <div class="modal-content">
+
+        <h2>Nova Solicitação</h2>
+
+        <input
+        type="text"
+        id="titulo"
+        placeholder="Título da Solicitação">
+
+        <input
+        type="text"
+        id="solicitante"
+        placeholder="Solicitante">
+
+        <input
+        type="date"
+        id="data">
+
+        <input
+        type="time"
+        id="hora">
+
+        <input
+        type="text"
+        id="local"
+        placeholder="Local da ação">
+
+        <select id="status">
+
+            <option>Pendente</option>
+
+            <option>Andamento</option>
+
+            <option>Concluído</option>
+
+        </select>
+
+        <textarea
+        id="descricao"
+        placeholder="Descrição da atividade">
+        </textarea>
+
+        <div class="modal-actions">
+
+            <button id="salvarSolicitacao">
+
+                Salvar
+
+            </button>
+
+            <button id="fecharModal">
+
+                Cancelar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MENU INFERIOR -->
+
+<nav class="bottom-nav">
+
+    <a href="../index.html">
+
+        <i class="fas fa-house"></i>
+
+        <span>Início</span>
+
+    </a>
+
+    <a href="agenda.html">
+
+        <i class="fas fa-calendar"></i>
+
+        <span>Agenda</span>
+
+    </a>
+
+    <a href="relatorio.html">
+
+        <i class="fas fa-chart-line"></i>
+
+        <span>Relatórios</span>
+
+    </a>
+
+</nav>
+
+<script src="../assets/js/sidebar.js"></script>
+
+<script src="../assets/js/solicitacoes.js"></script>
+
 </body>
+
 </html>
