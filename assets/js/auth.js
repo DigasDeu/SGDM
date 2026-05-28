@@ -1,98 +1,81 @@
-//
-// VERIFICAR LOGIN
-//
+import { auth } from "./firebase.js";
 
-const usuario =
-JSON.parse(
-localStorage.getItem(
-"usuarioLogado"
-)
-);
+import {
+    onAuthStateChanged,
+    signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-//
-// BLOQUEAR ACESSO
-//
+onAuthStateChanged(auth, (user) => {
 
-if(
-    !usuario ||
-    usuario.login !== true
-){
+    if (!user) {
 
-    window.location.href =
-    "../login.html";
-}
+        if (
+            !window.location.pathname.includes("login.html") &&
+            !window.location.pathname.includes("cadastro.html") &&
+            !window.location.pathname.includes("index.html")
+        ) {
+            window.location.href = "login.html";
+        }
 
-//
-// CARREGAR USUÁRIO
-//
-
-function carregarUsuario(){
-
-    //
-    // FOTO
-    //
-
-    const foto =
-    document.querySelector(
-    ".sidebar-header img"
-    );
-
-    if(foto){
-
-        foto.src =
-        "../" + usuario.foto;
+        return;
     }
 
-    //
-    // NOME
-    //
+    const usuario = {
+        nome: user.displayName || "Usuário",
+        email: user.email || "",
+        foto: user.photoURL || "assets/img/user.png",
+        uid: user.uid,
+        login: true
+    };
 
-    const nome =
-    document.querySelector(
-    ".sidebar-header h3"
+    localStorage.setItem(
+        "usuarioLogado",
+        JSON.stringify(usuario)
     );
 
-    if(nome){
+    atualizarUsuarioNaTela(usuario);
+});
 
-        nome.textContent =
-        usuario.nome;
+function atualizarUsuarioNaTela(usuario) {
+
+    const fotoUsuario = document.getElementById("fotoUsuario");
+
+    if (fotoUsuario) {
+        fotoUsuario.src = usuario.foto;
     }
 
-    //
-    // EMAIL
-    //
+    const nomeUsuario = document.getElementById("nomeUsuario");
 
-    const email =
-    document.querySelector(
-    ".sidebar-header p"
-    );
+    if (nomeUsuario) {
+        nomeUsuario.textContent = usuario.nome;
+    }
 
-    if(email){
+    const emailUsuario = document.getElementById("emailUsuario");
 
-        email.textContent =
-        usuario.email;
+    if (emailUsuario) {
+        emailUsuario.textContent = usuario.email;
+    }
+
+    const saudacaoUsuario = document.getElementById("saudacaoUsuario");
+
+    if (saudacaoUsuario) {
+        saudacaoUsuario.textContent = `Olá, ${usuario.nome}`;
     }
 }
 
-//
-// LOGOUT
-//
+window.logout = function () {
 
-function logout(){
+    signOut(auth)
+    .then(() => {
 
-    localStorage.removeItem(
-    "usuarioLogado"
-    );
+        localStorage.removeItem("usuarioLogado");
 
-    window.location.href =
-    "../login.html";
-}
+        window.location.href = "login.html";
+    })
+    .catch((error) => {
 
-//
-// INICIAR
-//
+        console.log(error);
 
-document.addEventListener(
-"DOMContentLoaded",
-carregarUsuario
-);
+        alert("Erro ao sair do sistema.");
+    });
+};

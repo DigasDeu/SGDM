@@ -25,94 +25,71 @@
 
         <img
         src="assets/img/user.png"
-        alt="Usuário">
+        alt="Usuário"
+        class="user-photo"
+        id="fotoUsuario">
 
-        <h3>Diego</h3>
+        <h3
+        class="user-name"
+        id="nomeUsuario">
+            Usuário
+        </h3>
 
-        <p>
-        Departamento de Mídia
+        <p
+        class="user-email"
+        id="emailUsuario">
+            email@usuario.com
         </p>
 
     </div>
 
     <nav class="sidebar-menu">
 
-        <a href="index.html">
-
+        <a href="dashboard.html">
             <i class="fas fa-house"></i>
-
             Dashboard
-
         </a>
 
         <a href="pages/agenda.html">
-
             <i class="fas fa-calendar"></i>
-
             Agenda
-
         </a>
 
         <a href="pages/solicitacoes.html">
-
             <i class="fas fa-file-lines"></i>
-
             Solicitações
-
         </a>
 
         <a href="pages/publicacoes.html">
-
             <i class="fas fa-bullhorn"></i>
-
             Publicações
-
         </a>
 
         <a href="pages/producoes.html">
-
             <i class="fas fa-video"></i>
-
             Produções
-
         </a>
 
         <a href="pages/relatorio.html">
-
             <i class="fas fa-chart-line"></i>
-
             Relatórios
-
         </a>
 
         <a href="pages/configs.html">
-
             <i class="fas fa-gear"></i>
-
             Configurações
-
         </a>
 
-        <a href="#">
-
+        <a href="#" onclick="logout()">
             <i class="fas fa-right-from-bracket"></i>
-
             Sair
-
         </a>
 
     </nav>
 
 </aside>
 
-<!-- OVERLAY -->
-
-<div
-class="overlay"
-id="overlay">
-</div>
-
-<!-- FIM SIDEBAR/OVERLAY -->
+<div class="overlay" id="overlay"></div>
 
 <header class="top-header">
 
@@ -135,10 +112,8 @@ id="overlay">
 
             <i class="far fa-bell"></i>
 
-            <span
-            class="badge"
-            id="notificationCount">
-            0
+            <span class="badge" id="notificationCount">
+                0
             </span>
 
         </div>
@@ -147,26 +122,16 @@ id="overlay">
 
 </header>
 
-<!-- DROPDOWN -->
-
-<div
-class="notification-dropdown"
-id="notificationDropdown">
+<div class="notification-dropdown" id="notificationDropdown">
 
     <div class="notification-header">
-
         <h3>Notificações</h3>
-
     </div>
 
-    <div
-    class="notification-list"
-    id="notificationList">
+    <div class="notification-list" id="notificationList">
 
         <p class="empty-notification">
-
             Nenhuma notificação.
-
         </p>
 
     </div>
@@ -177,7 +142,9 @@ id="notificationDropdown">
 
     <div>
 
-        <h2>Olá, Diego</h2>
+        <h2 id="saudacaoUsuario">
+            Olá, Usuário
+        </h2>
 
         <p>Equipe de Mídia</p>
 
@@ -185,108 +152,74 @@ id="notificationDropdown">
 
 </section>
 
-<!-- DASHBOARD -->
-
 <main class="dashboard">
-
-    <!-- Solicitações -->
 
     <a href="pages/solicitacoes.html" class="card-link">
 
         <div class="card orange">
 
             <div class="icon">
-
                 <i class="fas fa-clipboard-list"></i>
-
             </div>
 
             <div class="content">
-
                 <h3>Solicitações Pendentes</h3>
-
                 <span id="solicitacoes-count">0</span>
-
                 <p>Aguardando atendimento</p>
-
             </div>
 
         </div>
 
     </a>
-
-    <!-- Agenda -->
 
     <a href="pages/agenda.html" class="card-link">
 
         <div class="card blue">
 
             <div class="icon">
-
                 <i class="fas fa-calendar-days"></i>
-
             </div>
 
             <div class="content">
-
                 <h3>Coberturas Agendadas</h3>
-
                 <span id="coberturas-count">0</span>
-
                 <p>Eventos confirmados</p>
-
             </div>
 
         </div>
 
     </a>
-
-    <!-- Publicações -->
 
     <a href="pages/publicacoes.html" class="card-link">
 
         <div class="card green">
 
             <div class="icon">
-
                 <i class="fas fa-bullhorn"></i>
-
             </div>
 
             <div class="content">
-
                 <h3>Publicações no Mês</h3>
-
                 <span id="publicacoes-count">0</span>
-
                 <p>Publicações realizadas</p>
-
             </div>
 
         </div>
 
     </a>
 
-    <!-- Produções -->
-
     <a href="pages/producoes.html" class="card-link">
 
         <div class="card purple">
 
             <div class="icon">
-
                 <i class="fas fa-video"></i>
-
             </div>
 
             <div class="content">
-
                 <h3>Produções em Andamento</h3>
-
                 <span id="producoes-count">0</span>
-
                 <p>Produções ativas</p>
-
             </div>
 
         </div>
@@ -295,8 +228,6 @@ id="notificationDropdown">
 
 </main>
 
-<!-- AÇÕES RÁPIDAS -->
-
 <section class="quick-actions">
 
     <h2>Ações Rápidas</h2>
@@ -304,176 +235,115 @@ id="notificationDropdown">
     <div class="actions-grid">
 
         <a href="pages/solicitacoes.html" class="action-btn">
-
             <i class="fas fa-plus-circle"></i>
-
             <span>Nova Solicitação</span>
-
         </a>
 
         <a href="pages/agenda.html" class="action-btn">
-
             <i class="fas fa-calendar-plus"></i>
-
             <span>Novo Evento</span>
-
         </a>
 
         <a href="pages/relatorio.html" class="action-btn">
-
             <i class="fas fa-file-alt"></i>
-
             <span>Gerar Relatório</span>
-
         </a>
 
         <a href="pages/publicacoes.html" class="action-btn">
-
             <i class="fas fa-bullhorn"></i>
-
             <span>Nova Publicação</span>
-
         </a>
 
     </div>
 
 </section>
 
-<!-- EVENTOS -->
-
 <section class="dashboard-section">
 
     <div class="section-header">
-
         <h2>Próximos Eventos</h2>
-
-        <a href="pages/agenda.html">
-            Ver Agenda
-        </a>
-
+        <a href="pages/agenda.html">Ver Agenda</a>
     </div>
 
     <div id="listaEventos">
-
         <p>Nenhum evento cadastrado.</p>
-
     </div>
 
 </section>
 
-<!-- DEMANDAS -->
-
 <section class="dashboard-section">
 
     <div class="section-header">
-
         <h2>Demandas de Hoje</h2>
-
     </div>
 
     <div id="demandasHoje">
-
         <p>Nenhuma demanda registrada.</p>
-
     </div>
 
 </section>
 
-<!-- NOTIFICAÇÕES -->
-
 <section class="dashboard-section">
 
     <div class="section-header">
-
         <h2>Notificações</h2>
-
     </div>
 
     <div id="notificacoesSistema">
-
         <p>Nenhuma notificação.</p>
-
     </div>
 
 </section>
-
-<!-- ATIVIDADES -->
 
 <section class="dashboard-section">
 
     <div class="section-header">
-
         <h2>Atividades Recentes</h2>
-
     </div>
 
     <div id="atividadesRecentes">
-
         <p>Nenhuma atividade registrada.</p>
-
     </div>
 
 </section>
 
-<!-- BARRA INFERIOR -->
-
 <nav class="bottom-nav">
 
-    <a href="index.html" class="active">
-
+    <a href="dashboard.html" class="active">
         <i class="fas fa-house"></i>
-
         <span>Início</span>
-
     </a>
 
     <a href="pages/solicitacoes.html">
-
         <i class="fas fa-file-lines"></i>
-
         <span>Solicitações</span>
-
     </a>
 
     <a href="pages/agenda.html">
-
         <i class="fas fa-calendar"></i>
-
         <span>Agenda</span>
-
     </a>
 
     <a href="pages/relatorio.html">
-
         <i class="fas fa-chart-line"></i>
-
         <span>Relatórios</span>
-
     </a>
 
     <a href="pages/mais.html">
-
         <i class="fas fa-ellipsis"></i>
-
         <span>Mais</span>
-
     </a>
 
 </nav>
 
-<!-- JAVASCRIPT -->
-
 <script src="assets/js/cards.js"></script>
-
 <script src="assets/js/events.js"></script>
-
 <script src="assets/js/notifications.js"></script>
-
 <script src="assets/js/recent.js"></script>
-
 <script src="assets/js/dashboard.js"></script>
-
 <script src="assets/js/sidebar.js"></script>
+
+<script type="module" src="assets/js/auth.js"></script>
 
 </body>
 
