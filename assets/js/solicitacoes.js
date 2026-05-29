@@ -5,15 +5,11 @@ const formSolicitacao = document.getElementById("formSolicitacao");
 const listaSolicitacoes = document.getElementById("listaSolicitacoes");
 const pesquisa = document.getElementById("pesquisaSolicitacao");
 
-const localInput = document.getElementById("local");
-const latitudeInput = document.getElementById("latitude");
-const longitudeInput = document.getElementById("longitude");
-const buscarEnderecoBtn = document.getElementById("buscarEndereco");
-const usarLocalizacaoBtn = document.getElementById("usarLocalizacao");
-
 let filtroAtual = "Todos";
-let mapa = null;
-let marcador = null;
+
+let mapaSolicitacao = null;
+let marcadorSolicitacao = null;
+let geocoder = null;
 
 function buscarSolicitacoes() {
     return JSON.parse(localStorage.getItem("solicitacoes")) || [];
@@ -23,102 +19,154 @@ function salvarSolicitacoes(solicitacoes) {
     localStorage.setItem("solicitacoes", JSON.stringify(solicitacoes));
 }
 
+function buscarLista(chave) {
+    return JSON.parse(localStorage.getItem(chave)) || [];
+}
+
+function salvarLista(chave, lista) {
+    localStorage.setItem(chave, JSON.stringify(lista));
+}
+
+function adicionarNotificacao(titulo, descricao, tipo = "Solicitação") {
+    const notificacoes = buscarLista("notificacoes");
+
+    notificacoes.unshift({
+        id: Date.now(),
+        titulo,
+        descricao,
+        tipo,
+        data: new Date().toLocaleString("pt-BR"),
+        lida: false
+    });
+
+    salvarLista("notificacoes", notificacoes);
+}
+
+function adicionarHistoricoExclusao(item, origem) {
+    const historico = buscarLista("historicoExclusoes");
+
+    historico.unshift({
+        id: Date.now(),
+        origem,
+        item,
+        dataExclusao: new Date().toLocaleString("pt-BR")
+    });
+
+    salvarLista("historicoExclusoes", historico);
+}
+
+/* GOOGLE MAPS */
+
 function iniciarMapaSolicitacao() {
-    if (!document.getElementById("mapaSolicitacao")) return;
+    const mapaElemento = document.getElementById("mapaSolicitacao");
 
-    const maues = [-3.3836, -57.7186];
+    if (!mapaElemento || !window.google) return;
 
-    mapa = L.map("mapaSolicitacao", {
-        dragging: false,
-        tap: false,
-        scrollWheelZoom: false,
-        touchZoom: true,
-        doubleClickZoom: true,
-        zoomControl: true
-    }).setView(maues, 14);
+    const maues = {
+        lat: -3.3836,
+        lng: -57.7186
+    };
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap"
-    }).addTo(mapa);
+    geocoder = new google.maps.Geocoder();
 
-    marcador = L.marker(maues, {
-        draggable: false
-    }).addTo(mapa);
+    mapaSolicitacao = new google.maps.Map(mapaElemento, {
+        center: maues,
+        zoom: 15,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: true
+    });
 
-    preencherCoordenadas(maues[0], maues[1]);
+    marcadorSolicitacao = new google.maps.Marker({
+        position: maues,
+        map: mapaSolicitacao,
+        draggable: true
+    });
 
-    mapa.on("click", (event) => {
-        const lat = event.latlng.lat;
-        const lng = event.latlng.lng;
+    preencherCoordenadas(maues.lat, maues.lng);
 
-        marcador.setLatLng([lat, lng]);
+    mapaSolicitacao.addListener("click", (event) => {
+        const lat = event.latLng.lat();
+        const lng = event.latLng.lng();
+
+        marcadorSolicitacao.setPosition(event.latLng);
         preencherCoordenadas(lat, lng);
         buscarEnderecoPorCoordenadas(lat, lng);
     });
 
-    setTimeout(() => {
-        mapa.invalidateSize();
-    }, 300);
+    marcadorSolicitacao.addListener("dragend", () => {
+        const posicao = marcadorSolicitacao.getPosition();
+
+        const lat = posicao.lat();
+        const lng = posicao.lng();
+
+        preencherCoordenadas(lat, lng);
+        buscarEnderecoPorCoordenadas(lat, lng);
+    });
 }
 
 function preencherCoordenadas(lat, lng) {
-    latitudeInput.value = lat;
-    longitudeInput.value = lng;
+    const latitude = document.getElementById("latitude");
+    const longitude = document.getElementById("longitude");
+
+    if (latitude) latitude.value = lat;
+    if (longitude) longitude.value = lng;
 }
 
-async function buscarEnderecoPorCoordenadas(lat, lng) {
-    try {
-        const resposta = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-        );
+function buscarEnderecoPorCoordenadas(lat, lng) {
+    if (!geocoder) return;
 
-        const dados = await resposta.json();
-
-        if (dados.display_name) {
-            localInput.value = dados.display_name;
+    geocoder.geocode(
+        {
+            location: {
+                lat,
+                lng
+            }
+        },
+        (results, status) => {
+            if (status === "OK" && results[0]) {
+                document.getElementById("local").value =
+                results[0].formatted_address;
+            }
         }
-
-    } catch (error) {
-        console.log("Erro ao buscar endereço:", error);
-    }
+    );
 }
 
-async function buscarCoordenadasPorEndereco() {
-    const endereco = localInput.value.trim();
+function buscarLocalNoMapa() {
+    const endereco = document.getElementById("local").value.trim();
 
     if (!endereco) {
-        alert("Digite um endereço ou local para buscar.");
+        alert("Digite o local para buscar no mapa.");
         return;
     }
 
-    try {
-        const resposta = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco + ", Maués, Amazonas, Brasil")}`
-        );
-
-        const dados = await resposta.json();
-
-        if (!dados.length) {
-            alert("Local não encontrado. Tente escrever o endereço de outra forma.");
-            return;
-        }
-
-        const resultado = dados[0];
-
-        const lat = parseFloat(resultado.lat);
-        const lng = parseFloat(resultado.lon);
-
-        mapa.setView([lat, lng], 17);
-        marcador.setLatLng([lat, lng]);
-
-        preencherCoordenadas(lat, lng);
-
-        localInput.value = resultado.display_name;
-
-    } catch (error) {
-        console.log("Erro ao buscar local:", error);
-        alert("Erro ao buscar localização.");
+    if (!geocoder || !mapaSolicitacao || !marcadorSolicitacao) {
+        alert("Mapa ainda não carregou.");
+        return;
     }
+
+    geocoder.geocode(
+        {
+            address: `${endereco}, Maués, Amazonas, Brasil`
+        },
+        (results, status) => {
+            if (status === "OK" && results[0]) {
+                const posicao = results[0].geometry.location;
+
+                mapaSolicitacao.setCenter(posicao);
+                mapaSolicitacao.setZoom(17);
+
+                marcadorSolicitacao.setPosition(posicao);
+
+                preencherCoordenadas(posicao.lat(), posicao.lng());
+
+                document.getElementById("local").value =
+                results[0].formatted_address;
+            } else {
+                alert("Local não encontrado. Tente escrever de outra forma.");
+            }
+        }
+    );
 }
 
 function usarMinhaLocalizacao() {
@@ -132,8 +180,15 @@ function usarMinhaLocalizacao() {
             const lat = posicao.coords.latitude;
             const lng = posicao.coords.longitude;
 
-            mapa.setView([lat, lng], 17);
-            marcador.setLatLng([lat, lng]);
+            const localAtual = {
+                lat,
+                lng
+            };
+
+            mapaSolicitacao.setCenter(localAtual);
+            mapaSolicitacao.setZoom(17);
+
+            marcadorSolicitacao.setPosition(localAtual);
 
             preencherCoordenadas(lat, lng);
             buscarEnderecoPorCoordenadas(lat, lng);
@@ -144,82 +199,46 @@ function usarMinhaLocalizacao() {
     );
 }
 
-function pegarEquipeCobertura() {
-    const selecionados =
-    document.querySelectorAll('input[name="equipeCobertura"]:checked');
-
-    return Array.from(selecionados).map(item => item.value);
-}
-
-function pegarAnexos() {
-    const input = document.getElementById("anexos");
-
-    if (!input || !input.files.length) return [];
-
-    return Array.from(input.files).map(file => ({
-        nome: file.name,
-        tipo: file.type,
-        tamanho: file.size
-    }));
-}
-
-function adicionarHistoricoExclusao(item, origem) {
-    const historico =
-    JSON.parse(localStorage.getItem("historicoExclusoes")) || [];
-
-    historico.unshift({
-        id: Date.now(),
-        origem,
-        item,
-        dataExclusao: new Date().toLocaleString("pt-BR")
-    });
-
-    localStorage.setItem("historicoExclusoes", JSON.stringify(historico));
-}
-
-function adicionarNotificacao(titulo, descricao, tipo = "Sistema") {
-    const notificacoes =
-    JSON.parse(localStorage.getItem("notificacoes")) || [];
-
-    notificacoes.unshift({
-        id: Date.now(),
-        titulo,
-        descricao,
-        tipo,
-        data: new Date().toLocaleString("pt-BR"),
-        lida: false
-    });
-
-    localStorage.setItem("notificacoes", JSON.stringify(notificacoes));
-}
+/* MODAL */
 
 if (abrirModal) {
-    abrirModal.onclick = () => {
-        modal.style.display = "flex";
+    abrirModal.addEventListener("click", () => {
+        modal.classList.add("active");
 
         setTimeout(() => {
-            if (!mapa) {
-                iniciarMapaSolicitacao();
-            } else {
-                mapa.invalidateSize();
+            if (mapaSolicitacao) {
+                google.maps.event.trigger(mapaSolicitacao, "resize");
             }
         }, 300);
-    };
+    });
 }
 
 if (fecharModal) {
-    fecharModal.onclick = () => {
-        modal.style.display = "none";
-    };
+    fecharModal.addEventListener("click", () => {
+        modal.classList.remove("active");
+    });
 }
 
+if (modal) {
+    modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            modal.classList.remove("active");
+        }
+    });
+}
+
+const buscarEnderecoBtn = document.getElementById("buscarEndereco");
+const usarLocalizacaoBtn = document.getElementById("usarLocalizacao");
+
 if (buscarEnderecoBtn) {
-    buscarEnderecoBtn.onclick = buscarCoordenadasPorEndereco;
+    buscarEnderecoBtn.addEventListener("click", buscarLocalNoMapa);
 }
 
 if (usarLocalizacaoBtn) {
-    usarLocalizacaoBtn.onclick = usarMinhaLocalizacao;
+    usarLocalizacaoBtn.addEventListener("click", usarMinhaLocalizacao);
 }
+
+/* FORM */
 
 if (formSolicitacao) {
     formSolicitacao.addEventListener("submit", (event) => {
@@ -227,38 +246,25 @@ if (formSolicitacao) {
 
         const titulo = document.getElementById("titulo").value.trim();
         const solicitante = document.getElementById("solicitante").value.trim();
-        const setor = document.getElementById("setor").value.trim();
         const contato = document.getElementById("contato").value.trim();
         const data = document.getElementById("data").value;
         const hora = document.getElementById("hora").value;
         const local = document.getElementById("local").value.trim();
         const latitude = document.getElementById("latitude").value;
         const longitude = document.getElementById("longitude").value;
-        const equipeCobertura = pegarEquipeCobertura();
-        const prioridade = document.getElementById("prioridade").value;
         const status = document.getElementById("status").value;
-        const anexos = pegarAnexos();
+        const responsavel = document.getElementById("responsavel").value.trim();
 
         let descricao = document.getElementById("descricao").value.trim();
 
-        if (
-            !titulo ||
-            !solicitante ||
-            !setor ||
-            !data ||
-            !hora ||
-            !local ||
-            !latitude ||
-            !longitude ||
-            !prioridade
-        ) {
-            alert("Preencha todos os campos obrigatórios e marque a localização no mapa.");
+        if (!titulo || !solicitante || !data || !hora || !local || !latitude || !longitude) {
+            alert("Preencha os campos obrigatórios e marque a localização no mapa.");
             return;
         }
 
         if (!descricao) {
             descricao =
-            `A ação "${titulo}" ocorrerá no dia ${data}, às ${hora}, no local ${local}, conforme solicitação de ${solicitante}, setor ${setor}.`;
+            `A solicitação "${titulo}" ocorrerá no dia ${data}, às ${hora}, no local ${local}.`;
         }
 
         const solicitacoes = buscarSolicitacoes();
@@ -267,18 +273,15 @@ if (formSolicitacao) {
             id: Date.now(),
             titulo,
             solicitante,
-            setor,
             contato,
             data,
             hora,
             local,
             latitude,
             longitude,
-            equipeCobertura,
-            prioridade,
             status,
+            responsavel: responsavel || "Departamento de Mídia",
             descricao,
-            anexos,
             origem: "Solicitações",
             criadoEm: new Date().toLocaleString("pt-BR")
         };
@@ -289,37 +292,34 @@ if (formSolicitacao) {
 
         adicionarNotificacao(
             "Nova Solicitação",
-            `${novaSolicitacao.titulo} • ${novaSolicitacao.data || "Sem data"} • ${novaSolicitacao.local || "Local não informado"}`,
+            `${novaSolicitacao.titulo} • ${novaSolicitacao.data} • ${novaSolicitacao.local}`,
             "Solicitação"
         );
 
         carregarSolicitacoes();
 
-        modal.style.display = "none";
+        formSolicitacao.reset();
 
-        limparFormularioSolicitacao();
+        modal.classList.remove("active");
     });
 }
 
+/* GERAR EVENTO NA AGENDA */
+
 function gerarEventoAgenda(id) {
-    const solicitacoes =
-    JSON.parse(localStorage.getItem("solicitacoes")) || [];
+    const solicitacoes = buscarSolicitacoes();
+    const eventos = buscarLista("eventos");
 
-    const eventos =
-    JSON.parse(localStorage.getItem("eventos")) || [];
-
-    const solicitacao =
-    solicitacoes.find(item => item.id === id);
+    const solicitacao = solicitacoes.find(item => item.id === id);
 
     if (!solicitacao) {
         alert("Solicitação não encontrada.");
         return;
     }
 
-    const eventoExistente =
-    eventos.find(evento => evento.solicitacaoId === id);
+    const jaExiste = eventos.some(evento => evento.solicitacaoId === id);
 
-    if (eventoExistente) {
+    if (jaExiste) {
         alert("Essa solicitação já foi enviada para a agenda.");
         return;
     }
@@ -332,18 +332,18 @@ function gerarEventoAgenda(id) {
         data: solicitacao.data,
         hora: solicitacao.hora,
         local: solicitacao.local,
-        latitude: solicitacao.latitude || "",
-        longitude: solicitacao.longitude || "",
-        responsavel: solicitacao.equipeCobertura && solicitacao.equipeCobertura.length
-            ? solicitacao.equipeCobertura.join(", ")
-            : "Departamento de Mídia",
+        latitude: solicitacao.latitude,
+        longitude: solicitacao.longitude,
+        responsavel: solicitacao.responsavel || "Departamento de Mídia",
         descricao: solicitacao.descricao || "",
-        origem: "Solicitação"
+        origem: "Solicitação",
+        status: "Pendente",
+        criadoEm: new Date().toLocaleString("pt-BR")
     };
 
     eventos.push(novoEvento);
 
-    localStorage.setItem("eventos", JSON.stringify(eventos));
+    salvarLista("eventos", eventos);
 
     adicionarNotificacao(
         "Evento gerado pela solicitação",
@@ -353,6 +353,8 @@ function gerarEventoAgenda(id) {
 
     alert("Evento enviado para a agenda com sucesso.");
 }
+
+/* EXCLUIR */
 
 function excluirSolicitacao(id) {
     const confirmar =
@@ -383,50 +385,28 @@ function excluirSolicitacao(id) {
     carregarSolicitacoes();
 }
 
-function limparFormularioSolicitacao() {
-    if (formSolicitacao) {
-        formSolicitacao.reset();
-    }
-
-    latitudeInput.value = "";
-    longitudeInput.value = "";
-
-    const status = document.getElementById("status");
-
-    if (status) {
-        status.value = "Pendente";
-    }
-}
+/* LISTAGEM */
 
 function carregarSolicitacoes() {
     if (!listaSolicitacoes) return;
 
     const solicitacoes = buscarSolicitacoes();
+    const termo = pesquisa ? pesquisa.value.toLowerCase() : "";
 
-    listaSolicitacoes.innerHTML = "";
-
-    const termo =
-    pesquisa ? pesquisa.value.toLowerCase() : "";
-
-    const filtradas =
-    solicitacoes.filter(item => {
-        const textoBusca =
-        `
-        ${item.titulo || ""}
-        ${item.solicitante || ""}
-        ${item.setor || ""}
-        ${item.contato || ""}
-        ${item.data || ""}
-        ${item.hora || ""}
-        ${item.local || ""}
-        ${item.equipeCobertura ? item.equipeCobertura.join(" ") : ""}
-        ${item.prioridade || ""}
-        ${item.status || ""}
-        ${item.descricao || ""}
+    const filtradas = solicitacoes.filter(item => {
+        const texto = `
+            ${item.titulo || ""}
+            ${item.solicitante || ""}
+            ${item.contato || ""}
+            ${item.data || ""}
+            ${item.hora || ""}
+            ${item.local || ""}
+            ${item.status || ""}
+            ${item.responsavel || ""}
+            ${item.descricao || ""}
         `.toLowerCase();
 
-        const matchPesquisa =
-        textoBusca.includes(termo);
+        const matchPesquisa = texto.includes(termo);
 
         const matchFiltro =
         filtroAtual === "Todos" ||
@@ -436,101 +416,92 @@ function carregarSolicitacoes() {
     });
 
     if (filtradas.length === 0) {
-        listaSolicitacoes.innerHTML =
-        `<p>Nenhuma solicitação encontrada.</p>`;
+        listaSolicitacoes.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty-table">
+                    Nenhuma solicitação encontrada.
+                </td>
+            </tr>
+        `;
         return;
     }
+
+    listaSolicitacoes.innerHTML = "";
 
     filtradas
     .slice()
     .reverse()
     .forEach(item => {
-        let statusClass = "";
 
-        if (item.status === "Pendente") statusClass = "pendente";
-        if (item.status === "Andamento") statusClass = "andamento";
-        if (item.status === "Concluído") statusClass = "concluido";
+        const statusClass =
+        item.status === "Pendente"
+        ? "status-pendente"
+        : item.status === "Andamento"
+        ? "status-andamento"
+        : "status-concluido";
 
         const linkMapa =
         item.latitude && item.longitude
         ? `https://www.google.com/maps?q=${item.latitude},${item.longitude}`
         : "#";
 
-        const equipe =
-        item.equipeCobertura && item.equipeCobertura.length
-        ? item.equipeCobertura.join(", ")
-        : "Não definida";
-
-        const anexos =
-        item.anexos && item.anexos.length
-        ? item.anexos.map(anexo => anexo.nome).join(", ")
-        : "Nenhum anexo";
-
         listaSolicitacoes.innerHTML += `
-            <div class="solicitacao-card">
+            <tr>
+                <td>
+                    ${item.titulo}
+                    <span class="sol-subtext">
+                        ${item.responsavel || "Departamento de Mídia"}
+                    </span>
+                </td>
 
-                <h3>${item.titulo}</h3>
+                <td>
+                    ${item.solicitante}
+                    <span class="sol-subtext">
+                        ${item.contato || "Sem contato"}
+                    </span>
+                </td>
 
-                <div class="solicitacao-info">
+                <td>
+                    ${item.data || "Sem data"}
+                    <span class="sol-subtext">
+                        ${item.hora || "Sem horário"}
+                    </span>
+                </td>
 
-                    <p><strong>Solicitante:</strong> ${item.solicitante}</p>
+                <td>
+                    ${item.local || "Não informado"}
+                </td>
 
-                    <p><strong>Setor:</strong> ${item.setor || "Não informado"}</p>
+                <td>
+                    <span class="badge-status ${statusClass}">
+                        ${item.status}
+                    </span>
+                </td>
 
-                    <p><strong>Contato:</strong> ${item.contato || "Não informado"}</p>
+                <td>
+                    <div class="action-group">
 
-                    <p><strong>Data:</strong> ${item.data || "Não informada"}</p>
+                        <button class="action-btn agenda" onclick="gerarEventoAgenda(${item.id})" title="Enviar para agenda">
+                            <i class="fas fa-calendar-plus"></i>
+                        </button>
 
-                    <p><strong>Hora:</strong> ${item.hora || "Não informada"}</p>
+                        ${
+                            item.latitude && item.longitude
+                            ? `
+                            <a class="action-btn map" href="${linkMapa}" target="_blank" title="Abrir no Maps">
+                                <i class="fas fa-location-dot"></i>
+                            </a>
+                            `
+                            : ""
+                        }
 
-                    <p><strong>Local:</strong> ${item.local || "Não informado"}</p>
+                        <button class="action-btn delete" onclick="excluirSolicitacao(${item.id})" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
 
-                    <p><strong>Equipe da Cobertura:</strong> ${equipe}</p>
-
-                    <p><strong>Prioridade:</strong> ${item.prioridade || "Não informada"}</p>
-
-                    <p><strong>Anexos:</strong> ${anexos}</p>
-
-                    ${
-                        item.latitude && item.longitude
-                        ? `<p><strong>Coordenadas:</strong> ${item.latitude}, ${item.longitude}</p>`
-                        : ""
-                    }
-
-                </div>
-
-                <p>${item.descricao || "Sem descrição."}</p>
-
-                <span class="status ${statusClass}">
-                    ${item.status}
-                </span>
-
-                <div class="card-actions">
-
-                    <button class="agenda-btn" onclick="gerarEventoAgenda(${item.id})">
-                        <i class="fas fa-calendar-plus"></i>
-                        Gerar Evento
-                    </button>
-
-                    ${
-                        item.latitude && item.longitude
-                        ? `
-                        <a href="${linkMapa}" target="_blank" class="map-link">
-                            <i class="fas fa-location-dot"></i>
-                            Abrir no Maps
-                        </a>
-                        `
-                        : ""
-                    }
-
-                    <button class="delete-btn" onclick="excluirSolicitacao(${item.id})">
-                        <i class="fas fa-trash"></i>
-                        Excluir
-                    </button>
-
-                </div>
-
-            </div>
+                    </div>
+                </td>
+            </tr>
         `;
     });
 }
@@ -539,9 +510,7 @@ if (pesquisa) {
     pesquisa.addEventListener("input", carregarSolicitacoes);
 }
 
-document
-.querySelectorAll(".filtro-btn")
-.forEach(btn => {
+document.querySelectorAll(".filtro-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         document
         .querySelectorAll(".filtro-btn")
@@ -555,6 +524,7 @@ document
     });
 });
 
+window.iniciarMapaSolicitacao = iniciarMapaSolicitacao;
 window.gerarEventoAgenda = gerarEventoAgenda;
 window.excluirSolicitacao = excluirSolicitacao;
 
