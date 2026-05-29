@@ -89,3 +89,29 @@
 
     margin-bottom:5px;
 }
+.card-link,
+.card-link:visited,
+.card-link:hover,
+.card-link:active {
+    text-decoration: none;
+    color: inherit;
+}
+
+.card-link * {
+    text-decoration: none;
+}
+
+.action-btn,
+.action-btn:visited,
+.action-btn:hover,
+.action-btn:active {
+    text-decoration: none;
+    color: inherit;
+}
+
+.bottom-nav a,
+.bottom-nav a:visited,
+.bottom-nav a:hover,
+.bottom-nav a:active {
+    text-decoration: none;
+}

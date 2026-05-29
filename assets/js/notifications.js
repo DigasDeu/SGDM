@@ -48,11 +48,11 @@ function buscarDados(chave) {
     ) || [];
 }
 
-function salvarNotificacoes(notificacoes) {
+function salvarDados(chave, dados) {
 
     localStorage.setItem(
-        "notificacoes",
-        JSON.stringify(notificacoes)
+        chave,
+        JSON.stringify(dados)
     );
 }
 
@@ -70,7 +70,84 @@ function criarNotificacao(titulo, descricao, tipo = "Sistema") {
         lida: false
     });
 
-    salvarNotificacoes(notificacoes);
+    salvarDados("notificacoes", notificacoes);
+
+    carregarNotificacoes();
+}
+
+function montarNotificacoesAutomaticas() {
+
+    const eventos =
+    buscarDados("eventos");
+
+    const solicitacoes =
+    buscarDados("solicitacoes");
+
+    const publicacoes =
+    buscarDados("publicacoes");
+
+    const producoes =
+    buscarDados("producoes");
+
+    let automaticas = [];
+
+    solicitacoes
+    .filter(item => item.status === "Pendente")
+    .forEach(item => {
+
+        automaticas.push({
+            id: `solicitacao-${item.id}`,
+            titulo: "Solicitação pendente",
+            descricao: item.titulo || "Nova solicitação aguardando atendimento",
+            tipo: "Solicitação",
+            data: item.data || "",
+            automatica: true
+        });
+    });
+
+    eventos
+    .slice(-5)
+    .forEach(item => {
+
+        automaticas.push({
+            id: `evento-${item.id}`,
+            titulo: "Evento agendado",
+            descricao: `${item.titulo || "Evento"} - ${item.data || "sem data"}`,
+            tipo: "Agenda",
+            data: item.hora || "",
+            automatica: true
+        });
+    });
+
+    publicacoes
+    .slice(-5)
+    .forEach(item => {
+
+        automaticas.push({
+            id: `publicacao-${item.id}`,
+            titulo: "Publicação registrada",
+            descricao: `${item.titulo || "Publicação"} - ${item.plataforma || "Plataforma não informada"}`,
+            tipo: "Publicação",
+            data: item.data || "",
+            automatica: true
+        });
+    });
+
+    producoes
+    .slice(-5)
+    .forEach(item => {
+
+        automaticas.push({
+            id: `producao-${item.id}`,
+            titulo: "Produção registrada",
+            descricao: `${item.titulo || "Produção"} - ${item.tipo || "Tipo não informado"}`,
+            tipo: "Produção",
+            data: item.data || "",
+            automatica: true
+        });
+    });
+
+    return automaticas;
 }
 
 function carregarNotificacoes() {
@@ -86,70 +163,14 @@ function carregarNotificacoes() {
     const notificacoesSalvas =
     buscarDados("notificacoes");
 
-    const eventos =
-    buscarDados("eventos");
+    const notificacoesAutomaticas =
+    montarNotificacoesAutomaticas();
 
-    const solicitacoes =
-    buscarDados("solicitacoes");
-
-    const publicacoes =
-    buscarDados("publicacoes");
-
-    const producoes =
-    buscarDados("producoes");
-
-    let notificacoes = [...notificacoesSalvas];
-
-    solicitacoes
-    .filter(item => item.status === "Pendente")
-    .forEach(item => {
-
-        notificacoes.push({
-            titulo: "Solicitação pendente",
-            descricao: item.titulo || "Nova solicitação aguardando atendimento",
-            tipo: "Solicitação",
-            data: item.data || ""
-        });
-    });
-
-    eventos
-    .slice(-5)
-    .forEach(item => {
-
-        notificacoes.push({
-            titulo: "Evento agendado",
-            descricao: `${item.titulo || "Evento"} - ${item.data || "sem data"}`,
-            tipo: "Agenda",
-            data: item.hora || ""
-        });
-    });
-
-    publicacoes
-    .slice(-5)
-    .forEach(item => {
-
-        notificacoes.push({
-            titulo: "Publicação registrada",
-            descricao: `${item.titulo || "Publicação"} - ${item.plataforma || "Plataforma não informada"}`,
-            tipo: "Publicação",
-            data: item.data || ""
-        });
-    });
-
-    producoes
-    .slice(-5)
-    .forEach(item => {
-
-        notificacoes.push({
-            titulo: "Produção registrada",
-            descricao: `${item.titulo || "Produção"} - ${item.tipo || "Tipo não informado"}`,
-            tipo: "Produção",
-            data: item.data || ""
-        });
-    });
-
-    const naoLidas =
-    notificacoes.filter(item => item.lida === false || item.lida === undefined);
+    const notificacoes =
+    [
+        ...notificacoesSalvas,
+        ...notificacoesAutomaticas
+    ];
 
     notificationCount.textContent =
     notificacoes.length;
@@ -162,25 +183,78 @@ function carregarNotificacoes() {
         return;
     }
 
-    notificationList.innerHTML = "";
+    notificationList.innerHTML = `
+        <div class="notification-actions">
+            <button onclick="limparNotificacoes()" class="clear-notifications-btn">
+                Limpar notificações
+            </button>
+        </div>
+    `;
 
     notificacoes
-    .slice(0, 8)
+    .slice(0, 10)
     .forEach(item => {
 
         notificationList.innerHTML += `
             <div class="notification-item">
 
-                <strong>${item.titulo}</strong>
+                <div>
 
-                <p>${item.descricao}</p>
+                    <strong>${item.titulo}</strong>
 
-                <small>${item.tipo || ""} ${item.data ? "• " + item.data : ""}</small>
+                    <p>${item.descricao}</p>
+
+                    <small>
+                        ${item.tipo || ""}
+                        ${item.data ? " • " + item.data : ""}
+                    </small>
+
+                </div>
+
+                ${
+                    item.automatica
+                    ? ""
+                    : `
+                    <button class="delete-notification-btn" onclick="excluirNotificacao(${item.id})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    `
+                }
 
             </div>
         `;
     });
 }
 
+function excluirNotificacao(id) {
+
+    let notificacoes =
+    buscarDados("notificacoes");
+
+    notificacoes =
+    notificacoes.filter(item => item.id !== id);
+
+    salvarDados("notificacoes", notificacoes);
+
+    carregarNotificacoes();
+}
+
+function limparNotificacoes() {
+
+    const confirmar =
+    confirm("Deseja limpar as notificações salvas?");
+
+    if (!confirmar) return;
+
+    localStorage.removeItem("notificacoes");
+
+    carregarNotificacoes();
+}
+
 window.criarNotificacao = criarNotificacao;
+
 window.carregarNotificacoes = carregarNotificacoes;
+
+window.excluirNotificacao = excluirNotificacao;
+
+window.limparNotificacoes = limparNotificacoes;

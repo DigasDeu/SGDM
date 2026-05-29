@@ -1,5 +1,5 @@
 const modal =
-document.getElementById("modalPublicacao");
+document.getElementById("modalProducao");
 
 const abrirModal =
 document.getElementById("abrirModal");
@@ -7,29 +7,29 @@ document.getElementById("abrirModal");
 const fecharModal =
 document.getElementById("fecharModal");
 
-const salvarPublicacao =
-document.getElementById("salvarPublicacao");
+const salvarProducao =
+document.getElementById("salvarProducao");
 
-const listaPublicacoes =
-document.getElementById("listaPublicacoes");
+const listaProducoes =
+document.getElementById("listaProducoes");
 
 const pesquisa =
-document.getElementById("pesquisaPublicacao");
+document.getElementById("pesquisaProducao");
 
 let filtroAtual = "Todos";
 
-function buscarPublicacoes() {
+function buscarProducoes() {
 
     return JSON.parse(
-        localStorage.getItem("publicacoes")
+        localStorage.getItem("producoes")
     ) || [];
 }
 
-function salvarPublicacoes(publicacoes) {
+function salvarProducoes(producoes) {
 
     localStorage.setItem(
-        "publicacoes",
-        JSON.stringify(publicacoes)
+        "producoes",
+        JSON.stringify(producoes)
     );
 }
 
@@ -51,16 +51,16 @@ function adicionarHistoricoExclusao(item, origem) {
     );
 }
 
-function adicionarNotificacaoPublicacao(publicacao) {
+function adicionarNotificacaoProducao(producao) {
 
     const notificacoes =
     JSON.parse(localStorage.getItem("notificacoes")) || [];
 
     notificacoes.unshift({
         id: Date.now(),
-        titulo: "Nova Publicação",
-        descricao: `${publicacao.titulo} • ${publicacao.plataforma}`,
-        tipo: "Publicação",
+        titulo: "Nova Produção",
+        descricao: `${producao.titulo} • ${producao.tipo}`,
+        tipo: "Produção",
         data: new Date().toLocaleString("pt-BR"),
         lida: false
     });
@@ -71,16 +71,16 @@ function adicionarNotificacaoPublicacao(publicacao) {
     );
 }
 
-function adicionarNotificacaoExclusao(publicacao) {
+function adicionarNotificacaoExclusao(producao) {
 
     const notificacoes =
     JSON.parse(localStorage.getItem("notificacoes")) || [];
 
     notificacoes.unshift({
         id: Date.now(),
-        titulo: "Publicação excluída",
-        descricao: `${publicacao.titulo} foi removida do sistema.`,
-        tipo: "Publicação",
+        titulo: "Produção excluída",
+        descricao: `${producao.titulo} foi removida do sistema.`,
+        tipo: "Produção",
         data: new Date().toLocaleString("pt-BR"),
         lida: false
     });
@@ -105,9 +105,9 @@ if (fecharModal) {
     };
 }
 
-if (salvarPublicacao) {
+if (salvarProducao) {
 
-    salvarPublicacao.onclick = () => {
+    salvarProducao.onclick = () => {
 
         const titulo =
         document.getElementById("titulo").value.trim();
@@ -115,14 +115,8 @@ if (salvarPublicacao) {
         const eventoRelacionado =
         document.getElementById("eventoRelacionado")?.value.trim() || "";
 
-        const descricao =
-        document.getElementById("descricao").value.trim();
-
         const tipo =
         document.getElementById("tipo").value;
-
-        const plataforma =
-        document.getElementById("plataforma").value;
 
         const data =
         document.getElementById("data").value;
@@ -130,95 +124,112 @@ if (salvarPublicacao) {
         const hora =
         document.getElementById("hora").value;
 
+        const local =
+        document.getElementById("local").value.trim();
+
         const responsavel =
         document.getElementById("responsavel")?.value.trim() || "Departamento de Mídia";
 
-        const linkPublicacao =
-        document.getElementById("linkPublicacao")?.value.trim() || "";
+        const quantidadeFotos =
+        document.getElementById("quantidadeFotos")?.value || 0;
+
+        const quantidadeVideos =
+        document.getElementById("quantidadeVideos")?.value || 0;
+
+        const quantidadeArtes =
+        document.getElementById("quantidadeArtes")?.value || 0;
 
         const status =
         document.getElementById("status").value;
 
+        const descricao =
+        document.getElementById("descricao").value.trim();
+
         if (!titulo) {
 
-            alert("Preencha o título da publicação.");
+            alert("Preencha o título da produção.");
 
             return;
         }
 
-        const publicacoes =
-        buscarPublicacoes();
+        const producoes =
+        buscarProducoes();
 
-        const novaPublicacao = {
+        const novaProducao = {
             id: Date.now(),
             titulo,
             eventoRelacionado,
-            descricao,
             tipo,
-            plataforma,
             data,
             hora,
+            local,
             responsavel,
-            linkPublicacao,
+            quantidadeFotos,
+            quantidadeVideos,
+            quantidadeArtes,
             status,
-            origem: "Publicações"
+            descricao,
+            origem: "Produções"
         };
 
-        publicacoes.push(novaPublicacao);
+        producoes.push(novaProducao);
 
-        salvarPublicacoes(publicacoes);
+        salvarProducoes(producoes);
 
-        adicionarNotificacaoPublicacao(novaPublicacao);
+        adicionarNotificacaoProducao(novaProducao);
 
-        carregarPublicacoes();
+        carregarProducoes();
 
         modal.style.display = "none";
 
-        limparFormularioPublicacao();
+        limparFormularioProducao();
     };
 }
 
-function excluirPublicacao(id) {
+function excluirProducao(id) {
 
     const confirmar =
-    confirm("Tem certeza que deseja excluir esta publicação?");
+    confirm("Tem certeza que deseja excluir esta produção?");
 
     if (!confirmar) return;
 
-    let publicacoes =
-    buscarPublicacoes();
+    let producoes =
+    buscarProducoes();
 
     const itemExcluido =
-    publicacoes.find(item => item.id === id);
+    producoes.find(item => item.id === id);
 
-    publicacoes =
-    publicacoes.filter(item => item.id !== id);
+    producoes =
+    producoes.filter(item => item.id !== id);
 
-    salvarPublicacoes(publicacoes);
+    salvarProducoes(producoes);
 
     if (itemExcluido) {
 
         adicionarHistoricoExclusao(
             itemExcluido,
-            "Publicações"
+            "Produções"
         );
 
         adicionarNotificacaoExclusao(itemExcluido);
     }
 
-    carregarPublicacoes();
+    carregarProducoes();
 }
 
-function limparFormularioPublicacao() {
+function limparFormularioProducao() {
 
     const campos = [
         "titulo",
         "eventoRelacionado",
-        "descricao",
         "data",
         "hora",
+        "local",
         "responsavel",
-        "linkPublicacao"
+        "quantidadeFotos",
+        "quantidadeVideos",
+        "quantidadeArtes",
+        "descricao"
     ];
 
     campos.forEach(id => {
@@ -232,27 +243,28 @@ function limparFormularioPublicacao() {
     });
 }
 
-function carregarPublicacoes() {
+function carregarProducoes() {
 
-    if (!listaPublicacoes) return;
+    if (!listaProducoes) return;
 
-    const publicacoes =
-    buscarPublicacoes();
+    const producoes =
+    buscarProducoes();
 
-    listaPublicacoes.innerHTML = "";
+    listaProducoes.innerHTML = "";
 
     const termo =
     pesquisa ? pesquisa.value.toLowerCase() : "";
 
     const filtradas =
-    publicacoes.filter(item => {
+    producoes.filter(item => {
 
         const textoBusca =
         `
         ${item.titulo || ""}
         ${item.eventoRelacionado || ""}
         ${item.tipo || ""}
-        ${item.plataforma || ""}
+        ${item.data || ""}
+        ${item.local || ""}
         ${item.responsavel || ""}
         ${item.status || ""}
         ${item.descricao || ""}
@@ -270,8 +282,8 @@ function carregarPublicacoes() {
 
     if (filtradas.length === 0) {
 
-        listaPublicacoes.innerHTML =
-        `<p>Nenhuma publicação encontrada.</p>`;
+        listaProducoes.innerHTML =
+        `<p>Nenhuma produção encontrada.</p>`;
 
         return;
     }
@@ -283,46 +295,46 @@ function carregarPublicacoes() {
 
         let statusClass = "";
 
-        if (item.status === "Agendado") {
-            statusClass = "agendado";
+        if (item.status === "Pendente") {
+            statusClass = "pendente";
         }
 
-        if (item.status === "Publicado") {
-            statusClass = "publicado";
+        if (item.status === "Andamento") {
+            statusClass = "andamento";
         }
 
-        if (item.status === "Rascunho") {
-            statusClass = "rascunho";
+        if (item.status === "Concluído") {
+            statusClass = "concluido";
         }
 
-        listaPublicacoes.innerHTML += `
-            <div class="publicacao-card">
+        listaProducoes.innerHTML += `
+            <div class="producao-card event-card">
 
                 <h3>${item.titulo}</h3>
 
-                <div class="publicacao-info">
+                <div class="producao-info">
 
-                    <p><strong>Evento/Produção:</strong> ${item.eventoRelacionado || "Não informado"}</p>
+                    <p><strong>Evento/Demanda:</strong> ${item.eventoRelacionado || "Não informado"}</p>
 
                     <p><strong>Tipo:</strong> ${item.tipo}</p>
-
-                    <p><strong>Plataforma:</strong> ${item.plataforma}</p>
 
                     <p><strong>Data:</strong> ${item.data || "Não informada"}</p>
 
                     <p><strong>Hora:</strong> ${item.hora || "Não informada"}</p>
 
+                    <p><strong>Local:</strong> ${item.local || "Não informado"}</p>
+
                     <p><strong>Responsável:</strong> ${item.responsavel}</p>
+
+                    <p><strong>Fotos:</strong> ${item.quantidadeFotos || 0}</p>
+
+                    <p><strong>Vídeos:</strong> ${item.quantidadeVideos || 0}</p>
+
+                    <p><strong>Artes/Carrosséis:</strong> ${item.quantidadeArtes || 0}</p>
 
                 </div>
 
                 <p>${item.descricao || "Sem descrição."}</p>
-
-                ${
-                    item.linkPublicacao
-                    ? `<p><a href="${item.linkPublicacao}" target="_blank">Ver publicação</a></p>`
-                    : ""
-                }
 
                 <span class="status ${statusClass}">
                     ${item.status}
@@ -330,7 +342,7 @@ function carregarPublicacoes() {
 
                 <div class="card-actions">
 
-                    <button class="delete-btn" onclick="excluirPublicacao(${item.id})">
+                    <button class="delete-btn" onclick="excluirProducao(${item.id})">
                         <i class="fas fa-trash"></i>
                         Excluir
                     </button>
@@ -346,7 +358,7 @@ if (pesquisa) {
 
     pesquisa.addEventListener(
         "input",
-        carregarPublicacoes
+        carregarProducoes
     );
 }
 
@@ -365,10 +377,10 @@ document
         filtroAtual =
         btn.dataset.status;
 
-        carregarPublicacoes();
+        carregarProducoes();
     });
 });
 
-window.excluirPublicacao = excluirPublicacao;
+window.excluirProducao = excluirProducao;
 
-carregarPublicacoes();
+carregarProducoes();

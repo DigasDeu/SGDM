@@ -9,17 +9,42 @@ function salvarEventos() {
     localStorage.setItem("eventos", JSON.stringify(eventos));
 }
 
-function adicionarNotificacao(titulo, descricao) {
+function adicionarHistoricoExclusao(item, origem) {
 
-    const notificacoes = JSON.parse(localStorage.getItem("notificacoes")) || [];
+    const historico =
+    JSON.parse(localStorage.getItem("historicoExclusoes")) || [];
 
-    notificacoes.unshift({
-        titulo,
-        descricao,
-        data: new Date().toLocaleString("pt-BR")
+    historico.unshift({
+        id: Date.now(),
+        origem,
+        item,
+        dataExclusao: new Date().toLocaleString("pt-BR")
     });
 
-    localStorage.setItem("notificacoes", JSON.stringify(notificacoes));
+    localStorage.setItem(
+        "historicoExclusoes",
+        JSON.stringify(historico)
+    );
+}
+
+function adicionarNotificacao(titulo, descricao) {
+
+    const notificacoes =
+    JSON.parse(localStorage.getItem("notificacoes")) || [];
+
+    notificacoes.unshift({
+        id: Date.now(),
+        titulo,
+        descricao,
+        tipo: "Agenda",
+        data: new Date().toLocaleString("pt-BR"),
+        lida: false
+    });
+
+    localStorage.setItem(
+        "notificacoes",
+        JSON.stringify(notificacoes)
+    );
 }
 
 function renderCalendar() {
@@ -32,13 +57,16 @@ function renderCalendar() {
     const firstDay = new Date(year, month, 1).getDay();
     const lastDate = new Date(year, month + 1, 0).getDate();
 
-    monthYear.textContent = currentDate.toLocaleDateString("pt-BR", {
+    monthYear.textContent =
+    currentDate.toLocaleDateString("pt-BR", {
         month: "long",
         year: "numeric"
     });
 
     for (let i = 0; i < firstDay; i++) {
+
         const empty = document.createElement("div");
+
         calendar.appendChild(empty);
     }
 
@@ -51,7 +79,8 @@ function renderCalendar() {
         const dataCompleta =
         `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
-        const possuiEvento = eventos.some(e => e.data === dataCompleta);
+        const possuiEvento =
+        eventos.some(evento => evento.data === dataCompleta);
 
         cell.innerHTML = `
             <div class="day-number">${day}</div>
@@ -68,12 +97,17 @@ function renderCalendar() {
 
 function mostrarEventos(data) {
 
-    const container = document.getElementById("eventosDia");
+    const container =
+    document.getElementById("eventosDia");
 
-    const lista = eventos.filter(e => e.data === data);
+    const lista =
+    eventos.filter(evento => evento.data === data);
 
     if (lista.length === 0) {
-        container.innerHTML = "<p>Nenhum evento nesta data.</p>";
+
+        container.innerHTML =
+        "<p>Nenhum evento nesta data.</p>";
+
         return;
     }
 
@@ -86,53 +120,129 @@ function mostrarEventos(data) {
 
                 <strong>${evento.titulo}</strong>
 
-                <p>${evento.hora}</p>
+                <p><strong>Horário:</strong> ${evento.hora || "Não informado"}</p>
 
-                <p>${evento.local}</p>
+                <p><strong>Local:</strong> ${evento.local || "Não informado"}</p>
 
-                <p>${evento.tipo}</p>
+                <p><strong>Tipo:</strong> ${evento.tipo || "Evento"}</p>
 
-                <p>${evento.responsavel || "Departamento de Mídia"}</p>
+                <p><strong>Responsável:</strong> ${evento.responsavel || "Departamento de Mídia"}</p>
+
+                <p>${evento.descricao || "Sem descrição."}</p>
+
+                <div class="card-actions">
+
+                    <button class="delete-btn" onclick="excluirEvento(${evento.id})">
+                        <i class="fas fa-trash"></i>
+                        Excluir
+                    </button>
+
+                </div>
 
             </div>
         `;
     });
 }
 
+function excluirEvento(id) {
+
+    const confirmar =
+    confirm("Tem certeza que deseja excluir este evento da agenda?");
+
+    if (!confirmar) return;
+
+    const itemExcluido =
+    eventos.find(evento => evento.id === id);
+
+    eventos =
+    eventos.filter(evento => evento.id !== id);
+
+    salvarEventos();
+
+    if (itemExcluido) {
+
+        adicionarHistoricoExclusao(
+            itemExcluido,
+            "Agenda"
+        );
+
+        adicionarNotificacao(
+            "Evento excluído",
+            `${itemExcluido.titulo} foi removido da agenda.`
+        );
+    }
+
+    renderCalendar();
+
+    const hoje =
+    new Date().toISOString().split("T")[0];
+
+    mostrarEventos(hoje);
+}
+
 document.getElementById("prevMonth").onclick = () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
+
+    currentDate.setMonth(
+        currentDate.getMonth() - 1
+    );
+
     renderCalendar();
 };
 
 document.getElementById("nextMonth").onclick = () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
+
+    currentDate.setMonth(
+        currentDate.getMonth() + 1
+    );
+
     renderCalendar();
 };
 
-const modal = document.getElementById("modalEvento");
+const modal =
+document.getElementById("modalEvento");
 
 document.getElementById("novoEventoBtn").onclick = () => {
+
     modal.style.display = "flex";
 };
 
 document.getElementById("cancelar").onclick = () => {
+
     modal.style.display = "none";
 };
 
-document.getElementById("eventoForm").addEventListener("submit", function (e) {
+document
+.getElementById("eventoForm")
+.addEventListener("submit", function (event) {
 
-    e.preventDefault();
+    event.preventDefault();
 
     const novoEvento = {
         id: Date.now(),
-        titulo: document.getElementById("titulo").value,
-        tipo: document.getElementById("tipo").value,
-        data: document.getElementById("data").value,
-        hora: document.getElementById("hora").value,
-        local: document.getElementById("local").value,
-        responsavel: document.getElementById("responsavel")?.value || "Departamento de Mídia",
-        descricao: document.getElementById("descricao").value,
-        origem: "Agenda"
+
+        titulo:
+        document.getElementById("titulo").value,
+
+        tipo:
+        document.getElementById("tipo").value,
+
+        data:
+        document.getElementById("data").value,
+
+        hora:
+        document.getElementById("hora").value,
+
+        local:
+        document.getElementById("local").value,
+
+        responsavel:
+        document.getElementById("responsavel")?.value || "Departamento de Mídia",
+
+        descricao:
+        document.getElementById("descricao").value,
+
+        origem:
+        "Agenda"
     };
 
     eventos.push(novoEvento);
@@ -141,7 +251,7 @@ document.getElementById("eventoForm").addEventListener("submit", function (e) {
 
     adicionarNotificacao(
         "Novo evento agendado",
-        `${novoEvento.titulo} em ${novoEvento.local} no dia ${novoEvento.data} às ${novoEvento.hora}`
+        `${novoEvento.titulo} em ${novoEvento.local}, no dia ${novoEvento.data} às ${novoEvento.hora}.`
     );
 
     renderCalendar();
@@ -152,5 +262,7 @@ document.getElementById("eventoForm").addEventListener("submit", function (e) {
 
     this.reset();
 });
+
+window.excluirEvento = excluirEvento;
 
 renderCalendar();

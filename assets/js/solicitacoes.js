@@ -33,6 +33,24 @@ function salvarSolicitacoes(solicitacoes) {
     );
 }
 
+function adicionarHistoricoExclusao(item, origem) {
+
+    const historico =
+    JSON.parse(localStorage.getItem("historicoExclusoes")) || [];
+
+    historico.unshift({
+        id: Date.now(),
+        origem,
+        item,
+        dataExclusao: new Date().toLocaleString("pt-BR")
+    });
+
+    localStorage.setItem(
+        "historicoExclusoes",
+        JSON.stringify(historico)
+    );
+}
+
 function adicionarNotificacaoSolicitacao(solicitacao) {
 
     const notificacoes =
@@ -42,6 +60,26 @@ function adicionarNotificacaoSolicitacao(solicitacao) {
         id: Date.now(),
         titulo: "Nova Solicitação",
         descricao: `${solicitacao.titulo} • ${solicitacao.data || "Sem data"} • ${solicitacao.local || "Local não informado"}`,
+        tipo: "Solicitação",
+        data: new Date().toLocaleString("pt-BR"),
+        lida: false
+    });
+
+    localStorage.setItem(
+        "notificacoes",
+        JSON.stringify(notificacoes)
+    );
+}
+
+function adicionarNotificacaoExclusao(solicitacao) {
+
+    const notificacoes =
+    JSON.parse(localStorage.getItem("notificacoes")) || [];
+
+    notificacoes.unshift({
+        id: Date.now(),
+        titulo: "Solicitação excluída",
+        descricao: `${solicitacao.titulo} foi removida do sistema.`,
         tipo: "Solicitação",
         data: new Date().toLocaleString("pt-BR"),
         lida: false
@@ -136,6 +174,37 @@ if (salvarSolicitacao) {
 
         limparFormularioSolicitacao();
     };
+}
+
+function excluirSolicitacao(id) {
+
+    const confirmar =
+    confirm("Tem certeza que deseja excluir esta solicitação?");
+
+    if (!confirmar) return;
+
+    let solicitacoes =
+    buscarSolicitacoes();
+
+    const itemExcluido =
+    solicitacoes.find(item => item.id === id);
+
+    solicitacoes =
+    solicitacoes.filter(item => item.id !== id);
+
+    salvarSolicitacoes(solicitacoes);
+
+    if (itemExcluido) {
+
+        adicionarHistoricoExclusao(
+            itemExcluido,
+            "Solicitações"
+        );
+
+        adicionarNotificacaoExclusao(itemExcluido);
+    }
+
+    carregarSolicitacoes();
 }
 
 function limparFormularioSolicitacao() {
@@ -250,6 +319,15 @@ function carregarSolicitacoes() {
                     ${item.status}
                 </span>
 
+                <div class="card-actions">
+
+                    <button class="delete-btn" onclick="excluirSolicitacao(${item.id})">
+                        <i class="fas fa-trash"></i>
+                        Excluir
+                    </button>
+
+                </div>
+
             </div>
         `;
     });
@@ -281,5 +359,7 @@ document
         carregarSolicitacoes();
     });
 });
+
+window.excluirSolicitacao = excluirSolicitacao;
 
 carregarSolicitacoes();
