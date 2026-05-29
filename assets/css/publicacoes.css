@@ -1,192 +1,297 @@
-.page-content{
+/* ==========================================
+   PUBLICAÇÕES - SGDM
+========================================== */
 
+.pub-page{
+    min-height:100vh;
+    background:#f5f7fb;
+    padding:25px;
+    padding-bottom:110px;
+}
+
+.page-content{
     padding:20px;
 }
 
+/* TOPO */
+
 .publicacoes-top{
-
     display:flex;
-
-    gap:10px;
-
+    gap:12px;
     margin-bottom:20px;
 }
 
 .publicacoes-top input{
-
     flex:1;
-
     padding:14px;
-
-    border:none;
-
+    border:1px solid #d1d5db;
     border-radius:12px;
+    outline:none;
 }
 
+.publicacoes-top input:focus{
+    border-color:#003b8f;
+}
+
+/* BOTÃO PRINCIPAL */
+
+.pub-primary-btn,
 .primary-btn{
-
-    background:#16a34a;
-
+    background:#003b8f;
     color:white;
-
     border:none;
-
     padding:14px 20px;
-
     border-radius:12px;
-
     cursor:pointer;
+    font-weight:700;
 }
 
+.pub-primary-btn:hover,
+.primary-btn:hover{
+    background:#002b68;
+}
+
+/* FILTROS */
+
+.pub-filtros,
 .filtros{
-
     display:flex;
-
     gap:10px;
-
     margin-bottom:20px;
-
     overflow:auto;
 }
 
+.pub-filter-btn,
 .filtro-btn{
-
     padding:10px 16px;
-
-    border:none;
-
-    border-radius:10px;
-
+    border:1px solid #d1d5db;
+    border-radius:12px;
     cursor:pointer;
-
-    background:#e5e7eb;
+    background:white;
+    color:#334155;
+    font-weight:700;
+    white-space:nowrap;
 }
 
+.pub-filter-btn.active,
 .filtro-btn.active{
-
-    background:#16a34a;
-
+    background:#003b8f;
     color:white;
+    border-color:#003b8f;
 }
+
+/* CARD */
 
 .publicacao-card{
-
     background:white;
-
     border-radius:18px;
-
-    padding:18px;
-
+    padding:20px;
     margin-bottom:16px;
-
-    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    border:1px solid #e5e7eb;
+    box-shadow:0 6px 18px rgba(15,23,42,.08);
 }
 
 .publicacao-card h3{
-
     margin:0 0 10px;
+    color:#0f172a;
+    font-size:20px;
 }
 
 .publicacao-info{
-
     font-size:14px;
-
-    color:#555;
-
-    margin-bottom:10px;
+    color:#475569;
+    margin-bottom:12px;
+    display:grid;
+    gap:4px;
 }
 
+.publicacao-card p{
+    color:#334155;
+    line-height:1.5;
+}
+
+.publicacao-card a{
+    color:#003b8f;
+    font-weight:700;
+    text-decoration:none;
+}
+
+.publicacao-card a:hover{
+    text-decoration:underline;
+}
+
+/* STATUS */
+
+.pub-status,
 .status{
-
     display:inline-block;
-
-    padding:6px 12px;
-
-    border-radius:10px;
-
-    font-size:13px;
-
+    padding:7px 13px;
+    border-radius:999px;
+    font-size:12px;
     color:white;
+    font-weight:800;
+    margin-top:10px;
 }
 
 .agendado{
-
     background:#2563eb;
 }
 
 .publicado{
-
     background:#16a34a;
 }
 
 .rascunho{
-
     background:#6b7280;
 }
 
+/* MODAL */
+
+.pub-modal,
 .modal{
-
     position:fixed;
-
-    top:0;
-
-    left:0;
-
+    inset:0;
     width:100%;
-
     height:100%;
-
-    background:rgba(0,0,0,0.5);
-
+    background:rgba(15,23,42,.55);
     display:none;
-
     align-items:center;
-
     justify-content:center;
-
-    z-index:999;
+    z-index:9999;
+    padding:20px;
 }
 
+.pub-modal-content,
 .modal-content{
-
     background:white;
-
     width:90%;
-
-    max-width:450px;
-
+    max-width:520px;
+    max-height:88vh;
+    overflow-y:auto;
     padding:24px;
-
-    border-radius:20px;
+    border-radius:22px;
+    box-shadow:0 20px 40px rgba(0,0,0,.2);
 }
 
+.pub-modal-content h2,
+.modal-content h2{
+    margin:0 0 18px;
+    color:#0f172a;
+}
+
+/* FORM */
+
+.pub-modal-content input,
+.pub-modal-content textarea,
+.pub-modal-content select,
 .modal-content input,
 .modal-content textarea,
 .modal-content select{
-
     width:100%;
-
     margin-bottom:14px;
-
     padding:14px;
-
-    border:1px solid #ddd;
-
+    border:1px solid #d1d5db;
     border-radius:12px;
-
     box-sizing:border-box;
+    outline:none;
 }
 
+.pub-modal-content input:focus,
+.pub-modal-content textarea:focus,
+.pub-modal-content select:focus,
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus{
+    border-color:#003b8f;
+    box-shadow:0 0 0 3px rgba(0,59,143,.08);
+}
+
+.pub-modal-content textarea,
 .modal-content textarea{
-
-    height:120px;
-
+    min-height:120px;
     resize:none;
 }
 
+/* AÇÕES */
+
+.pub-modal-actions,
 .modal-actions{
-
     display:flex;
-
     gap:10px;
+    justify-content:flex-end;
+}
+
+.pub-modal-actions button,
+.modal-actions button{
+    border:none;
+    padding:12px 18px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:700;
+}
+
+.pub-modal-actions button:first-child,
+.modal-actions button:first-child{
+    background:#003b8f;
+    color:white;
+}
+
+.pub-modal-actions button:last-child,
+.modal-actions button:last-child{
+    background:#e5e7eb;
+    color:#334155;
+}
+
+.card-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:14px;
+}
+
+.delete-btn{
+    background:#dc2626;
+    color:white;
+    border:none;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:768px){
+
+    .pub-page,
+    .page-content{
+        padding:18px;
+        padding-bottom:110px;
+    }
+
+    .publicacoes-top{
+        flex-direction:column;
+    }
+
+    .pub-primary-btn,
+    .primary-btn{
+        width:100%;
+    }
+
+    .pub-modal-content,
+    .modal-content{
+        width:100%;
+        padding:18px;
+        border-radius:18px;
+    }
+
+    .pub-modal-actions,
+    .modal-actions{
+        flex-direction:column;
+    }
+
+    .pub-modal-actions button,
+    .modal-actions button{
+        width:100%;
+    }
 }

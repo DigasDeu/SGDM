@@ -1,29 +1,208 @@
-.notification-actions{
-    padding: 10px;
-    border-bottom: 1px solid #e5e7eb;
+/* ==========================================
+   NOTIFICAÇÕES - SGDM
+========================================== */
+
+.notification-wrapper{
+    position:relative;
 }
 
-.clear-notifications-btn{
-    width: 100%;
-    background: #0d47a1;
-    color: white;
-    border: none;
-    padding: 8px;
-    border-radius: 8px;
-    cursor: pointer;
+/* BOTÃO */
+
+.notification-btn{
+    position:relative;
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:12px;
+    background:white;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 4px 12px rgba(15,23,42,.08);
+    transition:.2s;
+}
+
+.notification-btn:hover{
+    background:#f8fafc;
+}
+
+.notification-btn i{
+    color:#003b8f;
+    font-size:18px;
+}
+
+/* CONTADOR */
+
+.notification-count{
+    position:absolute;
+    top:-6px;
+    right:-6px;
+    min-width:20px;
+    height:20px;
+    border-radius:50%;
+    background:#dc2626;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    font-weight:800;
+    padding:0 5px;
+}
+
+/* DROPDOWN */
+
+.notification-dropdown{
+    position:absolute;
+    top:55px;
+    right:0;
+    width:360px;
+    max-height:500px;
+    overflow-y:auto;
+    background:white;
+    border-radius:20px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+    display:none;
+    z-index:9999;
+}
+
+.notification-dropdown.active{
+    display:block;
+}
+
+/* HEADER */
+
+.notification-header{
+    padding:18px;
+    border-bottom:1px solid #e5e7eb;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.notification-header h3{
+    margin:0;
+    font-size:18px;
+    color:#0f172a;
+    font-weight:800;
+}
+
+.notification-header button{
+    border:none;
+    background:none;
+    color:#003b8f;
+    cursor:pointer;
+    font-weight:700;
+}
+
+/* LISTA */
+
+.notification-list{
+    padding:10px;
 }
 
 .notification-item{
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    align-items: flex-start;
+    padding:14px;
+    border-radius:14px;
+    margin-bottom:10px;
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    cursor:pointer;
+    transition:.2s;
 }
 
-.delete-notification-btn{
-    background: transparent;
-    border: none;
-    color: #dc2626;
-    cursor: pointer;
-    font-size: 16px;
+.notification-item:hover{
+    background:#eef4ff;
+}
+
+.notification-item.unread{
+    border-left:5px solid #003b8f;
+}
+
+.notification-item h4{
+    margin:0 0 6px;
+    color:#0f172a;
+    font-size:14px;
+    font-weight:800;
+}
+
+.notification-item p{
+    margin:0;
+    color:#475569;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.notification-item small{
+    display:block;
+    margin-top:8px;
+    color:#94a3b8;
+    font-size:12px;
+}
+
+/* TIPOS */
+
+.notification-item.solicitacao{
+    border-left:5px solid #2563eb;
+}
+
+.notification-item.agenda{
+    border-left:5px solid #16a34a;
+}
+
+.notification-item.producao{
+    border-left:5px solid #ea580c;
+}
+
+.notification-item.publicacao{
+    border-left:5px solid #9333ea;
+}
+
+.notification-item.relatorio{
+    border-left:5px solid #0891b2;
+}
+
+/* VAZIO */
+
+.notification-empty{
+    padding:30px;
+    text-align:center;
+    color:#64748b;
+}
+
+.notification-empty i{
+    font-size:32px;
+    margin-bottom:10px;
+    color:#cbd5e1;
+}
+
+/* FOOTER */
+
+.notification-footer{
+    padding:15px;
+    border-top:1px solid #e5e7eb;
+    text-align:center;
+}
+
+.notification-footer button{
+    border:none;
+    background:#003b8f;
+    color:white;
+    padding:10px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:768px){
+
+    .notification-dropdown{
+        width:calc(100vw - 30px);
+        right:-10px;
+        max-height:70vh;
+    }
 }

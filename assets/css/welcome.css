@@ -1,89 +1,88 @@
-*{
+/* ==========================================
+   WELCOME - SGDM
+========================================== */
 
+*{
     margin:0;
     padding:0;
     box-sizing:border-box;
-
-    font-family:Arial;
 }
 
 body{
-
+    min-height:100vh;
+    font-family:'Segoe UI', Arial, sans-serif;
     background:
     linear-gradient(
-    135deg,
-    #003b8e,
-    #0059d6
+        135deg,
+        #002b68,
+        #003b8f,
+        #0059d6
     );
-
-    height:100vh;
-
     display:flex;
-
-    justify-content:center;
-
     align-items:center;
-
+    justify-content:center;
     color:white;
+    padding:20px;
 }
 
 .welcome-container{
-
+    width:100%;
+    max-width:430px;
     text-align:center;
-
-    width:90%;
-
-    max-width:400px;
 }
 
-.logo-area img{
-
-    width:180px;
-
+.welcome-container .logo-area img{
+    width:170px;
     margin-bottom:30px;
 }
 
 .text-area h1{
-
-    font-size:32px;
-
-    margin-bottom:10px;
+    font-size:34px;
+    font-weight:800;
+    margin-bottom:8px;
 }
 
 .text-area h2{
-
-    font-size:28px;
-
-    margin-bottom:20px;
+    font-size:26px;
+    font-weight:700;
+    margin-bottom:18px;
 }
 
 .text-area p{
-
-    opacity:0.9;
-
-    margin-bottom:40px;
+    opacity:.9;
+    line-height:1.6;
+    margin-bottom:38px;
 }
 
 .enter-btn{
-
     display:block;
-
+    width:100%;
     background:white;
-
-    color:#003b8e;
-
+    color:#003b8f;
     padding:16px;
-
     border-radius:14px;
-
     text-decoration:none;
-
-    font-weight:bold;
-
-    transition:0.3s;
+    font-weight:800;
+    transition:.25s;
+    box-shadow:0 12px 30px rgba(0,0,0,.18);
 }
 
 .enter-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 16px 35px rgba(0,0,0,.22);
+}
 
-    transform:scale(1.03);
+@media(max-width:480px){
+
+    .welcome-container .logo-area img{
+        width:140px;
+    }
+
+    .text-area h1{
+        font-size:28px;
+    }
+
+    .text-area h2{
+        font-size:22px;
+    }
 }

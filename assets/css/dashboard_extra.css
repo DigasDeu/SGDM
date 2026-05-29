@@ -1,117 +1,147 @@
-.quick-actions{
+/* ==========================================
+   DASHBOARD EXTRA - SGDM
+========================================== */
 
+/* AÇÕES RÁPIDAS */
+
+.quick-actions{
     margin:20px;
 }
 
 .quick-actions h2{
-
     margin-bottom:15px;
+    color:#0f172a;
+    font-size:22px;
+    font-weight:800;
 }
 
 .actions-grid{
-
     display:grid;
-
-    grid-template-columns:
-    repeat(auto-fit,minmax(150px,1fr));
-
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
     gap:15px;
 }
 
 .action-btn{
-
     background:white;
-
-    border-radius:18px;
-
-    padding:20px;
-
+    border:1px solid #e5e7eb;
+    border-radius:20px;
+    padding:22px;
     text-decoration:none;
-
     color:#1e293b;
-
     display:flex;
-
     flex-direction:column;
-
     align-items:center;
-
-    gap:10px;
-
-    box-shadow:
-    0 4px 10px rgba(0,0,0,.08);
-
-    transition:.3s;
+    justify-content:center;
+    gap:12px;
+    box-shadow:0 8px 24px rgba(15,23,42,.08);
+    transition:.25s;
+    min-height:145px;
 }
 
 .action-btn:hover{
-
     transform:translateY(-5px);
+    box-shadow:0 14px 30px rgba(15,23,42,.12);
 }
 
 .action-btn i{
-
-    font-size:28px;
-
+    font-size:30px;
     color:#003b8f;
 }
 
-.dashboard-section{
-
-    background:white;
-
-    margin:20px;
-
-    padding:20px;
-
-    border-radius:20px;
-
-    box-shadow:
-    0 4px 12px rgba(0,0,0,.08);
+.action-btn span,
+.action-btn strong{
+    font-weight:800;
+    color:#0f172a;
+    text-align:center;
 }
 
+/* SEÇÕES DO DASHBOARD */
+
+.dashboard-section{
+    background:white;
+    margin:20px;
+    padding:22px;
+    border-radius:22px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 8px 24px rgba(15,23,42,.08);
+}
+
+.dashboard-section h2,
+.dashboard-section h3{
+    color:#0f172a;
+    margin-bottom:15px;
+    font-weight:800;
+}
+
+/* ITENS */
+
 .event-item{
-
     background:#f8fafc;
-
-    padding:15px;
-
-    border-radius:12px;
-
+    padding:16px;
+    border-radius:14px;
     margin-bottom:12px;
-
-    border-left:4px solid #003b8f;
+    border:1px solid #e5e7eb;
+    border-left:5px solid #003b8f;
 }
 
 .event-item strong{
-
     display:block;
-
-    margin-bottom:5px;
+    margin-bottom:6px;
+    color:#0f172a;
 }
+
+.event-item p{
+    color:#475569;
+    margin:4px 0;
+}
+
+/* LINKS */
+
 .card-link,
 .card-link:visited,
 .card-link:hover,
-.card-link:active {
-    text-decoration: none;
-    color: inherit;
-}
-
-.card-link * {
-    text-decoration: none;
-}
-
+.card-link:active,
 .action-btn,
 .action-btn:visited,
 .action-btn:hover,
-.action-btn:active {
-    text-decoration: none;
-    color: inherit;
+.action-btn:active{
+    text-decoration:none;
+    color:inherit;
+}
+
+.card-link *{
+    text-decoration:none;
 }
 
 .bottom-nav a,
 .bottom-nav a:visited,
 .bottom-nav a:hover,
-.bottom-nav a:active {
-    text-decoration: none;
+.bottom-nav a:active{
+    text-decoration:none;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:768px){
+
+    .quick-actions,
+    .dashboard-section{
+        margin:16px;
+    }
+
+    .actions-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .action-btn{
+        padding:18px;
+        min-height:130px;
+    }
+}
+
+@media(max-width:420px){
+
+    .actions-grid{
+        grid-template-columns:1fr;
+    }
 }

@@ -1,156 +1,171 @@
+/* ==========================================
+   SIDEBAR - SGDM
+========================================== */
+
 .sidebar{
-
     position:fixed;
-
     top:0;
-
-    left:-320px;
-
-    width:300px;
-
-    height:100%;
-
-    background:white;
-
-    z-index:9999;
-
-    transition:.3s ease;
-
-    box-shadow:
-    5px 0 20px rgba(0,0,0,.15);
-
-    overflow-y:auto;
-}
-
-.sidebar.active{
-
     left:0;
-}
+    width:270px;
+    height:100vh;
 
-.sidebar-header{
-
-    background:
-    linear-gradient(
-    135deg,
-    #003b8f,
-    #0056d6
+    background:linear-gradient(
+        180deg,
+        #003b8f,
+        #002b68
     );
 
     color:white;
 
-    padding:35px 20px;
+    display:flex;
+    flex-direction:column;
 
+    z-index:1000;
+
+    transition:.3s ease;
+
+    overflow-y:auto;
+}
+
+/* FECHADA */
+
+.sidebar.collapsed{
+    width:80px;
+}
+
+/* HEADER */
+
+.sidebar-header{
+    padding:24px 18px;
     text-align:center;
+    border-bottom:1px solid rgba(255,255,255,.1);
 }
 
-.sidebar-header img{
-
-    width:90px;
-
-    height:90px;
-
+.user-photo{
+    width:80px;
+    height:80px;
     border-radius:50%;
-
     object-fit:cover;
-
-    border:4px solid white;
-
-    margin-bottom:15px;
+    border:3px solid rgba(255,255,255,.2);
+    margin-bottom:12px;
 }
 
-.sidebar-header h3{
-
-    margin-bottom:5px;
-
-    font-size:22px;
+.user-name{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:4px;
 }
 
-.sidebar-header p{
-
-    opacity:.9;
-
-    font-size:14px;
+.user-email{
+    font-size:13px;
+    opacity:.8;
+    word-break:break-word;
 }
+
+/* MENU */
 
 .sidebar-menu{
-
-    padding:20px;
+    display:flex;
+    flex-direction:column;
+    padding:12px;
+    gap:4px;
 }
 
 .sidebar-menu a{
-
     display:flex;
-
     align-items:center;
+    gap:12px;
 
-    gap:15px;
-
-    padding:16px;
-
-    margin-bottom:10px;
-
-    border-radius:14px;
-
+    color:white;
     text-decoration:none;
 
-    color:#1e293b;
+    padding:14px;
+    border-radius:12px;
 
-    font-weight:500;
-
-    transition:.3s;
+    transition:.2s;
 }
 
 .sidebar-menu a:hover{
-
-    background:#f1f5f9;
-
-    transform:translateX(5px);
+    background:rgba(255,255,255,.12);
 }
 
-.sidebar-menu i{
-
-    width:22px;
-
-    font-size:18px;
-
+.sidebar-menu a.active{
+    background:white;
     color:#003b8f;
+    font-weight:700;
 }
+
+.sidebar-menu a i{
+    width:20px;
+    text-align:center;
+    font-size:18px;
+}
+
+/* COLAPSADA */
+
+.sidebar.collapsed .user-name,
+.sidebar.collapsed .user-email,
+.sidebar.collapsed .sidebar-menu span{
+    display:none;
+}
+
+.sidebar.collapsed .user-photo{
+    width:50px;
+    height:50px;
+}
+
+.sidebar.collapsed .sidebar-menu a{
+    justify-content:center;
+}
+
+/* OVERLAY */
 
 .overlay{
-
     position:fixed;
-
-    top:0;
-
-    left:0;
-
-    width:100%;
-
-    height:100%;
-
-    background:
-    rgba(0,0,0,.45);
-
-    z-index:999;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    z-index:998;
 
     opacity:0;
-
     visibility:hidden;
 
-    transition:.3s;
+    transition:.2s;
 }
 
 .overlay.active{
-
     opacity:1;
-
     visibility:visible;
 }
+
+/* ÁREA PRINCIPAL */
+
+.main-content{
+    margin-left:270px;
+    transition:.3s ease;
+}
+
+.sidebar.collapsed ~ .main-content{
+    margin-left:80px;
+}
+
+/* MOBILE */
 
 @media(max-width:768px){
 
     .sidebar{
+        left:-100%;
+        width:280px;
+    }
 
+    .sidebar.active{
+        left:0;
+    }
+
+    .main-content{
+        margin-left:0;
+    }
+
+    .sidebar.collapsed{
         width:280px;
     }
 }

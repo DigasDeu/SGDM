@@ -1,207 +1,276 @@
-.relatorios-container {
-    margin-left: 260px;
-    padding: 100px 30px 90px;
-    min-height: 100vh;
-    background: #f4f7fb;
+/* ==========================================
+   RELATÓRIOS - SGDM
+========================================== */
+
+.relatorios-container{
+    min-height:100vh;
+    background:#f5f7fb;
+    padding:28px;
+    padding-bottom:110px;
 }
 
-.relatorios-header {
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-    margin-bottom: 25px;
+/* HEADER */
+
+.relatorios-header{
+    background:#ffffff;
+    padding:25px;
+    border-radius:22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 8px 24px rgba(15,23,42,.08);
+    margin-bottom:25px;
 }
 
-.relatorios-header h2 {
-    margin: 0 0 8px;
-    color: #1f2937;
-    font-size: 24px;
+.relatorios-header h2{
+    margin:0 0 8px;
+    color:#0f172a;
+    font-size:26px;
+    font-weight:800;
 }
 
-.relatorios-header p {
-    margin: 0;
-    color: #6b7280;
-    font-size: 15px;
+.relatorios-header p{
+    margin:0;
+    color:#64748b;
+    font-size:15px;
 }
 
-.primary-btn {
-    border: none;
-    background: #2563eb;
-    color: #ffffff;
-    padding: 12px 18px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
+/* BOTÃO */
+
+.rel-primary-btn,
+.primary-btn{
+    border:none;
+    background:#003b8f;
+    color:#ffffff;
+    padding:14px 20px;
+    border-radius:12px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s;
 }
 
-.primary-btn:hover {
-    background: #1d4ed8;
+.rel-primary-btn:hover,
+.primary-btn:hover{
+    background:#002b68;
 }
 
-.resumo-relatorios {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 25px;
+/* CARDS DE RESUMO */
+
+.resumo-relatorios{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:25px;
 }
 
-.resumo-card {
-    background: #ffffff;
-    padding: 24px 20px;
-    border-radius: 18px;
-    text-align: center;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+.resumo-card{
+    background:#ffffff;
+    padding:24px 20px;
+    border-radius:20px;
+    text-align:center;
+    border:1px solid #e5e7eb;
+    box-shadow:0 8px 24px rgba(15,23,42,.08);
 }
 
-.resumo-card strong {
-    display: block;
-    font-size: 34px;
-    color: #2563eb;
-    margin-bottom: 6px;
+.resumo-card strong{
+    display:block;
+    font-size:36px;
+    color:#003b8f;
+    margin-bottom:6px;
+    font-weight:800;
 }
 
-.resumo-card span {
-    color: #374151;
-    font-weight: 600;
-    font-size: 15px;
+.resumo-card span{
+    color:#334155;
+    font-weight:700;
+    font-size:15px;
 }
 
-.relatorio-filtros {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 18px;
-    display: flex;
-    gap: 15px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+/* FILTROS */
+
+.relatorio-filtros{
+    background:#ffffff;
+    padding:20px;
+    border-radius:20px;
+    display:flex;
+    gap:15px;
+    margin-bottom:25px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 8px 24px rgba(15,23,42,.08);
 }
 
 .relatorio-filtros input,
-.relatorio-filtros select {
-    border: 1px solid #d1d5db;
-    border-radius: 10px;
-    padding: 13px 14px;
-    font-size: 14px;
-    outline: none;
-    background: #ffffff;
+.relatorio-filtros select{
+    border:1px solid #d1d5db;
+    border-radius:12px;
+    padding:14px;
+    font-size:14px;
+    outline:none;
+    background:#ffffff;
 }
 
-.relatorio-filtros input {
-    flex: 1;
+.relatorio-filtros input{
+    flex:1;
 }
 
-.relatorio-filtros select {
-    width: 220px;
+.relatorio-filtros select{
+    width:220px;
 }
 
 .relatorio-filtros input:focus,
-.relatorio-filtros select:focus {
-    border-color: #2563eb;
+.relatorio-filtros select:focus{
+    border-color:#003b8f;
+    box-shadow:0 0 0 3px rgba(0,59,143,.08);
 }
 
-.lista-relatorios {
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 18px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+/* LISTA */
+
+.lista-relatorios{
+    background:#ffffff;
+    padding:25px;
+    border-radius:22px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 8px 24px rgba(15,23,42,.08);
 }
 
-.lista-relatorios h3 {
-    margin: 0 0 20px;
-    color: #1f2937;
-    font-size: 20px;
+.lista-relatorios h3{
+    margin:0 0 20px;
+    color:#0f172a;
+    font-size:22px;
+    font-weight:800;
 }
 
-#listaRelatorios {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+#listaRelatorios{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
 }
 
-#listaRelatorios > p {
-    margin: 0;
-    color: #6b7280;
+#listaRelatorios > p{
+    margin:0;
+    color:#64748b;
 }
 
-.relatorio-item {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-left: 5px solid #2563eb;
-    border-radius: 14px;
-    padding: 18px;
+/* ITEM */
+
+.relatorio-card,
+.relatorio-item{
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-left:5px solid #003b8f;
+    border-radius:16px;
+    padding:18px;
 }
 
-.relatorio-item h4 {
-    margin: 0 0 8px;
-    color: #111827;
-    font-size: 17px;
+.relatorio-card h3,
+.relatorio-item h4{
+    margin:0 0 8px;
+    color:#111827;
+    font-size:18px;
+    font-weight:800;
 }
 
-.relatorio-item p {
-    margin: 5px 0;
-    color: #4b5563;
-    font-size: 14px;
+.relatorio-card p,
+.relatorio-item p{
+    margin:5px 0;
+    color:#4b5563;
+    font-size:14px;
 }
 
-.relatorio-tipo {
-    display: inline-block;
-    margin-top: 10px;
-    background: #dbeafe;
-    color: #1d4ed8;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
+.relatorio-tipo{
+    display:inline-block;
+    margin-top:10px;
+    background:#dbeafe;
+    color:#003b8f;
+    padding:7px 13px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:800;
 }
 
-@media (max-width: 900px) {
-    .relatorios-container {
-        margin-left: 0;
-        padding: 90px 18px 90px;
+/* AÇÕES */
+
+.card-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:14px;
+}
+
+.restore-btn{
+    background:#003b8f;
+    color:white;
+    border:none;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+}
+
+.delete-btn{
+    background:#dc2626;
+    color:white;
+    border:none;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+}
+
+.restore-btn:hover,
+.delete-btn:hover{
+    opacity:.9;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:900px){
+
+    .relatorios-container{
+        padding:90px 18px 110px;
     }
 
-    .relatorios-header {
-        flex-direction: column;
-        align-items: flex-start;
+    .relatorios-header{
+        flex-direction:column;
+        align-items:flex-start;
     }
 
-    .primary-btn {
-        width: 100%;
+    .rel-primary-btn,
+    .primary-btn{
+        width:100%;
     }
 
-    .resumo-relatorios {
-        grid-template-columns: repeat(2, 1fr);
+    .resumo-relatorios{
+        grid-template-columns:repeat(2,1fr);
     }
 
-    .relatorio-filtros {
-        flex-direction: column;
+    .relatorio-filtros{
+        flex-direction:column;
     }
 
-    .relatorio-filtros select {
-        width: 100%;
+    .relatorio-filtros select{
+        width:100%;
     }
 }
 
-@media (max-width: 480px) {
-    .relatorios-container {
-        padding: 85px 14px 85px;
+@media(max-width:480px){
+
+    .relatorios-container{
+        padding:85px 14px 110px;
     }
 
-    .resumo-relatorios {
-        grid-template-columns: 1fr;
+    .resumo-relatorios{
+        grid-template-columns:1fr;
     }
 
-    .relatorios-header h2 {
-        font-size: 21px;
+    .relatorios-header h2{
+        font-size:22px;
     }
 
-    .lista-relatorios {
-        padding: 20px;
+    .lista-relatorios{
+        padding:20px;
     }
 }

@@ -1,97 +1,287 @@
-body{
+/* ==========================================
+   CONFIGURAÇÕES - SGDM
+========================================== */
 
-    margin:0;
-    padding:20px;
-
+.config-page{
+    min-height:100vh;
     background:#f5f7fb;
-
-    font-family:'Segoe UI',sans-serif;
+    padding:25px;
+    padding-bottom:100px;
 }
 
-.config-container{
+/* ==========================================
+   HEADER
+========================================== */
 
-    max-width:900px;
-
-    margin:auto;
-}
-
-.page-header{
-
+.config-header{
     margin-bottom:25px;
 }
 
-.page-header h1{
-
+.config-header h1{
+    margin:0;
     color:#003b8f;
+    font-size:32px;
+    font-weight:800;
 }
 
+.config-header p{
+    margin-top:8px;
+    color:#64748b;
+    font-size:15px;
+}
+
+/* ==========================================
+   CONTAINER
+========================================== */
+
+.config-container{
+    max-width:1100px;
+    margin:auto;
+}
+
+/* ==========================================
+   CARDS
+========================================== */
+
 .config-card{
-
     background:white;
-
-    border-radius:20px;
-
-    padding:20px;
-
+    border-radius:22px;
+    padding:24px;
     margin-bottom:20px;
-
+    border:1px solid #e5e7eb;
     box-shadow:
-    0 3px 15px rgba(0,0,0,.08);
+    0 8px 24px rgba(15,23,42,.08);
 }
 
 .config-card h2{
+    color:#003b8f;
+    font-size:22px;
+    margin:0 0 20px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
 
-    margin-bottom:15px;
-
+.config-card h2 i{
     color:#003b8f;
 }
 
-input{
+/* ==========================================
+   FORMULÁRIOS
+========================================== */
 
-    width:100%;
-
-    padding:12px;
-
-    margin-bottom:10px;
-
-    border:1px solid #ddd;
-
-    border-radius:10px;
+.config-form-group{
+    margin-bottom:16px;
 }
 
-button{
+.config-form-group label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:600;
+    color:#334155;
+}
 
+.config-card input,
+.config-card select,
+.config-card textarea{
+    width:100%;
+    padding:14px;
+    border:1px solid #d1d5db;
+    border-radius:12px;
+    outline:none;
+    background:white;
+    transition:.2s;
+}
+
+.config-card textarea{
+    min-height:100px;
+    resize:vertical;
+}
+
+.config-card input:focus,
+.config-card select:focus,
+.config-card textarea:focus{
+    border-color:#003b8f;
+    box-shadow:
+    0 0 0 3px rgba(0,59,143,.08);
+}
+
+/* ==========================================
+   BOTÕES
+========================================== */
+
+.config-btn{
     background:#003b8f;
-
     color:white;
-
     border:none;
+    padding:14px 20px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:700;
+    transition:.2s;
+}
 
-    padding:12px 20px;
+.config-btn:hover{
+    background:#002b68;
+}
 
-    border-radius:10px;
+.config-btn-danger{
+    background:#dc2626;
+}
 
+.config-btn-danger:hover{
+    background:#b91c1c;
+}
+
+.config-btn-success{
+    background:#16a34a;
+}
+
+.config-btn-success:hover{
+    background:#15803d;
+}
+
+/* ==========================================
+   CONFIGURAÇÕES EM LINHA
+========================================== */
+
+.setting-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    padding:15px 0;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.setting-item:last-child{
+    border-bottom:none;
+}
+
+.setting-info h4{
+    margin:0;
+    color:#0f172a;
+    font-size:16px;
+}
+
+.setting-info p{
+    margin-top:4px;
+    color:#64748b;
+    font-size:14px;
+}
+
+/* ==========================================
+   SWITCH
+========================================== */
+
+.switch{
+    position:relative;
+    display:inline-block;
+    width:52px;
+    height:28px;
+}
+
+.switch input{
+    opacity:0;
+    width:0;
+    height:0;
+}
+
+.slider{
+    position:absolute;
+    inset:0;
+    background:#cbd5e1;
+    border-radius:999px;
+    transition:.3s;
     cursor:pointer;
 }
 
-.setting-item{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    padding:10px 0;
+.slider:before{
+    content:"";
+    position:absolute;
+    width:22px;
+    height:22px;
+    left:3px;
+    bottom:3px;
+    background:white;
+    border-radius:50%;
+    transition:.3s;
 }
+
+.switch input:checked + .slider{
+    background:#003b8f;
+}
+
+.switch input:checked + .slider:before{
+    transform:translateX(24px);
+}
+
+/* ==========================================
+   GRID
+========================================== */
+
+.config-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+}
+
+/* ==========================================
+   ALERTAS
+========================================== */
+
+.config-alert{
+    padding:14px;
+    border-radius:12px;
+    margin-bottom:15px;
+    font-size:14px;
+}
+
+.config-alert.success{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.config-alert.warning{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.config-alert.danger{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+/* ==========================================
+   RESPONSIVO
+========================================== */
 
 @media(max-width:768px){
 
-    body{
-        padding:15px;
+    .config-page{
+        padding:18px;
+        padding-bottom:100px;
+    }
+
+    .config-grid{
+        grid-template-columns:1fr;
     }
 
     .config-card{
-        border-radius:15px;
+        padding:18px;
+        border-radius:18px;
+    }
+
+    .config-header h1{
+        font-size:28px;
+    }
+
+    .setting-item{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .config-btn{
+        width:100%;
     }
 }

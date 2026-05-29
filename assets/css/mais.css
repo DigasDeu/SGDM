@@ -1,87 +1,136 @@
-body{
-    margin:0;
-    font-family:'Segoe UI',sans-serif;
+/* ==========================================
+   MAIS - CENTRAL DO SISTEMA SGDM
+========================================== */
+
+.mais-container{
+    min-height:100vh;
     background:#f5f7fb;
+    padding:28px;
+    padding-bottom:110px;
 }
 
-.container{
-    padding:20px;
-}
+/* HEADER DA PÁGINA */
 
-.page-header{
+.mais-container .page-header{
     margin-bottom:25px;
 }
 
-.page-header h1{
-    color:#003b8f;
-    margin-bottom:5px;
+.mais-container .page-header h2,
+.mais-container .page-header h1{
+    color:#0f172a;
+    margin:0 0 6px;
+    font-size:30px;
+    font-weight:800;
 }
 
-.page-header p{
-    color:#6b7280;
+.mais-container .page-header p{
+    color:#64748b;
+    margin:0;
+    font-size:15px;
 }
+
+/* GRID */
 
 .menu-grid{
-
     display:grid;
-
-    grid-template-columns:
-    repeat(auto-fit,minmax(140px,1fr));
-
-    gap:15px;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:18px;
 }
 
+/* CARD */
+
 .menu-card{
-
     background:white;
-
-    border-radius:20px;
-
-    padding:25px 15px;
-
+    border:1px solid #e5e7eb;
+    border-radius:22px;
+    padding:26px 18px;
     text-decoration:none;
-
     color:#1f2937;
-
     text-align:center;
-
-    box-shadow:
-    0 4px 15px rgba(0,0,0,.08);
-
-    transition:.3s;
+    box-shadow:0 8px 24px rgba(15,23,42,.08);
+    transition:.25s;
+    min-height:170px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
 }
 
 .menu-card:hover{
-
     transform:translateY(-5px);
+    box-shadow:0 14px 30px rgba(15,23,42,.12);
 }
 
 .menu-card i{
-
-    font-size:34px;
-
+    font-size:36px;
     color:#003b8f;
-
-    margin-bottom:12px;
-
-    display:block;
+    margin-bottom:14px;
 }
 
 .menu-card span{
-
-    font-size:14px;
-    font-weight:600;
+    font-size:16px;
+    font-weight:800;
+    margin-bottom:8px;
 }
 
-.danger i{
+.menu-card small{
+    color:#64748b;
+    font-size:13px;
+    line-height:1.4;
+}
+
+/* CARD DE SAIR */
+
+.menu-card.danger i{
     color:#dc2626;
 }
 
-@media(max-width:600px){
+.menu-card.danger:hover{
+    border-color:#fecaca;
+    background:#fff5f5;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:768px){
+
+    .mais-container{
+        padding:18px;
+        padding-bottom:110px;
+    }
+
+    .mais-container .page-header h2,
+    .mais-container .page-header h1{
+        font-size:26px;
+    }
 
     .menu-grid{
+        grid-template-columns:repeat(2,1fr);
+        gap:14px;
+    }
 
-        grid-template-columns:
-        repeat(2,1fr);
+    .menu-card{
+        padding:22px 14px;
+        min-height:155px;
+        border-radius:18px;
+    }
+
+    .menu-card i{
+        font-size:30px;
+    }
+
+    .menu-card span{
+        font-size:14px;
+    }
+
+    .menu-card small{
+        font-size:12px;
+    }
+}
+
+@media(max-width:420px){
+
+    .menu-grid{
+        grid-template-columns:1fr;
     }
 }

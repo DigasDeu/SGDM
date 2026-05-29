@@ -1,11 +1,22 @@
+/* ==========================================
+   RESPONSIVE - SGDM
+   Ajustes globais responsivos
+========================================== */
+
 /* TABLETS */
 
 @media(max-width:992px){
 
     .dashboard{
+        grid-template-columns:repeat(2,1fr);
+    }
 
-        grid-template-columns:
-        repeat(2,1fr);
+    .actions-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .resumo-relatorios{
+        grid-template-columns:repeat(2,1fr);
     }
 }
 
@@ -13,40 +24,72 @@
 
 @media(max-width:768px){
 
-    .top-header{
+    body{
+        max-width:none;
+        margin:0;
+    }
 
+    .top-header{
         padding:20px;
+        min-height:130px;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .logo-area h1{
+        font-size:20px;
     }
 
     .dashboard{
+        grid-template-columns:1fr;
+        padding:10px 15px 110px;
+    }
 
-        grid-template-columns:
-        1fr;
+    .events{
+        padding:0 15px 110px;
+    }
+
+    .card{
+        padding:18px;
+    }
+
+    .icon{
+        width:60px;
+        height:60px;
+        font-size:28px;
+        margin-right:14px;
+    }
+
+    .content span{
+        font-size:1.7rem;
     }
 
     .actions-grid{
-
-        grid-template-columns:
-        repeat(2,1fr);
-    }
-
-    .bottom-nav{
-
-        padding:10px;
-    }
-
-    .bottom-nav span{
-
-        font-size:12px;
+        grid-template-columns:repeat(2,1fr);
     }
 
     .section-header{
-
         flex-direction:column;
-
         align-items:flex-start;
-
         gap:10px;
+    }
+
+    .bottom-nav{
+        padding:10px 0;
+    }
+
+    .bottom-nav span{
+        font-size:12px;
+    }
+
+    .bottom-nav i{
+        font-size:19px;
+    }
+
+    .notification-dropdown{
+        right:10px;
+        left:10px;
+        width:auto;
     }
 }
 
@@ -54,29 +97,53 @@
 
 @media(max-width:480px){
 
-    .logo-area h1{
+    .top-header{
+        border-bottom-left-radius:24px;
+        border-bottom-right-radius:24px;
+    }
 
-        font-size:20px;
+    .logo-area{
+        gap:10px;
+    }
+
+    .logo-area img{
+        width:48px;
+        height:48px;
+    }
+
+    .logo-area h1{
+        font-size:18px;
+    }
+
+    .welcome{
+        padding:20px 15px 8px;
     }
 
     .welcome h2{
-
-        font-size:28px;
+        font-size:24px;
     }
 
     .card{
-
-        padding:20px;
+        border-radius:20px;
     }
 
     .actions-grid{
-
-        grid-template-columns:
-        1fr;
+        grid-template-columns:1fr;
     }
 
     .sidebar{
-
         width:260px;
+    }
+
+    .bottom-nav a{
+        font-size:11px;
+    }
+
+    .bottom-nav span{
+        font-size:11px;
+    }
+
+    .bottom-nav i{
+        font-size:18px;
     }
 }
