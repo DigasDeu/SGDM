@@ -13,8 +13,6 @@
 <link rel="stylesheet" href="../assets/css/solicitacoes.css">
 <link rel="stylesheet" href="../assets/css/responsive.css">
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
 </head>
@@ -45,7 +43,7 @@
             Agenda
         </a>
 
-        <a href="solicitacoes.html">
+        <a href="solicitacoes.html" class="active">
             <i class="fas fa-file-lines"></i>
             Solicitações
         </a>
@@ -81,163 +79,188 @@
 
 <div class="overlay" id="overlay"></div>
 
-<header class="top-header">
+<main class="sol-page">
 
-    <div class="menu-btn">
-        <i class="fas fa-bars"></i>
-    </div>
+    <header class="sol-header">
 
-    <div class="logo-area">
-        <h1>Solicitações</h1>
-    </div>
+        <div class="menu-btn">
+            <i class="fas fa-bars"></i>
+        </div>
 
-</header>
+        <div>
+            <h1>Solicitações</h1>
+            <p>Gerencie e acompanhe as solicitações de cobertura de mídia.</p>
+        </div>
 
-<section class="page-content">
-
-    <div class="solicitacoes-top">
-
-        <input
-        type="text"
-        id="pesquisaSolicitacao"
-        placeholder="Pesquisar por título, solicitante, setor ou local...">
-
-        <button class="primary-btn" id="abrirModal">
+        <button class="primary-btn" id="toggleFormBtn">
+            <i class="fas fa-plus"></i>
             Nova Solicitação
         </button>
 
-    </div>
+    </header>
 
-    <div class="filtros">
+    <section class="form-card" id="formCard">
 
-        <button class="filtro-btn active" data-status="Todos">Todos</button>
+        <div class="form-card-title">
 
-        <button class="filtro-btn" data-status="Pendente">Pendentes</button>
+            <div class="form-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
 
-        <button class="filtro-btn" data-status="Andamento">Andamento</button>
+            <div>
+                <h2>Nova Solicitação</h2>
+                <p>Registre uma nova solicitação de cobertura.</p>
+            </div>
 
-        <button class="filtro-btn" data-status="Concluído">Concluídos</button>
-
-    </div>
-
-    <div id="listaSolicitacoes"></div>
-
-</section>
-
-<div class="modal" id="modalSolicitacao">
-
-    <div class="modal-content">
-
-        <h2>Nova Solicitação</h2>
+        </div>
 
         <form id="formSolicitacao">
 
-            <input type="text" id="titulo" placeholder="Título da solicitação" required>
+            <div class="form-grid">
 
-            <input type="text" id="solicitante" placeholder="Nome do solicitante" required>
+                <input type="text" id="titulo" placeholder="Título da solicitação *" required>
 
-            <input type="text" id="setor" placeholder="Setor / Departamento" required>
+                <input type="text" id="solicitante" placeholder="Nome do solicitante *" required>
 
-            <input type="tel" id="contato" placeholder="Contato do responsável pela demanda">
+                <input type="text" id="setor" placeholder="Setor / Departamento">
 
-            <input type="date" id="data" required>
+                <input type="tel" id="contato" placeholder="Contato do responsável">
 
-            <input type="time" id="hora" required>
+                <input type="date" id="data" required>
 
-            <div class="localizacao-area">
+                <input type="time" id="hora" required>
 
-                <label for="local">Localização da ação *</label>
+            </div>
 
-                <input
-                type="text"
-                id="local"
-                placeholder="Digite ou marque o local no mapa"
-                required>
+            <div class="location-row">
 
-                <button type="button" id="buscarEndereco" class="map-btn">
+                <input type="text" id="local" placeholder="Local da ação *" required>
+
+                <button type="button" class="map-btn" id="buscarEndereco">
+                    <i class="fas fa-location-dot"></i>
                     Buscar no mapa
                 </button>
 
-                <button type="button" id="usarLocalizacao" class="map-btn secondary">
-                    Usar minha localização atual
+                <button type="button" class="map-btn green" id="usarLocalizacao">
+                    <i class="fas fa-crosshairs"></i>
+                    Minha localização
                 </button>
 
-                <div id="mapaSolicitacao" class="mapa-solicitacao"></div>
-
-                <input type="hidden" id="latitude">
-                <input type="hidden" id="longitude">
-
-                <small>
-                    Clique no mapa para marcar o local exato da solicitação.
-                </small>
-
             </div>
 
-            <div class="equipe-area">
+            <div class="form-grid small">
 
-                <strong>Equipe da Cobertura</strong>
+                <select id="prioridade">
+                    <option value="Média">Prioridade média</option>
+                    <option value="Baixa">Baixa</option>
+                    <option value="Alta">Alta</option>
+                    <option value="Urgente">Urgente</option>
+                </select>
 
-                <label>
-                    <input type="checkbox" name="equipeCobertura" value="Diego">
-                    Diego
-                </label>
+                <select id="status">
+                    <option>Pendente</option>
+                    <option>Andamento</option>
+                    <option>Concluído</option>
+                </select>
 
-                <label>
-                    <input type="checkbox" name="equipeCobertura" value="Alicia">
-                    Alicia
-                </label>
-
-                <label>
-                    <input type="checkbox" name="equipeCobertura" value="Clarissa">
-                    Clarissa
-                </label>
-
-                <label>
-                    <input type="checkbox" name="equipeCobertura" value="Kelson">
-                    Kelson
-                </label>
+                <input type="text" id="responsavel" placeholder="Responsável pela cobertura">
 
             </div>
-
-            <select id="prioridade" required>
-                <option value="">Selecione a prioridade</option>
-                <option>Baixa</option>
-                <option>Média</option>
-                <option>Alta</option>
-                <option>Urgente</option>
-            </select>
-
-            <select id="status" required>
-                <option>Pendente</option>
-                <option>Andamento</option>
-                <option>Concluído</option>
-            </select>
 
             <textarea id="descricao" placeholder="Descrição da solicitação"></textarea>
 
-            <input
-            type="file"
-            id="anexos"
-            multiple
-            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+            <div class="form-actions">
 
-            <div class="modal-actions">
-
-                <button type="submit" id="salvarSolicitacao">
-                    Salvar
+                <button type="submit" class="save-btn">
+                    <i class="fas fa-save"></i>
+                    Salvar Solicitação
                 </button>
 
-                <button type="button" id="fecharModal">
-                    Cancelar
+                <button type="reset" class="cancel-btn">
+                    Limpar
                 </button>
 
             </div>
 
         </form>
 
-    </div>
+    </section>
 
-</div>
+    <section class="list-card">
+
+        <div class="toolbar">
+
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="pesquisaSolicitacao" placeholder="Pesquisar por título, solicitante, local...">
+            </div>
+
+            <div class="filtros">
+
+                <button class="filtro-btn active" data-status="Todos">
+                    Todos
+                </button>
+
+                <button class="filtro-btn" data-status="Pendente">
+                    Pendentes
+                </button>
+
+                <button class="filtro-btn" data-status="Andamento">
+                    Andamento
+                </button>
+
+                <button class="filtro-btn" data-status="Concluído">
+                    Concluídos
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="table-header">
+
+            <h2>
+                <i class="fas fa-clipboard-list"></i>
+                Solicitações registradas
+            </h2>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="sol-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Título</th>
+                        <th>Solicitante</th>
+                        <th>Data/Hora</th>
+                        <th>Local</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="listaSolicitacoes">
+
+                    <tr>
+                        <td colspan="7" class="empty-table">
+                            Nenhuma solicitação encontrada.
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
 
 <nav class="bottom-nav">
 
@@ -267,8 +290,6 @@
     </a>
 
 </nav>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script src="../assets/js/sidebar.js"></script>
 <script src="../assets/js/solicitacoes.js"></script>
