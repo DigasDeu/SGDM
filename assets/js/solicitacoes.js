@@ -11,14 +11,6 @@ let mapaSolicitacao = null;
 let marcadorSolicitacao = null;
 let geocoder = null;
 
-function buscarSolicitacoes() {
-    return JSON.parse(localStorage.getItem("solicitacoes")) || [];
-}
-
-function salvarSolicitacoes(solicitacoes) {
-    localStorage.setItem("solicitacoes", JSON.stringify(solicitacoes));
-}
-
 function buscarLista(chave) {
     return JSON.parse(localStorage.getItem(chave)) || [];
 }
@@ -27,7 +19,16 @@ function salvarLista(chave, lista) {
     localStorage.setItem(chave, JSON.stringify(lista));
 }
 
+function buscarSolicitacoes() {
+    return buscarLista("solicitacoes");
+}
+
+function salvarSolicitacoes(solicitacoes) {
+    salvarLista("solicitacoes", solicitacoes);
+}
+
 function adicionarNotificacao(titulo, descricao, tipo = "Solicitação") {
+
     const notificacoes = buscarLista("notificacoes");
 
     notificacoes.unshift({
@@ -43,6 +44,7 @@ function adicionarNotificacao(titulo, descricao, tipo = "Solicitação") {
 }
 
 function adicionarHistoricoExclusao(item, origem) {
+
     const historico = buscarLista("historicoExclusoes");
 
     historico.unshift({
@@ -55,12 +57,66 @@ function adicionarHistoricoExclusao(item, origem) {
     salvarLista("historicoExclusoes", historico);
 }
 
+/* MODAL */
+
+function abrirModalSolicitacao() {
+
+    if (!modal) return;
+
+    modal.classList.add("active");
+
+    setTimeout(() => {
+
+        if (typeof google !== "undefined" && mapaSolicitacao) {
+            google.maps.event.trigger(mapaSolicitacao, "resize");
+        }
+
+    }, 300);
+}
+
+function fecharModalSolicitacao() {
+
+    if (!modal) return;
+
+    modal.classList.remove("active");
+}
+
+if (abrirModal) {
+
+    abrirModal.addEventListener("click", () => {
+        abrirModalSolicitacao();
+    });
+}
+
+if (fecharModal) {
+
+    fecharModal.addEventListener("click", () => {
+        fecharModalSolicitacao();
+    });
+}
+
+if (modal) {
+
+    modal.addEventListener("click", (event) => {
+
+        if (event.target === modal) {
+            fecharModalSolicitacao();
+        }
+    });
+}
+
 /* GOOGLE MAPS */
 
 function iniciarMapaSolicitacao() {
+
     const mapaElemento = document.getElementById("mapaSolicitacao");
 
-    if (!mapaElemento || !window.google) return;
+    if (!mapaElemento) return;
+
+    if (typeof google === "undefined") {
+        console.log("Google Maps ainda não carregou.");
+        return;
+    }
 
     const maues = {
         lat: -3.3836,
@@ -86,34 +142,46 @@ function iniciarMapaSolicitacao() {
     preencherCoordenadas(maues.lat, maues.lng);
 
     mapaSolicitacao.addListener("click", (event) => {
+
         const lat = event.latLng.lat();
         const lng = event.latLng.lng();
 
         marcadorSolicitacao.setPosition(event.latLng);
+
         preencherCoordenadas(lat, lng);
+
         buscarEnderecoPorCoordenadas(lat, lng);
     });
 
     marcadorSolicitacao.addListener("dragend", () => {
+
         const posicao = marcadorSolicitacao.getPosition();
 
         const lat = posicao.lat();
         const lng = posicao.lng();
 
         preencherCoordenadas(lat, lng);
+
         buscarEnderecoPorCoordenadas(lat, lng);
     });
 }
 
 function preencherCoordenadas(lat, lng) {
+
     const latitude = document.getElementById("latitude");
     const longitude = document.getElementById("longitude");
 
-    if (latitude) latitude.value = lat;
-    if (longitude) longitude.value = lng;
+    if (latitude) {
+        latitude.value = lat;
+    }
+
+    if (longitude) {
+        longitude.value = lng;
+    }
 }
 
 function buscarEnderecoPorCoordenadas(lat, lng) {
+
     if (!geocoder) return;
 
     geocoder.geocode(
@@ -124,16 +192,26 @@ function buscarEnderecoPorCoordenadas(lat, lng) {
             }
         },
         (results, status) => {
+
             if (status === "OK" && results[0]) {
-                document.getElementById("local").value =
-                results[0].formatted_address;
+
+                const local = document.getElementById("local");
+
+                if (local) {
+                    local.value = results[0].formatted_address;
+                }
             }
         }
     );
 }
 
 function buscarLocalNoMapa() {
-    const endereco = document.getElementById("local").value.trim();
+
+    const local = document.getElementById("local");
+
+    if (!local) return;
+
+    const endereco = local.value.trim();
 
     if (!endereco) {
         alert("Digite o local para buscar no mapa.");
@@ -150,7 +228,9 @@ function buscarLocalNoMapa() {
             address: `${endereco}, Maués, Amazonas, Brasil`
         },
         (results, status) => {
+
             if (status === "OK" && results[0]) {
+
                 const posicao = results[0].geometry.location;
 
                 mapaSolicitacao.setCenter(posicao);
@@ -158,11 +238,14 @@ function buscarLocalNoMapa() {
 
                 marcadorSolicitacao.setPosition(posicao);
 
-                preencherCoordenadas(posicao.lat(), posicao.lng());
+                preencherCoordenadas(
+                    posicao.lat(),
+                    posicao.lng()
+                );
 
-                document.getElementById("local").value =
-                results[0].formatted_address;
-            } else {
+                local.value = results[0].formatted_address;
+            }
+            else {
                 alert("Local não encontrado. Tente escrever de outra forma.");
             }
         }
@@ -170,13 +253,20 @@ function buscarLocalNoMapa() {
 }
 
 function usarMinhaLocalizacao() {
+
     if (!navigator.geolocation) {
         alert("Seu navegador não permite acessar localização.");
         return;
     }
 
+    if (!mapaSolicitacao || !marcadorSolicitacao) {
+        alert("Mapa ainda não carregou.");
+        return;
+    }
+
     navigator.geolocation.getCurrentPosition(
         (posicao) => {
+
             const lat = posicao.coords.latitude;
             const lng = posicao.coords.longitude;
 
@@ -191,40 +281,13 @@ function usarMinhaLocalizacao() {
             marcadorSolicitacao.setPosition(localAtual);
 
             preencherCoordenadas(lat, lng);
+
             buscarEnderecoPorCoordenadas(lat, lng);
         },
         () => {
             alert("Não foi possível obter sua localização.");
         }
     );
-}
-
-/* MODAL */
-
-if (abrirModal) {
-    abrirModal.addEventListener("click", () => {
-        modal.classList.add("active");
-
-        setTimeout(() => {
-            if (mapaSolicitacao) {
-                google.maps.event.trigger(mapaSolicitacao, "resize");
-            }
-        }, 300);
-    });
-}
-
-if (fecharModal) {
-    fecharModal.addEventListener("click", () => {
-        modal.classList.remove("active");
-    });
-}
-
-if (modal) {
-    modal.addEventListener("click", (event) => {
-        if (event.target === modal) {
-            modal.classList.remove("active");
-        }
-    });
 }
 
 const buscarEnderecoBtn = document.getElementById("buscarEndereco");
@@ -238,10 +301,12 @@ if (usarLocalizacaoBtn) {
     usarLocalizacaoBtn.addEventListener("click", usarMinhaLocalizacao);
 }
 
-/* FORM */
+/* FORMULÁRIO */
 
 if (formSolicitacao) {
+
     formSolicitacao.addEventListener("submit", (event) => {
+
         event.preventDefault();
 
         const titulo = document.getElementById("titulo").value.trim();
@@ -257,7 +322,15 @@ if (formSolicitacao) {
 
         let descricao = document.getElementById("descricao").value.trim();
 
-        if (!titulo || !solicitante || !data || !hora || !local || !latitude || !longitude) {
+        if (
+            !titulo ||
+            !solicitante ||
+            !data ||
+            !hora ||
+            !local ||
+            !latitude ||
+            !longitude
+        ) {
             alert("Preencha os campos obrigatórios e marque a localização no mapa.");
             return;
         }
@@ -300,24 +373,33 @@ if (formSolicitacao) {
 
         formSolicitacao.reset();
 
-        modal.classList.remove("active");
+        const latitudeInput = document.getElementById("latitude");
+        const longitudeInput = document.getElementById("longitude");
+
+        if (latitudeInput) latitudeInput.value = "";
+        if (longitudeInput) longitudeInput.value = "";
+
+        fecharModalSolicitacao();
     });
 }
 
 /* GERAR EVENTO NA AGENDA */
 
 function gerarEventoAgenda(id) {
+
     const solicitacoes = buscarSolicitacoes();
     const eventos = buscarLista("eventos");
 
-    const solicitacao = solicitacoes.find(item => item.id === id);
+    const solicitacao =
+    solicitacoes.find(item => item.id === id);
 
     if (!solicitacao) {
         alert("Solicitação não encontrada.");
         return;
     }
 
-    const jaExiste = eventos.some(evento => evento.solicitacaoId === id);
+    const jaExiste =
+    eventos.some(evento => evento.solicitacaoId === id);
 
     if (jaExiste) {
         alert("Essa solicitação já foi enviada para a agenda.");
@@ -357,6 +439,7 @@ function gerarEventoAgenda(id) {
 /* EXCLUIR */
 
 function excluirSolicitacao(id) {
+
     const confirmar =
     confirm("Tem certeza que deseja excluir esta solicitação?");
 
@@ -373,7 +456,11 @@ function excluirSolicitacao(id) {
     salvarSolicitacoes(solicitacoes);
 
     if (itemExcluido) {
-        adicionarHistoricoExclusao(itemExcluido, "Solicitações");
+
+        adicionarHistoricoExclusao(
+            itemExcluido,
+            "Solicitações"
+        );
 
         adicionarNotificacao(
             "Solicitação excluída",
@@ -388,12 +475,17 @@ function excluirSolicitacao(id) {
 /* LISTAGEM */
 
 function carregarSolicitacoes() {
+
     if (!listaSolicitacoes) return;
 
     const solicitacoes = buscarSolicitacoes();
-    const termo = pesquisa ? pesquisa.value.toLowerCase() : "";
 
-    const filtradas = solicitacoes.filter(item => {
+    const termo =
+    pesquisa ? pesquisa.value.toLowerCase() : "";
+
+    const filtradas =
+    solicitacoes.filter(item => {
+
         const texto = `
             ${item.titulo || ""}
             ${item.solicitante || ""}
@@ -406,7 +498,8 @@ function carregarSolicitacoes() {
             ${item.descricao || ""}
         `.toLowerCase();
 
-        const matchPesquisa = texto.includes(termo);
+        const matchPesquisa =
+        texto.includes(termo);
 
         const matchFiltro =
         filtroAtual === "Todos" ||
@@ -416,6 +509,7 @@ function carregarSolicitacoes() {
     });
 
     if (filtradas.length === 0) {
+
         listaSolicitacoes.innerHTML = `
             <tr>
                 <td colspan="6" class="empty-table">
@@ -423,6 +517,7 @@ function carregarSolicitacoes() {
                 </td>
             </tr>
         `;
+
         return;
     }
 
@@ -447,6 +542,7 @@ function carregarSolicitacoes() {
 
         listaSolicitacoes.innerHTML += `
             <tr>
+
                 <td>
                     ${item.titulo}
                     <span class="sol-subtext">
@@ -501,17 +597,25 @@ function carregarSolicitacoes() {
 
                     </div>
                 </td>
+
             </tr>
         `;
     });
 }
 
+/* FILTROS */
+
 if (pesquisa) {
+
     pesquisa.addEventListener("input", carregarSolicitacoes);
 }
 
-document.querySelectorAll(".filtro-btn").forEach(btn => {
+document
+.querySelectorAll(".filtro-btn")
+.forEach(btn => {
+
     btn.addEventListener("click", () => {
+
         document
         .querySelectorAll(".filtro-btn")
         .forEach(b => b.classList.remove("active"));
@@ -524,8 +628,12 @@ document.querySelectorAll(".filtro-btn").forEach(btn => {
     });
 });
 
+/* FUNÇÕES GLOBAIS */
+
 window.iniciarMapaSolicitacao = iniciarMapaSolicitacao;
 window.gerarEventoAgenda = gerarEventoAgenda;
 window.excluirSolicitacao = excluirSolicitacao;
 
-carregarSolicitacoes();
+document.addEventListener("DOMContentLoaded", () => {
+    carregarSolicitacoes();
+});

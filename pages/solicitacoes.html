@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -13,6 +14,7 @@
 <link rel="stylesheet" href="../assets/css/responsive.css">
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -20,20 +22,57 @@
 <aside class="sidebar" id="sidebar">
 
     <div class="sidebar-header">
+
         <img src="../assets/img/user.png" alt="Usuário" class="user-photo" id="fotoUsuario">
+
         <h3 class="user-name" id="nomeUsuario">Usuário</h3>
+
         <p class="user-email" id="emailUsuario">email@usuario.com</p>
+
     </div>
 
     <nav class="sidebar-menu">
-        <a href="../dashboard.html"><i class="fas fa-house"></i>Dashboard</a>
-        <a href="agenda.html"><i class="fas fa-calendar"></i>Agenda</a>
-        <a href="solicitacoes.html" class="active"><i class="fas fa-file-lines"></i>Solicitações</a>
-        <a href="publicacoes.html"><i class="fas fa-bullhorn"></i>Publicações</a>
-        <a href="producoes.html"><i class="fas fa-video"></i>Produções</a>
-        <a href="relatorio.html"><i class="fas fa-chart-line"></i>Relatórios</a>
-        <a href="configs.html"><i class="fas fa-gear"></i>Configurações</a>
-        <a href="#" onclick="logout()"><i class="fas fa-right-from-bracket"></i>Sair</a>
+
+        <a href="../dashboard.html">
+            <i class="fas fa-house"></i>
+            Dashboard
+        </a>
+
+        <a href="agenda.html">
+            <i class="fas fa-calendar"></i>
+            Agenda
+        </a>
+
+        <a href="solicitacoes.html" class="active">
+            <i class="fas fa-file-lines"></i>
+            Solicitações
+        </a>
+
+        <a href="publicacoes.html">
+            <i class="fas fa-bullhorn"></i>
+            Publicações
+        </a>
+
+        <a href="producoes.html">
+            <i class="fas fa-video"></i>
+            Produções
+        </a>
+
+        <a href="relatorio.html">
+            <i class="fas fa-chart-line"></i>
+            Relatórios
+        </a>
+
+        <a href="configs.html">
+            <i class="fas fa-gear"></i>
+            Configurações
+        </a>
+
+        <a href="#" onclick="logout()">
+            <i class="fas fa-right-from-bracket"></i>
+            Sair
+        </a>
+
     </nav>
 
 </aside>
@@ -53,7 +92,7 @@
             <p>Gerencie e acompanhe as solicitações de cobertura de mídia.</p>
         </div>
 
-        <button class="primary-btn" id="abrirModal">
+        <button type="button" class="primary-btn" id="abrirModal">
             <i class="fas fa-plus"></i>
             Nova Solicitação
         </button>
@@ -70,19 +109,34 @@
             </div>
 
             <div class="filtros">
-                <button class="filtro-btn active" data-status="Todos">Todos</button>
-                <button class="filtro-btn" data-status="Pendente">Pendentes</button>
-                <button class="filtro-btn" data-status="Andamento">Andamento</button>
-                <button class="filtro-btn" data-status="Concluído">Concluídos</button>
+
+                <button class="filtro-btn active" data-status="Todos">
+                    Todos
+                </button>
+
+                <button class="filtro-btn" data-status="Pendente">
+                    Pendentes
+                </button>
+
+                <button class="filtro-btn" data-status="Andamento">
+                    Andamento
+                </button>
+
+                <button class="filtro-btn" data-status="Concluído">
+                    Concluídos
+                </button>
+
             </div>
 
         </div>
 
         <div class="table-header">
+
             <h2>
                 <i class="fas fa-clipboard-list"></i>
                 Solicitações registradas
             </h2>
+
         </div>
 
         <div class="table-responsive">
@@ -90,6 +144,7 @@
             <table class="sol-table">
 
                 <thead>
+
                     <tr>
                         <th>Título</th>
                         <th>Solicitante</th>
@@ -98,14 +153,17 @@
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
+
                 </thead>
 
                 <tbody id="listaSolicitacoes">
+
                     <tr>
                         <td colspan="6" class="empty-table">
                             Nenhuma solicitação encontrada.
                         </td>
                     </tr>
+
                 </tbody>
 
             </table>
@@ -232,11 +290,16 @@
 
 </nav>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=SUA_CHAVE_GOOGLE_MAPS&callback=iniciarMapaSolicitacao" async defer></script>
-
 <script src="../assets/js/solicitacoes.js"></script>
+
+<script
+src="https://maps.googleapis.com/maps/api/js?key=SUA_CHAVE_GOOGLE_MAPS&callback=iniciarMapaSolicitacao"
+async defer>
+</script>
+
 <script src="../assets/js/sidebar.js"></script>
 <script type="module" src="../assets/js/auth.js"></script>
-
+ 
 </body>
+
 </html>
