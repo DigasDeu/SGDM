@@ -5,19 +5,21 @@ import {
     updateProfile
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-document.getElementById("cadastroBtn").addEventListener("click", () => {
+const cadastroBtn = document.getElementById("cadastroBtn");
+
+cadastroBtn.addEventListener("click", async () => {
 
     const nome = document.getElementById("nome").value.trim();
     const email = document.getElementById("email").value.trim();
     const senha = document.getElementById("senha").value;
-    const confirmarSenha = document.getElementById("confirmarSenha")?.value;
+    const confirmarSenha = document.getElementById("confirmarSenha").value;
 
-    if (!nome || !email || !senha) {
+    if (!nome || !email || !senha || !confirmarSenha) {
         alert("Preencha todos os campos.");
         return;
     }
 
-    if (confirmarSenha !== undefined && senha !== confirmarSenha) {
+    if (senha !== confirmarSenha) {
         alert("As senhas não conferem.");
         return;
     }
@@ -27,16 +29,16 @@ document.getElementById("cadastroBtn").addEventListener("click", () => {
         return;
     }
 
-    createUserWithEmailAndPassword(auth, email, senha)
-    .then((userCredential) => {
+    try {
+
+        const userCredential =
+        await createUserWithEmailAndPassword(auth, email, senha);
 
         const user = userCredential.user;
 
-        return updateProfile(user, {
+        await updateProfile(user, {
             displayName: nome
-        }).then(() => user);
-    })
-    .then((user) => {
+        });
 
         localStorage.setItem("usuarioLogado", JSON.stringify({
             nome: nome,
@@ -47,13 +49,13 @@ document.getElementById("cadastroBtn").addEventListener("click", () => {
         }));
 
         window.location.href = "../dashboard.html";
-    })
-    .catch((error) => {
 
-        console.log(error);
+    } catch (error) {
+
+        console.log("ERRO CADASTRO:", error.code, error.message);
 
         if (error.code === "auth/email-already-in-use") {
-            alert("Este e-mail já está cadastrado.");
+            alert("Este e-mail já está cadastrado. Clique em Entrar.");
         }
         else if (error.code === "auth/invalid-email") {
             alert("E-mail inválido.");
@@ -64,5 +66,5 @@ document.getElementById("cadastroBtn").addEventListener("click", () => {
         else {
             alert("Erro ao cadastrar: " + error.code);
         }
-    });
+    }
 });
