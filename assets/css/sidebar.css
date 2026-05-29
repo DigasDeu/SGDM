@@ -150,22 +150,21 @@
 
 /* MOBILE */
 
+.sidebar{
+    left:0;
+}
+
+.sidebar.active{
+    left:0;
+}
+
 @media(max-width:768px){
 
     .sidebar{
         left:-100%;
-        width:280px;
     }
 
     .sidebar.active{
         left:0;
-    }
-
-    .main-content{
-        margin-left:0;
-    }
-
-    .sidebar.collapsed{
-        width:280px;
     }
 }

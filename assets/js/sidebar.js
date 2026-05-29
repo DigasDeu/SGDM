@@ -1,41 +1,33 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    const menuBtn =
-    document.querySelector(".menu-btn");
+    const sidebar = document.getElementById("sidebar");
+    const menuBtn = document.querySelector(".menu-btn");
+    const overlay = document.getElementById("overlay");
 
-    const sidebar =
-    document.getElementById("sidebar");
+    if (!sidebar || !menuBtn) return;
 
-    const overlay =
-    document.getElementById("overlay");
+    menuBtn.addEventListener("click", () => {
 
-    if (!menuBtn || !sidebar || !overlay) {
-        return;
-    }
+        if (window.innerWidth <= 768) {
 
-    function abrirSidebar() {
+            sidebar.classList.toggle("active");
 
-        sidebar.classList.add("active");
+            if (overlay) {
+                overlay.classList.toggle("active");
+            }
 
-        overlay.classList.add("active");
-    }
+        } else {
 
-    function fecharSidebar() {
-
-        sidebar.classList.remove("active");
-
-        overlay.classList.remove("active");
-    }
-
-    menuBtn.addEventListener("click", abrirSidebar);
-
-    overlay.addEventListener("click", fecharSidebar);
-
-    document.addEventListener("keydown", (event) => {
-
-        if (event.key === "Escape") {
-            fecharSidebar();
+            sidebar.classList.toggle("collapsed");
         }
     });
 
+    if (overlay) {
+
+        overlay.addEventListener("click", () => {
+
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
+        });
+    }
 });
