@@ -35,14 +35,45 @@
 
     <nav class="sidebar-menu">
 
-        <a href="../dashboard.html"><i class="fas fa-house"></i>Dashboard</a>
-        <a href="agenda.html"><i class="fas fa-calendar"></i>Agenda</a>
-        <a href="solicitacoes.html"><i class="fas fa-file-lines"></i>Solicitações</a>
-        <a href="publicacoes.html"><i class="fas fa-bullhorn"></i>Publicações</a>
-        <a href="producoes.html"><i class="fas fa-video"></i>Produções</a>
-        <a href="relatorio.html"><i class="fas fa-chart-line"></i>Relatórios</a>
-        <a href="configs.html"><i class="fas fa-gear"></i>Configurações</a>
-        <a href="#" onclick="logout()"><i class="fas fa-right-from-bracket"></i>Sair</a>
+        <a href="../dashboard.html">
+            <i class="fas fa-house"></i>
+            Dashboard
+        </a>
+
+        <a href="agenda.html">
+            <i class="fas fa-calendar"></i>
+            Agenda
+        </a>
+
+        <a href="solicitacoes.html">
+            <i class="fas fa-file-lines"></i>
+            Solicitações
+        </a>
+
+        <a href="publicacoes.html">
+            <i class="fas fa-bullhorn"></i>
+            Publicações
+        </a>
+
+        <a href="producoes.html">
+            <i class="fas fa-video"></i>
+            Produções
+        </a>
+
+        <a href="relatorio.html">
+            <i class="fas fa-chart-line"></i>
+            Relatórios
+        </a>
+
+        <a href="configs.html">
+            <i class="fas fa-gear"></i>
+            Configurações
+        </a>
+
+        <a href="#" onclick="logout()">
+            <i class="fas fa-right-from-bracket"></i>
+            Sair
+        </a>
 
     </nav>
 
@@ -69,7 +100,7 @@
         <input
         type="text"
         id="pesquisaSolicitacao"
-        placeholder="Pesquisar por título, solicitante ou local...">
+        placeholder="Pesquisar por título, solicitante, setor ou local...">
 
         <button class="primary-btn" id="abrirModal">
             Nova Solicitação
@@ -80,8 +111,11 @@
     <div class="filtros">
 
         <button class="filtro-btn active" data-status="Todos">Todos</button>
+
         <button class="filtro-btn" data-status="Pendente">Pendentes</button>
+
         <button class="filtro-btn" data-status="Andamento">Andamento</button>
+
         <button class="filtro-btn" data-status="Concluído">Concluídos</button>
 
     </div>
@@ -100,7 +134,11 @@
 
             <input type="text" id="titulo" placeholder="Título da solicitação" required>
 
-            <input type="text" id="solicitante" placeholder="Solicitante / Departamento" required>
+            <input type="text" id="solicitante" placeholder="Nome do solicitante" required>
+
+            <input type="text" id="setor" placeholder="Setor / Departamento" required>
+
+            <input type="tel" id="contato" placeholder="Contato do responsável pela demanda">
 
             <input type="date" id="data" required>
 
@@ -135,7 +173,31 @@
 
             </div>
 
-            <input type="text" id="responsavel" placeholder="Responsável pela ação">
+            <div class="equipe-area">
+
+                <strong>Equipe da Cobertura</strong>
+
+                <label>
+                    <input type="checkbox" name="equipeCobertura" value="Diego">
+                    Diego
+                </label>
+
+                <label>
+                    <input type="checkbox" name="equipeCobertura" value="Alicia">
+                    Alicia
+                </label>
+
+                <label>
+                    <input type="checkbox" name="equipeCobertura" value="Clarissa">
+                    Clarissa
+                </label>
+
+                <label>
+                    <input type="checkbox" name="equipeCobertura" value="Kelson">
+                    Kelson
+                </label>
+
+            </div>
 
             <select id="prioridade" required>
                 <option value="">Selecione a prioridade</option>
@@ -152,6 +214,12 @@
             </select>
 
             <textarea id="descricao" placeholder="Descrição da solicitação"></textarea>
+
+            <input
+            type="file"
+            id="anexos"
+            multiple
+            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
 
             <div class="modal-actions">
 

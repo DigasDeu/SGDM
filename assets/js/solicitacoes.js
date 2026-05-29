@@ -12,7 +12,6 @@ const buscarEnderecoBtn = document.getElementById("buscarEndereco");
 const usarLocalizacaoBtn = document.getElementById("usarLocalizacao");
 
 let filtroAtual = "Todos";
-
 let mapa = null;
 let marcador = null;
 
@@ -30,30 +29,34 @@ function iniciarMapaSolicitacao() {
 
     const maues = [-3.3836, -57.7186];
 
-    mapa = L.map("mapaSolicitacao").setView(maues, 14);
+    mapa = L.map("mapaSolicitacao", {
+        dragging: false,
+        tap: false,
+        scrollWheelZoom: false,
+        touchZoom: true,
+        doubleClickZoom: true,
+        zoomControl: true
+    }).setView(maues, 14);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap"
     }).addTo(mapa);
 
     marcador = L.marker(maues, {
-        draggable: true
+        draggable: false
     }).addTo(mapa);
 
     preencherCoordenadas(maues[0], maues[1]);
 
-    marcador.on("dragend", () => {
-        const posicao = marcador.getLatLng();
-        preencherCoordenadas(posicao.lat, posicao.lng);
-        buscarEnderecoPorCoordenadas(posicao.lat, posicao.lng);
-    });
-
     mapa.on("click", (event) => {
+
         const lat = event.latlng.lat;
         const lng = event.latlng.lng;
 
         marcador.setLatLng([lat, lng]);
+
         preencherCoordenadas(lat, lng);
+
         buscarEnderecoPorCoordenadas(lat, lng);
     });
 
@@ -151,9 +154,31 @@ function usarMinhaLocalizacao() {
     );
 }
 
+function pegarEquipeCobertura() {
+
+    const selecionados =
+    document.querySelectorAll('input[name="equipeCobertura"]:checked');
+
+    return Array.from(selecionados).map(item => item.value);
+}
+
+function pegarAnexos() {
+
+    const input = document.getElementById("anexos");
+
+    if (!input || !input.files.length) return [];
+
+    return Array.from(input.files).map(file => ({
+        nome: file.name,
+        tipo: file.type,
+        tamanho: file.size
+    }));
+}
+
 function adicionarHistoricoExclusao(item, origem) {
 
-    const historico = JSON.parse(localStorage.getItem("historicoExclusoes")) || [];
+    const historico =
+    JSON.parse(localStorage.getItem("historicoExclusoes")) || [];
 
     historico.unshift({
         id: Date.now(),
@@ -167,7 +192,8 @@ function adicionarHistoricoExclusao(item, origem) {
 
 function adicionarNotificacaoSolicitacao(solicitacao) {
 
-    const notificacoes = JSON.parse(localStorage.getItem("notificacoes")) || [];
+    const notificacoes =
+    JSON.parse(localStorage.getItem("notificacoes")) || [];
 
     notificacoes.unshift({
         id: Date.now(),
@@ -183,7 +209,8 @@ function adicionarNotificacaoSolicitacao(solicitacao) {
 
 function adicionarNotificacaoExclusao(solicitacao) {
 
-    const notificacoes = JSON.parse(localStorage.getItem("notificacoes")) || [];
+    const notificacoes =
+    JSON.parse(localStorage.getItem("notificacoes")) || [];
 
     notificacoes.unshift({
         id: Date.now(),
@@ -238,25 +265,38 @@ if (formSolicitacao) {
 
         const titulo = document.getElementById("titulo").value.trim();
         const solicitante = document.getElementById("solicitante").value.trim();
+        const setor = document.getElementById("setor").value.trim();
+        const contato = document.getElementById("contato").value.trim();
         const data = document.getElementById("data").value;
         const hora = document.getElementById("hora").value;
         const local = document.getElementById("local").value.trim();
         const latitude = document.getElementById("latitude").value;
         const longitude = document.getElementById("longitude").value;
-        const responsavel = document.getElementById("responsavel")?.value.trim() || "Departamento de Mídia";
+        const equipeCobertura = pegarEquipeCobertura();
         const prioridade = document.getElementById("prioridade").value;
         const status = document.getElementById("status").value;
+        const anexos = pegarAnexos();
 
         let descricao = document.getElementById("descricao").value.trim();
 
-        if (!titulo || !solicitante || !data || !hora || !local || !latitude || !longitude || !prioridade) {
+        if (
+            !titulo ||
+            !solicitante ||
+            !setor ||
+            !data ||
+            !hora ||
+            !local ||
+            !latitude ||
+            !longitude ||
+            !prioridade
+        ) {
             alert("Preencha todos os campos obrigatórios e marque a localização no mapa.");
             return;
         }
 
         if (!descricao) {
             descricao =
-            `A ação "${titulo}" ocorrerá no dia ${data}, às ${hora}, no local ${local}, sob responsabilidade de ${responsavel}, conforme solicitação do setor ${solicitante}.`;
+            `A ação "${titulo}" ocorrerá no dia ${data}, às ${hora}, no local ${local}, conforme solicitação de ${solicitante}, setor ${setor}.`;
         }
 
         const solicitacoes = buscarSolicitacoes();
@@ -265,16 +305,20 @@ if (formSolicitacao) {
             id: Date.now(),
             titulo,
             solicitante,
+            setor,
+            contato,
             data,
             hora,
             local,
             latitude,
             longitude,
-            responsavel,
+            equipeCobertura,
             prioridade,
             status,
             descricao,
-            origem: "Solicitações"
+            anexos,
+            origem: "Solicitações",
+            criadoEm: new Date().toLocaleString("pt-BR")
         };
 
         solicitacoes.push(novaSolicitacao);
@@ -293,15 +337,18 @@ if (formSolicitacao) {
 
 function excluirSolicitacao(id) {
 
-    const confirmar = confirm("Tem certeza que deseja excluir esta solicitação?");
+    const confirmar =
+    confirm("Tem certeza que deseja excluir esta solicitação?");
 
     if (!confirmar) return;
 
     let solicitacoes = buscarSolicitacoes();
 
-    const itemExcluido = solicitacoes.find(item => item.id === id);
+    const itemExcluido =
+    solicitacoes.find(item => item.id === id);
 
-    solicitacoes = solicitacoes.filter(item => item.id !== id);
+    solicitacoes =
+    solicitacoes.filter(item => item.id !== id);
 
     salvarSolicitacoes(solicitacoes);
 
@@ -315,27 +362,10 @@ function excluirSolicitacao(id) {
 
 function limparFormularioSolicitacao() {
 
-    const campos = [
-        "titulo",
-        "solicitante",
-        "data",
-        "hora",
-        "local",
-        "latitude",
-        "longitude",
-        "responsavel",
-        "prioridade",
-        "descricao"
-    ];
+    formSolicitacao.reset();
 
-    campos.forEach(id => {
-
-        const campo = document.getElementById(id);
-
-        if (campo) {
-            campo.value = "";
-        }
-    });
+    latitudeInput.value = "";
+    longitudeInput.value = "";
 
     const status = document.getElementById("status");
 
@@ -352,23 +382,29 @@ function carregarSolicitacoes() {
 
     listaSolicitacoes.innerHTML = "";
 
-    const termo = pesquisa ? pesquisa.value.toLowerCase() : "";
+    const termo =
+    pesquisa ? pesquisa.value.toLowerCase() : "";
 
-    const filtradas = solicitacoes.filter(item => {
+    const filtradas =
+    solicitacoes.filter(item => {
 
-        const textoBusca = `
+        const textoBusca =
+        `
         ${item.titulo || ""}
         ${item.solicitante || ""}
+        ${item.setor || ""}
+        ${item.contato || ""}
         ${item.data || ""}
         ${item.hora || ""}
         ${item.local || ""}
-        ${item.responsavel || ""}
+        ${item.equipeCobertura ? item.equipeCobertura.join(" ") : ""}
         ${item.prioridade || ""}
         ${item.status || ""}
         ${item.descricao || ""}
         `.toLowerCase();
 
-        const matchPesquisa = textoBusca.includes(termo);
+        const matchPesquisa =
+        textoBusca.includes(termo);
 
         const matchFiltro =
         filtroAtual === "Todos" ||
@@ -378,7 +414,8 @@ function carregarSolicitacoes() {
     });
 
     if (filtradas.length === 0) {
-        listaSolicitacoes.innerHTML = `<p>Nenhuma solicitação encontrada.</p>`;
+        listaSolicitacoes.innerHTML =
+        `<p>Nenhuma solicitação encontrada.</p>`;
         return;
     }
 
@@ -398,6 +435,16 @@ function carregarSolicitacoes() {
         ? `https://www.google.com/maps?q=${item.latitude},${item.longitude}`
         : "#";
 
+        const equipe =
+        item.equipeCobertura && item.equipeCobertura.length
+        ? item.equipeCobertura.join(", ")
+        : "Não definida";
+
+        const anexos =
+        item.anexos && item.anexos.length
+        ? item.anexos.map(anexo => anexo.nome).join(", ")
+        : "Nenhum anexo";
+
         listaSolicitacoes.innerHTML += `
             <div class="solicitacao-card">
 
@@ -407,15 +454,21 @@ function carregarSolicitacoes() {
 
                     <p><strong>Solicitante:</strong> ${item.solicitante}</p>
 
+                    <p><strong>Setor:</strong> ${item.setor || "Não informado"}</p>
+
+                    <p><strong>Contato:</strong> ${item.contato || "Não informado"}</p>
+
                     <p><strong>Data:</strong> ${item.data || "Não informada"}</p>
 
                     <p><strong>Hora:</strong> ${item.hora || "Não informada"}</p>
 
                     <p><strong>Local:</strong> ${item.local || "Não informado"}</p>
 
+                    <p><strong>Equipe da Cobertura:</strong> ${equipe}</p>
+
                     <p><strong>Prioridade:</strong> ${item.prioridade || "Não informada"}</p>
 
-                    <p><strong>Responsável:</strong> ${item.responsavel || "Departamento de Mídia"}</p>
+                    <p><strong>Anexos:</strong> ${anexos}</p>
 
                     ${
                         item.latitude && item.longitude
@@ -460,7 +513,9 @@ if (pesquisa) {
     pesquisa.addEventListener("input", carregarSolicitacoes);
 }
 
-document.querySelectorAll(".filtro-btn").forEach(btn => {
+document
+.querySelectorAll(".filtro-btn")
+.forEach(btn => {
 
     btn.addEventListener("click", () => {
 
