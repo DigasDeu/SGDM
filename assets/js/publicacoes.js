@@ -1,330 +1,285 @@
 const modal =
-document.getElementById(
-"modalPublicacao"
-);
+document.getElementById("modalPublicacao");
 
 const abrirModal =
-document.getElementById(
-"abrirModal"
-);
+document.getElementById("abrirModal");
 
 const fecharModal =
-document.getElementById(
-"fecharModal"
-);
+document.getElementById("fecharModal");
 
 const salvarPublicacao =
-document.getElementById(
-"salvarPublicacao"
-);
+document.getElementById("salvarPublicacao");
 
 const listaPublicacoes =
-document.getElementById(
-"listaPublicacoes"
-);
+document.getElementById("listaPublicacoes");
 
 const pesquisa =
-document.getElementById(
-"pesquisaPublicacao"
-);
+document.getElementById("pesquisaPublicacao");
 
 let filtroAtual = "Todos";
 
-//
-// ABRIR MODAL
-//
+function buscarPublicacoes() {
 
-abrirModal.onclick = ()=>{
-
-    modal.style.display = "flex";
-};
-
-//
-// FECHAR MODAL
-//
-
-fecharModal.onclick = ()=>{
-
-    modal.style.display = "none";
-};
-
-//
-// SALVAR
-//
-
-salvarPublicacao.onclick = ()=>{
-
-    const titulo =
-    document.getElementById(
-    "titulo"
-    ).value;
-
-    const descricao =
-    document.getElementById(
-    "descricao"
-    ).value;
-
-    const tipo =
-    document.getElementById(
-    "tipo"
-    ).value;
-
-    const plataforma =
-    document.getElementById(
-    "plataforma"
-    ).value;
-
-    const data =
-    document.getElementById(
-    "data"
-    ).value;
-
-    const hora =
-    document.getElementById(
-    "hora"
-    ).value;
-
-    const status =
-    document.getElementById(
-    "status"
-    ).value;
-
-    if(!titulo){
-
-        alert(
-        "Preencha o título."
-        );
-
-        return;
-    }
-
-    const publicacoes =
-    JSON.parse(
-        localStorage.getItem(
-        "publicacoes"
-        )
+    return JSON.parse(
+        localStorage.getItem("publicacoes")
     ) || [];
+}
 
-    publicacoes.push({
-
-        titulo,
-        descricao,
-        tipo,
-        plataforma,
-        data,
-        hora,
-        status
-
-    });
+function salvarPublicacoes(publicacoes) {
 
     localStorage.setItem(
-    "publicacoes",
-    JSON.stringify(
-    publicacoes
-    )
+        "publicacoes",
+        JSON.stringify(publicacoes)
     );
+}
 
-    //
-    // NOTIFICAÇÃO
-    //
+function adicionarNotificacaoPublicacao(publicacao) {
 
     const notificacoes =
-    JSON.parse(
-        localStorage.getItem(
-        "notificacoes"
-        )
-    ) || [];
+    JSON.parse(localStorage.getItem("notificacoes")) || [];
 
-    notificacoes.push({
-
-        titulo:
-        "Nova Publicação",
-
-        descricao:
-        `${titulo} • ${plataforma}`
-
+    notificacoes.unshift({
+        id: Date.now(),
+        titulo: "Nova Publicação",
+        descricao: `${publicacao.titulo} • ${publicacao.plataforma}`,
+        tipo: "Publicação",
+        data: new Date().toLocaleString("pt-BR"),
+        lida: false
     });
 
     localStorage.setItem(
-    "notificacoes",
-    JSON.stringify(
-    notificacoes
-    )
+        "notificacoes",
+        JSON.stringify(notificacoes)
     );
+}
 
-    carregarPublicacoes();
+if (abrirModal) {
 
-    modal.style.display = "none";
-};
+    abrirModal.onclick = () => {
+        modal.style.display = "flex";
+    };
+}
 
-//
-// LISTAR
-//
+if (fecharModal) {
 
-function carregarPublicacoes(){
+    fecharModal.onclick = () => {
+        modal.style.display = "none";
+    };
+}
+
+if (salvarPublicacao) {
+
+    salvarPublicacao.onclick = () => {
+
+        const titulo =
+        document.getElementById("titulo").value.trim();
+
+        const eventoRelacionado =
+        document.getElementById("eventoRelacionado")?.value.trim() || "";
+
+        const descricao =
+        document.getElementById("descricao").value.trim();
+
+        const tipo =
+        document.getElementById("tipo").value;
+
+        const plataforma =
+        document.getElementById("plataforma").value;
+
+        const data =
+        document.getElementById("data").value;
+
+        const hora =
+        document.getElementById("hora").value;
+
+        const responsavel =
+        document.getElementById("responsavel")?.value.trim() || "Departamento de Mídia";
+
+        const linkPublicacao =
+        document.getElementById("linkPublicacao")?.value.trim() || "";
+
+        const status =
+        document.getElementById("status").value;
+
+        if (!titulo) {
+            alert("Preencha o título da publicação.");
+            return;
+        }
+
+        const publicacoes =
+        buscarPublicacoes();
+
+        const novaPublicacao = {
+            id: Date.now(),
+            titulo,
+            eventoRelacionado,
+            descricao,
+            tipo,
+            plataforma,
+            data,
+            hora,
+            responsavel,
+            linkPublicacao,
+            status,
+            origem: "Publicações"
+        };
+
+        publicacoes.push(novaPublicacao);
+
+        salvarPublicacoes(publicacoes);
+
+        adicionarNotificacaoPublicacao(novaPublicacao);
+
+        carregarPublicacoes();
+
+        modal.style.display = "none";
+
+        limparFormularioPublicacao();
+    };
+}
+
+function limparFormularioPublicacao() {
+
+    const campos = [
+        "titulo",
+        "eventoRelacionado",
+        "descricao",
+        "data",
+        "hora",
+        "responsavel",
+        "linkPublicacao"
+    ];
+
+    campos.forEach(id => {
+
+        const campo =
+        document.getElementById(id);
+
+        if (campo) {
+            campo.value = "";
+        }
+    });
+}
+
+function carregarPublicacoes() {
+
+    if (!listaPublicacoes) return;
 
     const publicacoes =
-    JSON.parse(
-        localStorage.getItem(
-        "publicacoes"
-        )
-    ) || [];
+    buscarPublicacoes();
 
     listaPublicacoes.innerHTML = "";
 
-    let filtradas =
-    publicacoes.filter(item=>{
+    const termo =
+    pesquisa ? pesquisa.value.toLowerCase() : "";
+
+    const filtradas =
+    publicacoes.filter(item => {
+
+        const textoBusca =
+        `
+        ${item.titulo || ""}
+        ${item.eventoRelacionado || ""}
+        ${item.tipo || ""}
+        ${item.plataforma || ""}
+        ${item.responsavel || ""}
+        ${item.status || ""}
+        `.toLowerCase();
 
         const matchPesquisa =
-        item.titulo
-        .toLowerCase()
-        .includes(
-        pesquisa.value.toLowerCase()
-        );
+        textoBusca.includes(termo);
 
         const matchFiltro =
-
-        filtroAtual === "Todos"
-
-        ||
-
+        filtroAtual === "Todos" ||
         item.status === filtroAtual;
 
-        return(
-            matchPesquisa &&
-            matchFiltro
-        );
+        return matchPesquisa && matchFiltro;
     });
 
-    if(filtradas.length === 0){
+    if (filtradas.length === 0) {
 
         listaPublicacoes.innerHTML =
-
-        `
-        <p>
-        Nenhuma publicação encontrada.
-        </p>
-        `;
+        `<p>Nenhuma publicação encontrada.</p>`;
 
         return;
     }
 
-    filtradas.reverse()
-    .forEach(item=>{
+    filtradas
+    .slice()
+    .reverse()
+    .forEach(item => {
 
         let statusClass = "";
 
-        if(item.status === "Agendado"){
-
+        if (item.status === "Agendado") {
             statusClass = "agendado";
         }
 
-        if(item.status === "Publicado"){
-
+        if (item.status === "Publicado") {
             statusClass = "publicado";
         }
 
-        if(item.status === "Rascunho"){
-
+        if (item.status === "Rascunho") {
             statusClass = "rascunho";
         }
 
-        listaPublicacoes.innerHTML +=
+        listaPublicacoes.innerHTML += `
+            <div class="publicacao-card">
 
-        `
-        <div class="publicacao-card">
+                <h3>${item.titulo}</h3>
 
-            <h3>
-            ${item.titulo}
-            </h3>
+                <div class="publicacao-info">
 
-            <div class="publicacao-info">
+                    <p><strong>Evento/Produção:</strong> ${item.eventoRelacionado || "Não informado"}</p>
 
-                <p>
+                    <p><strong>Tipo:</strong> ${item.tipo}</p>
 
-                <strong>Tipo:</strong>
+                    <p><strong>Plataforma:</strong> ${item.plataforma}</p>
 
-                ${item.tipo}
+                    <p><strong>Data:</strong> ${item.data || "Não informada"}</p>
 
-                </p>
+                    <p><strong>Hora:</strong> ${item.hora || "Não informada"}</p>
 
-                <p>
+                    <p><strong>Responsável:</strong> ${item.responsavel}</p>
 
-                <strong>Plataforma:</strong>
+                </div>
 
-                ${item.plataforma}
+                <p>${item.descricao || "Sem descrição."}</p>
 
-                </p>
+                ${
+                    item.linkPublicacao
+                    ? `<p><a href="${item.linkPublicacao}" target="_blank">Ver publicação</a></p>`
+                    : ""
+                }
 
-                <p>
-
-                <strong>Data:</strong>
-
-                ${item.data}
-
-                </p>
-
-                <p>
-
-                <strong>Hora:</strong>
-
-                ${item.hora}
-
-                </p>
+                <span class="status ${statusClass}">
+                    ${item.status}
+                </span>
 
             </div>
-
-            <p>
-
-            ${item.descricao}
-
-            </p>
-
-            <span class="status ${statusClass}">
-
-                ${item.status}
-
-            </span>
-
-        </div>
         `;
     });
 }
 
-//
-// PESQUISA
-//
+if (pesquisa) {
 
-pesquisa.addEventListener(
-"input",
-carregarPublicacoes
-);
+    pesquisa.addEventListener(
+        "input",
+        carregarPublicacoes
+    );
+}
 
-//
-// FILTROS
-//
+document
+.querySelectorAll(".filtro-btn")
+.forEach(btn => {
 
-document.querySelectorAll(
-".filtro-btn"
-).forEach(btn=>{
-
-    btn.addEventListener(
-    "click",
-    ()=>{
+    btn.addEventListener("click", () => {
 
         document
-        .querySelectorAll(
-        ".filtro-btn"
-        )
-        .forEach(
-        b=>b.classList.remove(
-        "active"
-        )
-        );
+        .querySelectorAll(".filtro-btn")
+        .forEach(b => b.classList.remove("active"));
 
-        btn.classList.add(
-        "active"
-        );
+        btn.classList.add("active");
 
         filtroAtual =
         btn.dataset.status;
@@ -332,9 +287,5 @@ document.querySelectorAll(
         carregarPublicacoes();
     });
 });
-
-//
-// INICIAR
-//
 
 carregarPublicacoes();

@@ -8,7 +8,10 @@
 
 <title>Agenda - Departamento de Mídia</title>
 
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/sidebar.css">
 <link rel="stylesheet" href="../assets/css/agenda.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
@@ -16,9 +19,83 @@
 
 <body>
 
+<aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-header">
+
+        <img
+        src="../assets/img/user.png"
+        alt="Usuário"
+        class="user-photo"
+        id="fotoUsuario">
+
+        <h3 class="user-name" id="nomeUsuario">
+            Usuário
+        </h3>
+
+        <p class="user-email" id="emailUsuario">
+            email@usuario.com
+        </p>
+
+    </div>
+
+    <nav class="sidebar-menu">
+
+        <a href="../dashboard.html">
+            <i class="fas fa-house"></i>
+            Dashboard
+        </a>
+
+        <a href="agenda.html">
+            <i class="fas fa-calendar"></i>
+            Agenda
+        </a>
+
+        <a href="solicitacoes.html">
+            <i class="fas fa-file-lines"></i>
+            Solicitações
+        </a>
+
+        <a href="publicacoes.html">
+            <i class="fas fa-bullhorn"></i>
+            Publicações
+        </a>
+
+        <a href="producoes.html">
+            <i class="fas fa-video"></i>
+            Produções
+        </a>
+
+        <a href="relatorio.html">
+            <i class="fas fa-chart-line"></i>
+            Relatórios
+        </a>
+
+        <a href="configs.html">
+            <i class="fas fa-gear"></i>
+            Configurações
+        </a>
+
+        <a href="#" onclick="logout()">
+            <i class="fas fa-right-from-bracket"></i>
+            Sair
+        </a>
+
+    </nav>
+
+</aside>
+
+<div class="overlay" id="overlay"></div>
+
 <header class="top-header">
 
-    <h1>📅 Agenda</h1>
+    <div class="menu-btn">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <div class="logo-area">
+        <h1>📅 Agenda</h1>
+    </div>
 
     <button id="novoEventoBtn">
         <i class="fas fa-plus"></i>
@@ -62,16 +139,12 @@
         <h3>Eventos do Dia</h3>
 
         <div id="eventosDia">
-
             <p>Nenhum evento selecionado.</p>
-
         </div>
 
     </section>
 
 </main>
-
-<!-- MODAL -->
 
 <div class="modal" id="modalEvento">
 
@@ -81,15 +154,9 @@
 
         <form id="eventoForm">
 
-            <input
-                type="text"
-                id="titulo"
-                placeholder="Título do evento"
-                required
-            >
+            <input type="text" id="titulo" placeholder="Título do evento" required>
 
             <select id="tipo">
-
                 <option>Cobertura Fotográfica</option>
                 <option>Cobertura Audiovisual</option>
                 <option>Produção de Vídeo</option>
@@ -97,24 +164,17 @@
                 <option>Publicação</option>
                 <option>Evento Institucional</option>
                 <option>Reunião</option>
-
             </select>
 
             <input type="date" id="data" required>
 
             <input type="time" id="hora" required>
 
-            <input
-                type="text"
-                id="local"
-                placeholder="Local"
-                required
-            >
+            <input type="text" id="local" placeholder="Local" required>
 
-            <textarea
-                id="descricao"
-                placeholder="Descrição"
-            ></textarea>
+            <input type="text" id="responsavel" placeholder="Responsável pela cobertura">
+
+            <textarea id="descricao" placeholder="Descrição da atividade"></textarea>
 
             <div class="modal-buttons">
 
@@ -134,7 +194,38 @@
 
 </div>
 
+<nav class="bottom-nav">
+
+    <a href="../dashboard.html">
+        <i class="fas fa-house"></i>
+        <span>Início</span>
+    </a>
+
+    <a href="solicitacoes.html">
+        <i class="fas fa-file-lines"></i>
+        <span>Solicitações</span>
+    </a>
+
+    <a href="agenda.html" class="active">
+        <i class="fas fa-calendar"></i>
+        <span>Agenda</span>
+    </a>
+
+    <a href="relatorio.html">
+        <i class="fas fa-chart-line"></i>
+        <span>Relatórios</span>
+    </a>
+
+    <a href="mais.html">
+        <i class="fas fa-ellipsis"></i>
+        <span>Mais</span>
+    </a>
+
+</nav>
+
+<script src="../assets/js/sidebar.js"></script>
 <script src="../assets/js/agenda.js"></script>
+<script type="module" src="../assets/js/auth.js"></script>
 
 </body>
 </html>

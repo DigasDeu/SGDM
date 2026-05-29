@@ -5,16 +5,36 @@ import {
     signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+function estaNaPastaPages() {
+    return window.location.pathname.includes("/pages/");
+}
+
+function caminhoLogin() {
+    return estaNaPastaPages() ? "../login.html" : "login.html";
+}
+
+function caminhoDashboard() {
+    return estaNaPastaPages() ? "../dashboard.html" : "dashboard.html";
+}
+
+function caminhoFotoPadrao() {
+    return estaNaPastaPages() ? "../assets/img/user.png" : "assets/img/user.png";
+}
+
 onAuthStateChanged(auth, (user) => {
+
+    const paginaAtual = window.location.pathname;
+
+    const paginaLivre =
+        paginaAtual.includes("login.html") ||
+        paginaAtual.includes("cadastro.html") ||
+        paginaAtual.endsWith("/") ||
+        paginaAtual.includes("index.html");
 
     if (!user) {
 
-        if (
-            !window.location.pathname.includes("login.html") &&
-            !window.location.pathname.includes("cadastro.html") &&
-            !window.location.pathname.includes("index.html")
-        ) {
-            window.location.href = "login.html";
+        if (!paginaLivre) {
+            window.location.href = caminhoLogin();
         }
 
         return;
@@ -23,15 +43,12 @@ onAuthStateChanged(auth, (user) => {
     const usuario = {
         nome: user.displayName || "Usuário",
         email: user.email || "",
-        foto: user.photoURL || "assets/img/user.png",
+        foto: user.photoURL || caminhoFotoPadrao(),
         uid: user.uid,
         login: true
     };
 
-    localStorage.setItem(
-        "usuarioLogado",
-        JSON.stringify(usuario)
-    );
+    localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
 
     atualizarUsuarioNaTela(usuario);
 });
@@ -41,7 +58,7 @@ function atualizarUsuarioNaTela(usuario) {
     const fotoUsuario = document.getElementById("fotoUsuario");
 
     if (fotoUsuario) {
-        fotoUsuario.src = usuario.foto;
+        fotoUsuario.src = usuario.foto || caminhoFotoPadrao();
     }
 
     const nomeUsuario = document.getElementById("nomeUsuario");
@@ -70,7 +87,7 @@ window.logout = function () {
 
         localStorage.removeItem("usuarioLogado");
 
-        window.location.href = "login.html";
+        window.location.href = caminhoLogin();
     })
     .catch((error) => {
 

@@ -2,19 +2,17 @@
 <html lang="pt-BR">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Mais</title>
+<title>Relatórios</title>
 
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/sidebar.css">
-<link rel="stylesheet" href="../assets/css/mais.css">
+<link rel="stylesheet" href="../assets/css/relatorios.css">
 <link rel="stylesheet" href="../assets/css/responsive.css">
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-
 </head>
 
 <body>
@@ -22,13 +20,11 @@
 <aside class="sidebar" id="sidebar">
 
     <div class="sidebar-header">
-
         <img src="../assets/img/user.png" alt="Usuário" class="user-photo" id="fotoUsuario">
 
         <h3 class="user-name" id="nomeUsuario">Usuário</h3>
 
         <p class="user-email" id="emailUsuario">email@usuario.com</p>
-
     </div>
 
     <nav class="sidebar-menu">
@@ -58,7 +54,7 @@
             Produções
         </a>
 
-        <a href="relatorio.html">
+        <a href="relatorios.html">
             <i class="fas fa-chart-line"></i>
             Relatórios
         </a>
@@ -86,70 +82,76 @@
     </div>
 
     <div class="logo-area">
-        <h1>Mais</h1>
+        <h1>Relatórios</h1>
     </div>
 
 </header>
 
-<main class="mais-container">
+<main class="relatorios-container">
 
-    <section class="page-header">
+    <section class="relatorios-header">
 
-        <h2>Central do Sistema</h2>
+        <div>
+            <h2>Relatórios de Atividades</h2>
+            <p>Consulte produções, publicações, eventos e solicitações registradas no sistema.</p>
+        </div>
 
-        <p>Acesso rápido às ferramentas complementares do Departamento de Mídia.</p>
+        <button class="primary-btn" id="atualizarRelatorios">
+            Atualizar Dados
+        </button>
 
     </section>
 
-    <section class="menu-grid">
+    <section class="relatorio-filtros">
 
-        <a href="producoes.html" class="menu-card">
-            <i class="fas fa-video"></i>
-            <span>Produções</span>
-            <small>Vídeos, fotos, artes e campanhas</small>
-        </a>
+        <input
+        type="text"
+        id="pesquisaRelatorio"
+        placeholder="Pesquisar por título, local, responsável ou tipo...">
 
-        <a href="publicacoes.html" class="menu-card">
-            <i class="fas fa-bullhorn"></i>
-            <span>Publicações</span>
-            <small>Posts, reels, stories e comunicados</small>
-        </a>
+        <select id="tipoRelatorio">
+            <option value="Todos">Todos</option>
+            <option value="Eventos">Eventos</option>
+            <option value="Solicitações">Solicitações</option>
+            <option value="Produções">Produções</option>
+            <option value="Publicações">Publicações</option>
+        </select>
 
-        <a href="relatorio.html" class="menu-card">
-            <i class="fas fa-chart-line"></i>
-            <span>Relatórios</span>
-            <small>Consulta e geração de documentos</small>
-        </a>
+    </section>
 
-        <a href="relatorio-impressao.html" class="menu-card">
-            <i class="fas fa-print"></i>
-            <span>Impressão</span>
-            <small>Modelo oficial para secretaria</small>
-        </a>
+    <section class="resumo-relatorios">
 
-        <a href="agenda.html" class="menu-card">
-            <i class="fas fa-calendar-check"></i>
-            <span>Agenda</span>
-            <small>Eventos e coberturas agendadas</small>
-        </a>
+        <div class="resumo-card">
+            <strong id="totalEventos">0</strong>
+            <span>Eventos</span>
+        </div>
 
-        <a href="solicitacoes.html" class="menu-card">
-            <i class="fas fa-file-lines"></i>
+        <div class="resumo-card">
+            <strong id="totalSolicitacoes">0</strong>
             <span>Solicitações</span>
-            <small>Demandas recebidas da secretaria</small>
-        </a>
+        </div>
 
-        <a href="configs.html" class="menu-card">
-            <i class="fas fa-gear"></i>
-            <span>Configurações</span>
-            <small>Perfil, assinaturas e preferências</small>
-        </a>
+        <div class="resumo-card">
+            <strong id="totalProducoes">0</strong>
+            <span>Produções</span>
+        </div>
 
-        <a href="#" class="menu-card danger" onclick="logout()">
-            <i class="fas fa-right-from-bracket"></i>
-            <span>Sair</span>
-            <small>Encerrar sessão do usuário</small>
-        </a>
+        <div class="resumo-card">
+            <strong id="totalPublicacoes">0</strong>
+            <span>Publicações</span>
+        </div>
+
+    </section>
+
+    <section class="lista-relatorios">
+
+        <h3>Atividades Registradas</h3>
+
+        <div id="listaRelatorios">
+
+            <p>Nenhuma atividade encontrada.</p>
+
+        </div>
 
     </section>
 
@@ -172,12 +174,12 @@
         <span>Agenda</span>
     </a>
 
-    <a href="relatorio.html">
+    <a href="relatorios.html" class="active">
         <i class="fas fa-chart-line"></i>
         <span>Relatórios</span>
     </a>
 
-    <a href="mais.html" class="active">
+    <a href="mais.html">
         <i class="fas fa-ellipsis"></i>
         <span>Mais</span>
     </a>
@@ -185,8 +187,8 @@
 </nav>
 
 <script src="../assets/js/sidebar.js"></script>
+<script src="../assets/js/relatorios.js"></script>
 <script type="module" src="../assets/js/auth.js"></script>
 
 </body>
-
 </html>

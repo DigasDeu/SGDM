@@ -4,75 +4,73 @@
 <head>
 
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Produções</title>
 
-<link rel="stylesheet"
-href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/sidebar.css">
+<link rel="stylesheet" href="../assets/css/producoes.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
 
-<link rel="stylesheet"
-href="../assets/css/sidebar.css">
-
-<link rel="stylesheet"
-href="../assets/css/responsive.css">
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-
 <aside class="sidebar" id="sidebar">
 
     <div class="sidebar-header">
 
-        <img
-        src="assets/img/user.png">
+        <img src="../assets/img/user.png" alt="Usuário" class="user-photo" id="fotoUsuario">
 
-        <h3>Diego</h3>
+        <h3 class="user-name" id="nomeUsuario">Usuário</h3>
 
-        <p>Departamento de Mídia</p>
+        <p class="user-email" id="emailUsuario">email@usuario.com</p>
 
     </div>
 
     <nav class="sidebar-menu">
 
-        <a href="../index.html">
-
+        <a href="../dashboard.html">
             <i class="fas fa-house"></i>
-
             Dashboard
-
         </a>
 
         <a href="agenda.html">
-
             <i class="fas fa-calendar"></i>
-
             Agenda
-
         </a>
 
         <a href="solicitacoes.html">
-
             <i class="fas fa-file-lines"></i>
-
             Solicitações
-
         </a>
 
         <a href="publicacoes.html">
-
             <i class="fas fa-bullhorn"></i>
-
             Publicações
+        </a>
 
+        <a href="producoes.html">
+            <i class="fas fa-video"></i>
+            Produções
+        </a>
+
+        <a href="relatorios.html">
+            <i class="fas fa-chart-line"></i>
+            Relatórios
+        </a>
+
+        <a href="configs.html">
+            <i class="fas fa-gear"></i>
+            Configurações
+        </a>
+
+        <a href="#" onclick="logout()">
+            <i class="fas fa-right-from-bracket"></i>
+            Sair
         </a>
 
     </nav>
@@ -81,85 +79,139 @@ rel="stylesheet">
 
 <div class="overlay" id="overlay"></div>
 
-<!-- HEADER -->
-
 <header class="top-header">
 
     <div class="menu-btn">
-
         <i class="fas fa-bars"></i>
-
     </div>
 
     <div class="logo-area">
-
         <h1>Produções</h1>
-
     </div>
 
 </header>
 
-<!-- CONTEÚDO -->
-
 <section class="page-content">
 
-    <div class="section-header">
+    <div class="producoes-top">
 
-        <h2>Produções em Andamento</h2>
+        <input type="text" id="pesquisaProducao" placeholder="Pesquisar por título, evento, responsável ou tipo...">
 
-        <button class="primary-btn">
-
+        <button class="primary-btn" id="abrirModal">
             Nova Produção
-
         </button>
 
     </div>
 
-    <div id="listaProducoes">
+    <div class="filtros">
 
-        <div class="event-card">
+        <button class="filtro-btn active" data-status="Todos">Todos</button>
 
-            <strong>Vídeo Institucional</strong>
+        <button class="filtro-btn" data-status="Pendente">Pendentes</button>
 
-            <p>Status: Em andamento</p>
+        <button class="filtro-btn" data-status="Andamento">Em andamento</button>
+
+        <button class="filtro-btn" data-status="Concluído">Concluídas</button>
+
+    </div>
+
+    <div id="listaProducoes"></div>
+
+</section>
+
+<div class="modal" id="modalProducao">
+
+    <div class="modal-content">
+
+        <h2>Nova Produção</h2>
+
+        <input type="text" id="titulo" placeholder="Título da produção">
+
+        <input type="text" id="eventoRelacionado" placeholder="Evento ou demanda relacionada">
+
+        <select id="tipo">
+            <option>Vídeo Institucional</option>
+            <option>Vídeo para Reels</option>
+            <option>Carrossel</option>
+            <option>Arte Gráfica</option>
+            <option>Banner</option>
+            <option>Fotografia</option>
+            <option>Cobertura Audiovisual</option>
+            <option>Campanha Institucional</option>
+        </select>
+
+        <input type="date" id="data">
+
+        <input type="time" id="hora">
+
+        <input type="text" id="local" placeholder="Local da produção">
+
+        <input type="text" id="responsavel" placeholder="Responsável pela produção">
+
+        <input type="number" id="quantidadeFotos" placeholder="Quantidade de fotos produzidas">
+
+        <input type="number" id="quantidadeVideos" placeholder="Quantidade de vídeos produzidos">
+
+        <input type="number" id="quantidadeArtes" placeholder="Quantidade de artes/carrosséis produzidos">
+
+        <select id="status">
+            <option>Pendente</option>
+            <option>Andamento</option>
+            <option>Concluído</option>
+        </select>
+
+        <textarea
+        id="descricao"
+        placeholder="Descrição da produção, objetivo, materiais produzidos e observações"></textarea>
+
+        <div class="modal-actions">
+
+            <button id="salvarProducao">
+                Salvar
+            </button>
+
+            <button id="fecharModal">
+                Cancelar
+            </button>
 
         </div>
 
     </div>
 
-</section>
-
-<!-- MENU INFERIOR -->
+</div>
 
 <nav class="bottom-nav">
 
-    <a href="index.html">
-
+    <a href="../dashboard.html">
         <i class="fas fa-house"></i>
-
         <span>Início</span>
+    </a>
 
+    <a href="solicitacoes.html">
+        <i class="fas fa-file-lines"></i>
+        <span>Solicitações</span>
     </a>
 
     <a href="agenda.html">
-
         <i class="fas fa-calendar"></i>
-
         <span>Agenda</span>
-
     </a>
 
-    <a href="relatorio.html">
-
+    <a href="relatorios.html">
         <i class="fas fa-chart-line"></i>
-
         <span>Relatórios</span>
+    </a>
 
+    <a href="mais.html" class="active">
+        <i class="fas fa-ellipsis"></i>
+        <span>Mais</span>
     </a>
 
 </nav>
 
 <script src="../assets/js/sidebar.js"></script>
+<script src="../assets/js/producoes.js"></script>
+<script type="module" src="../assets/js/auth.js"></script>
 
 </body>
 

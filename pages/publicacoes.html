@@ -4,78 +4,73 @@
 <head>
 
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Publicações</title>
 
-<link rel="stylesheet"
-href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/sidebar.css">
+<link rel="stylesheet" href="../assets/css/publicacoes.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
 
-<link rel="stylesheet"
-href="../assets/css/publicacoes.css">
-
-<link rel="stylesheet"
-href="../assets/css/sidebar.css">
-
-<link rel="stylesheet"
-href="../assets/css/responsive.css">
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-
 <aside class="sidebar" id="sidebar">
 
     <div class="sidebar-header">
 
-        <img
-        src="../assets/img/user.png">
+        <img src="../assets/img/user.png" alt="Usuário" class="user-photo" id="fotoUsuario">
 
-        <h3>Diego</h3>
+        <h3 class="user-name" id="nomeUsuario">Usuário</h3>
 
-        <p>Departamento de Mídia</p>
+        <p class="user-email" id="emailUsuario">email@usuario.com</p>
 
     </div>
 
     <nav class="sidebar-menu">
 
-        <a href="../index.html">
-
+        <a href="../dashboard.html">
             <i class="fas fa-house"></i>
-
             Dashboard
-
         </a>
 
         <a href="agenda.html">
-
             <i class="fas fa-calendar"></i>
-
             Agenda
-
         </a>
 
         <a href="solicitacoes.html">
-
             <i class="fas fa-file-lines"></i>
-
             Solicitações
-
         </a>
 
-        <a href="relatorio.html">
+        <a href="publicacoes.html">
+            <i class="fas fa-bullhorn"></i>
+            Publicações
+        </a>
 
+        <a href="producoes.html">
+            <i class="fas fa-video"></i>
+            Produções
+        </a>
+
+        <a href="relatorios.html">
             <i class="fas fa-chart-line"></i>
-
             Relatórios
+        </a>
 
+        <a href="configs.html">
+            <i class="fas fa-gear"></i>
+            Configurações
+        </a>
+
+        <a href="#" onclick="logout()">
+            <i class="fas fa-right-from-bracket"></i>
+            Sair
         </a>
 
     </nav>
@@ -84,90 +79,45 @@ rel="stylesheet">
 
 <div class="overlay" id="overlay"></div>
 
-<!-- HEADER -->
-
 <header class="top-header">
 
     <div class="menu-btn">
-
         <i class="fas fa-bars"></i>
-
     </div>
 
     <div class="logo-area">
-
         <h1>Publicações</h1>
-
     </div>
 
 </header>
 
-<!-- CONTEÚDO -->
-
 <section class="page-content">
-
-    <!-- TOPO -->
 
     <div class="publicacoes-top">
 
-        <input
-        type="text"
-        id="pesquisaPublicacao"
-        placeholder="Pesquisar publicação...">
+        <input type="text" id="pesquisaPublicacao" placeholder="Pesquisar por título, evento, plataforma ou status...">
 
-        <button
-        class="primary-btn"
-        id="abrirModal">
-
+        <button class="primary-btn" id="abrirModal">
             Nova Publicação
-
         </button>
 
     </div>
-
-    <!-- FILTROS -->
 
     <div class="filtros">
 
-        <button class="filtro-btn active"
-        data-status="Todos">
+        <button class="filtro-btn active" data-status="Todos">Todos</button>
 
-            Todos
+        <button class="filtro-btn" data-status="Agendado">Agendados</button>
 
-        </button>
+        <button class="filtro-btn" data-status="Publicado">Publicados</button>
 
-        <button class="filtro-btn"
-        data-status="Agendado">
-
-            Agendados
-
-        </button>
-
-        <button class="filtro-btn"
-        data-status="Publicado">
-
-            Publicados
-
-        </button>
-
-        <button class="filtro-btn"
-        data-status="Rascunho">
-
-            Rascunhos
-
-        </button>
+        <button class="filtro-btn" data-status="Rascunho">Rascunhos</button>
 
     </div>
 
-    <!-- LISTA -->
-
-    <div id="listaPublicacoes">
-
-    </div>
+    <div id="listaPublicacoes"></div>
 
 </section>
-
-<!-- MODAL -->
 
 <div class="modal" id="modalPublicacao">
 
@@ -175,72 +125,55 @@ rel="stylesheet">
 
         <h2>Nova Publicação</h2>
 
-        <input
-        type="text"
-        id="titulo"
-        placeholder="Título da publicação">
+        <input type="text" id="titulo" placeholder="Título da publicação">
+
+        <input type="text" id="eventoRelacionado" placeholder="Evento ou produção relacionada">
 
         <textarea
         id="descricao"
-        placeholder="Descrição da publicação">
-        </textarea>
+        placeholder="Descrição da publicação, legenda ou texto utilizado"></textarea>
 
         <select id="tipo">
-
             <option>Arte Institucional</option>
-
             <option>Vídeo</option>
-
             <option>Banner</option>
-
             <option>Campanha</option>
-
             <option>Comunicado</option>
-
+            <option>Reels</option>
+            <option>Stories</option>
+            <option>Carrossel</option>
         </select>
 
         <select id="plataforma">
-
             <option>Instagram</option>
-
             <option>Facebook</option>
-
             <option>Site Oficial</option>
-
             <option>WhatsApp</option>
-
+            <option>Todas as plataformas</option>
         </select>
 
-        <input
-        type="date"
-        id="data">
+        <input type="date" id="data">
 
-        <input
-        type="time"
-        id="hora">
+        <input type="time" id="hora">
+
+        <input type="text" id="responsavel" placeholder="Responsável pela publicação">
+
+        <input type="url" id="linkPublicacao" placeholder="Link da publicação, se houver">
 
         <select id="status">
-
             <option>Agendado</option>
-
             <option>Publicado</option>
-
             <option>Rascunho</option>
-
         </select>
 
         <div class="modal-actions">
 
             <button id="salvarPublicacao">
-
                 Salvar
-
             </button>
 
             <button id="fecharModal">
-
                 Cancelar
-
             </button>
 
         </div>
@@ -249,39 +182,38 @@ rel="stylesheet">
 
 </div>
 
-<!-- MENU INFERIOR -->
-
 <nav class="bottom-nav">
 
-    <a href="../index.html">
-
+    <a href="../dashboard.html">
         <i class="fas fa-house"></i>
-
         <span>Início</span>
+    </a>
 
+    <a href="solicitacoes.html">
+        <i class="fas fa-file-lines"></i>
+        <span>Solicitações</span>
     </a>
 
     <a href="agenda.html">
-
         <i class="fas fa-calendar"></i>
-
         <span>Agenda</span>
-
     </a>
 
-    <a href="relatorio.html">
-
+    <a href="relatorios.html">
         <i class="fas fa-chart-line"></i>
-
         <span>Relatórios</span>
+    </a>
 
+    <a href="mais.html" class="active">
+        <i class="fas fa-ellipsis"></i>
+        <span>Mais</span>
     </a>
 
 </nav>
 
 <script src="../assets/js/sidebar.js"></script>
-
 <script src="../assets/js/publicacoes.js"></script>
+<script type="module" src="../assets/js/auth.js"></script>
 
 </body>
 

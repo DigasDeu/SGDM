@@ -1,333 +1,279 @@
 const modal =
-document.getElementById(
-"modalSolicitacao"
-);
+document.getElementById("modalSolicitacao");
 
 const abrirModal =
-document.getElementById(
-"abrirModal"
-);
+document.getElementById("abrirModal");
 
 const fecharModal =
-document.getElementById(
-"fecharModal"
-);
+document.getElementById("fecharModal");
 
 const salvarSolicitacao =
-document.getElementById(
-"salvarSolicitacao"
-);
+document.getElementById("salvarSolicitacao");
 
 const listaSolicitacoes =
-document.getElementById(
-"listaSolicitacoes"
-);
+document.getElementById("listaSolicitacoes");
 
 const pesquisa =
-document.getElementById(
-"pesquisaSolicitacao"
-);
+document.getElementById("pesquisaSolicitacao");
 
 let filtroAtual = "Todos";
 
-//
-// ABRIR MODAL
-//
+function buscarSolicitacoes() {
 
-abrirModal.onclick = ()=>{
-
-    modal.style.display = "flex";
-};
-
-//
-// FECHAR MODAL
-//
-
-fecharModal.onclick = ()=>{
-
-    modal.style.display = "none";
-};
-
-//
-// SALVAR
-//
-
-salvarSolicitacao.onclick = ()=>{
-
-    const titulo =
-    document.getElementById(
-    "titulo"
-    ).value;
-
-    const solicitante =
-    document.getElementById(
-    "solicitante"
-    ).value;
-
-    const data =
-    document.getElementById(
-    "data"
-    ).value;
-
-    const hora =
-    document.getElementById(
-    "hora"
-    ).value;
-
-    const local =
-    document.getElementById(
-    "local"
-    ).value;
-
-    const status =
-    document.getElementById(
-    "status"
-    ).value;
-
-    const descricao =
-    document.getElementById(
-    "descricao"
-    ).value;
-
-    if(
-        !titulo ||
-        !solicitante
-    ){
-
-        alert(
-        "Preencha os campos."
-        );
-
-        return;
-    }
-
-    const solicitacoes =
-    JSON.parse(
-        localStorage.getItem(
-        "solicitacoes"
-        )
+    return JSON.parse(
+        localStorage.getItem("solicitacoes")
     ) || [];
+}
 
-    solicitacoes.push({
-
-        titulo,
-        solicitante,
-        data,
-        hora,
-        local,
-        status,
-        descricao
-
-    });
+function salvarSolicitacoes(solicitacoes) {
 
     localStorage.setItem(
-    "solicitacoes",
-    JSON.stringify(
-    solicitacoes
-    )
+        "solicitacoes",
+        JSON.stringify(solicitacoes)
     );
+}
 
-    //
-    // NOTIFICAÇÃO
-    //
+function adicionarNotificacaoSolicitacao(solicitacao) {
 
     const notificacoes =
-    JSON.parse(
-        localStorage.getItem(
-        "notificacoes"
-        )
-    ) || [];
+    JSON.parse(localStorage.getItem("notificacoes")) || [];
 
-    notificacoes.push({
-
-        titulo:
-        "Nova Solicitação",
-
-        descricao:
-        `${titulo} - ${data}`
-
+    notificacoes.unshift({
+        id: Date.now(),
+        titulo: "Nova Solicitação",
+        descricao: `${solicitacao.titulo} • ${solicitacao.data || "Sem data"} • ${solicitacao.local || "Local não informado"}`,
+        tipo: "Solicitação",
+        data: new Date().toLocaleString("pt-BR"),
+        lida: false
     });
 
     localStorage.setItem(
-    "notificacoes",
-    JSON.stringify(
-    notificacoes
-    )
+        "notificacoes",
+        JSON.stringify(notificacoes)
     );
+}
 
-    carregarSolicitacoes();
+if (abrirModal) {
 
-    modal.style.display = "none";
-};
+    abrirModal.onclick = () => {
+        modal.style.display = "flex";
+    };
+}
 
-//
-// LISTAR
-//
+if (fecharModal) {
 
-function carregarSolicitacoes(){
+    fecharModal.onclick = () => {
+        modal.style.display = "none";
+    };
+}
+
+if (salvarSolicitacao) {
+
+    salvarSolicitacao.onclick = () => {
+
+        const titulo =
+        document.getElementById("titulo").value.trim();
+
+        const solicitante =
+        document.getElementById("solicitante").value.trim();
+
+        const data =
+        document.getElementById("data").value;
+
+        const hora =
+        document.getElementById("hora").value;
+
+        const local =
+        document.getElementById("local").value.trim();
+
+        const responsavel =
+        document.getElementById("responsavel")?.value.trim() || "Departamento de Mídia";
+
+        const status =
+        document.getElementById("status").value;
+
+        let descricao =
+        document.getElementById("descricao").value.trim();
+
+        if (!titulo || !solicitante) {
+
+            alert("Preencha título e solicitante.");
+
+            return;
+        }
+
+        if (!descricao) {
+
+            descricao =
+            `A ação "${titulo}" ocorrerá no dia ${data || "não informado"}, às ${hora || "horário não informado"}, no local ${local || "não informado"}, sob responsabilidade de ${responsavel}, conforme solicitação do setor ${solicitante}.`;
+        }
+
+        const solicitacoes =
+        buscarSolicitacoes();
+
+        const novaSolicitacao = {
+            id: Date.now(),
+            titulo,
+            solicitante,
+            data,
+            hora,
+            local,
+            responsavel,
+            status,
+            descricao,
+            origem: "Solicitações"
+        };
+
+        solicitacoes.push(novaSolicitacao);
+
+        salvarSolicitacoes(solicitacoes);
+
+        adicionarNotificacaoSolicitacao(novaSolicitacao);
+
+        carregarSolicitacoes();
+
+        modal.style.display = "none";
+
+        limparFormularioSolicitacao();
+    };
+}
+
+function limparFormularioSolicitacao() {
+
+    const campos = [
+        "titulo",
+        "solicitante",
+        "data",
+        "hora",
+        "local",
+        "responsavel",
+        "descricao"
+    ];
+
+    campos.forEach(id => {
+
+        const campo =
+        document.getElementById(id);
+
+        if (campo) {
+            campo.value = "";
+        }
+    });
+}
+
+function carregarSolicitacoes() {
+
+    if (!listaSolicitacoes) return;
 
     const solicitacoes =
-    JSON.parse(
-        localStorage.getItem(
-        "solicitacoes"
-        )
-    ) || [];
+    buscarSolicitacoes();
 
     listaSolicitacoes.innerHTML = "";
 
-    let filtradas =
-    solicitacoes.filter(item=>{
+    const termo =
+    pesquisa ? pesquisa.value.toLowerCase() : "";
+
+    const filtradas =
+    solicitacoes.filter(item => {
+
+        const textoBusca =
+        `
+        ${item.titulo || ""}
+        ${item.solicitante || ""}
+        ${item.data || ""}
+        ${item.hora || ""}
+        ${item.local || ""}
+        ${item.responsavel || ""}
+        ${item.status || ""}
+        ${item.descricao || ""}
+        `.toLowerCase();
 
         const matchPesquisa =
-        item.titulo
-        .toLowerCase()
-        .includes(
-        pesquisa.value.toLowerCase()
-        );
+        textoBusca.includes(termo);
 
         const matchFiltro =
-
-        filtroAtual === "Todos"
-
-        ||
-
+        filtroAtual === "Todos" ||
         item.status === filtroAtual;
 
-        return(
-            matchPesquisa &&
-            matchFiltro
-        );
+        return matchPesquisa && matchFiltro;
     });
 
-    if(filtradas.length === 0){
+    if (filtradas.length === 0) {
 
         listaSolicitacoes.innerHTML =
-
-        `
-        <p>
-        Nenhuma solicitação encontrada.
-        </p>
-        `;
+        `<p>Nenhuma solicitação encontrada.</p>`;
 
         return;
     }
 
-    filtradas.reverse()
-    .forEach(item=>{
+    filtradas
+    .slice()
+    .reverse()
+    .forEach(item => {
 
         let statusClass = "";
 
-        if(item.status === "Pendente"){
-
+        if (item.status === "Pendente") {
             statusClass = "pendente";
         }
 
-        if(item.status === "Andamento"){
-
+        if (item.status === "Andamento") {
             statusClass = "andamento";
         }
 
-        if(item.status === "Concluído"){
-
+        if (item.status === "Concluído") {
             statusClass = "concluido";
         }
 
-        listaSolicitacoes.innerHTML +=
+        listaSolicitacoes.innerHTML += `
+            <div class="solicitacao-card">
 
-        `
-        <div class="solicitacao-card">
+                <h3>${item.titulo}</h3>
 
-            <h3>
-            ${item.titulo}
-            </h3>
+                <div class="solicitacao-info">
 
-            <div class="solicitacao-info">
+                    <p><strong>Solicitante:</strong> ${item.solicitante}</p>
 
-                <p>
+                    <p><strong>Data:</strong> ${item.data || "Não informada"}</p>
 
-                <strong>Solicitante:</strong>
+                    <p><strong>Hora:</strong> ${item.hora || "Não informada"}</p>
 
-                ${item.solicitante}
+                    <p><strong>Local:</strong> ${item.local || "Não informado"}</p>
 
-                </p>
+                    <p><strong>Responsável:</strong> ${item.responsavel || "Departamento de Mídia"}</p>
 
-                <p>
+                </div>
 
-                <strong>Data:</strong>
+                <p>${item.descricao || "Sem descrição."}</p>
 
-                ${item.data}
-
-                </p>
-
-                <p>
-
-                <strong>Hora:</strong>
-
-                ${item.hora}
-
-                </p>
-
-                <p>
-
-                <strong>Local:</strong>
-
-                ${item.local}
-
-                </p>
+                <span class="status ${statusClass}">
+                    ${item.status}
+                </span>
 
             </div>
-
-            <p>
-
-            ${item.descricao}
-
-            </p>
-
-            <span class="status ${statusClass}">
-
-                ${item.status}
-
-            </span>
-
-        </div>
         `;
     });
 }
 
-//
-// PESQUISA
-//
+if (pesquisa) {
 
-pesquisa.addEventListener(
-"input",
-carregarSolicitacoes
-);
+    pesquisa.addEventListener(
+        "input",
+        carregarSolicitacoes
+    );
+}
 
-//
-// FILTROS
-//
+document
+.querySelectorAll(".filtro-btn")
+.forEach(btn => {
 
-document.querySelectorAll(
-".filtro-btn"
-).forEach(btn=>{
-
-    btn.addEventListener(
-    "click",
-    ()=>{
+    btn.addEventListener("click", () => {
 
         document
-        .querySelectorAll(
-        ".filtro-btn"
-        )
-        .forEach(
-        b=>b.classList.remove(
-        "active"
-        )
-        );
+        .querySelectorAll(".filtro-btn")
+        .forEach(b => b.classList.remove("active"));
 
-        btn.classList.add(
-        "active"
-        );
+        btn.classList.add("active");
 
         filtroAtual =
         btn.dataset.status;
@@ -335,9 +281,5 @@ document.querySelectorAll(
         carregarSolicitacoes();
     });
 });
-
-//
-// INICIAR
-//
 
 carregarSolicitacoes();

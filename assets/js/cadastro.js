@@ -1,129 +1,68 @@
-document
-.getElementById(
-"cadastroBtn"
-)
-.addEventListener(
-"click",
-()=>{
+import { auth } from "./firebase.js";
 
-    const nome =
-    document
-    .getElementById(
-    "nome"
-    ).value;
+import {
+    createUserWithEmailAndPassword,
+    updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    const email =
-    document
-    .getElementById(
-    "email"
-    ).value;
+document.getElementById("cadastroBtn").addEventListener("click", () => {
 
-    const senha =
-    document
-    .getElementById(
-    "senha"
-    ).value;
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const senha = document.getElementById("senha").value;
+    const confirmarSenha = document.getElementById("confirmarSenha")?.value;
 
-    //
-    // VALIDAÇÃO
-    //
-
-    if(
-        nome === "" ||
-        email === "" ||
-        senha === ""
-    ){
-
-        alert(
-        "Preencha todos os campos."
-        );
-
+    if (!nome || !email || !senha) {
+        alert("Preencha todos os campos.");
         return;
     }
 
-    //
-    // PEGAR USUÁRIOS
-    //
-
-    const usuarios =
-    JSON.parse(
-        localStorage.getItem(
-        "usuarios"
-        )
-    ) || [];
-
-    //
-    // VERIFICAR EMAIL
-    //
-
-    const existe =
-    usuarios.find(
-        usuario =>
-        usuario.email === email
-    );
-
-    if(existe){
-
-        alert(
-        "Este email já está cadastrado."
-        );
-
+    if (confirmarSenha !== undefined && senha !== confirmarSenha) {
+        alert("As senhas não conferem.");
         return;
     }
 
-    //
-    // NOVO USUÁRIO
-    //
+    if (senha.length < 6) {
+        alert("A senha precisa ter pelo menos 6 caracteres.");
+        return;
+    }
 
-    const novoUsuario = {
+    createUserWithEmailAndPassword(auth, email, senha)
+    .then((userCredential) => {
 
-        nome:nome,
+        const user = userCredential.user;
 
-        email:email,
-
-        senha:senha,
-
-        foto:"assets/img/user.png"
-    };
-
-    //
-    // SALVAR
-    //
-
-    usuarios.push(
-    novoUsuario
-    );
-
-    localStorage.setItem(
-    "usuarios",
-    JSON.stringify(
-    usuarios
-    )
-    );
-
-    //
-    // LOGIN AUTOMÁTICO
-    //
-
-    localStorage.setItem(
-    "usuarioLogado",
-
-    JSON.stringify({
-
-        nome:nome,
-
-        email:email,
-
-        foto:"assets/img/user.png",
-
-        login:true
+        return updateProfile(user, {
+            displayName: nome
+        }).then(() => user);
     })
-    );
+    .then((user) => {
 
-    //
-    // REDIRECIONAR
-    //
+        localStorage.setItem("usuarioLogado", JSON.stringify({
+            nome: nome,
+            email: user.email,
+            foto: "../assets/img/user.png",
+            uid: user.uid,
+            login: true
+        }));
 
-    window.location.href =
-    "../dashboard.html";
+        window.location.href = "../dashboard.html";
+    })
+    .catch((error) => {
+
+        console.log(error);
+
+        if (error.code === "auth/email-already-in-use") {
+            alert("Este e-mail já está cadastrado.");
+        }
+        else if (error.code === "auth/invalid-email") {
+            alert("E-mail inválido.");
+        }
+        else if (error.code === "auth/weak-password") {
+            alert("Senha fraca. Use pelo menos 6 caracteres.");
+        }
+        else {
+            alert("Erro ao cadastrar: " + error.code);
+        }
+    });
 });

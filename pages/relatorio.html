@@ -4,220 +4,194 @@
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<title>Relatórios</title>
 
-<title>
-Relatório Institucional
-</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/sidebar.css">
+<link rel="stylesheet" href="../assets/css/relatorios.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
 
-<link rel="stylesheet"
-href="../assets/css/relatorio.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
 </head>
 
 <body>
 
-<div class="print-button">
+<aside class="sidebar" id="sidebar">
 
-    <button onclick="window.print()">
+    <div class="sidebar-header">
 
-        Imprimir Relatório
+        <img src="../assets/img/user.png" alt="Usuário" class="user-photo" id="fotoUsuario">
 
-    </button>
+        <h3 class="user-name" id="nomeUsuario">Usuário</h3>
 
-</div>
+        <p class="user-email" id="emailUsuario">email@usuario.com</p>
 
-<section class="documento">
+    </div>
 
-    <!-- CABEÇALHO -->
+    <nav class="sidebar-menu">
 
-    <header class="cabecalho-imagem">
+        <a href="../dashboard.html">
+            <i class="fas fa-house"></i>
+            Dashboard
+        </a>
 
-        <img
-        src="../assets/img/cabecalho-semsa.png"
-        alt="Cabeçalho SEMSA">
+        <a href="agenda.html">
+            <i class="fas fa-calendar"></i>
+            Agenda
+        </a>
 
-    </header>
+        <a href="solicitacoes.html">
+            <i class="fas fa-file-lines"></i>
+            Solicitações
+        </a>
 
-    <!-- TÍTULO -->
+        <a href="publicacoes.html">
+            <i class="fas fa-bullhorn"></i>
+            Publicações
+        </a>
 
-    <section class="titulo-documento">
+        <a href="producoes.html">
+            <i class="fas fa-video"></i>
+            Produções
+        </a>
 
-        <h1>
-        RELATÓRIO DE COBERTURA INSTITUCIONAL
-        </h1>
+        <a href="relatorio.html">
+            <i class="fas fa-chart-line"></i>
+            Relatórios
+        </a>
 
-    </section>
+        <a href="configs.html">
+            <i class="fas fa-gear"></i>
+            Configurações
+        </a>
 
-    <!-- IDENTIFICAÇÃO -->
+        <a href="#" onclick="logout()">
+            <i class="fas fa-right-from-bracket"></i>
+            Sair
+        </a>
 
-    <section class="identificacao">
+    </nav>
 
-        <p>
+</aside>
 
-            <strong>Evento:</strong>
-            Ação UBS Jorge Brito
+<div class="overlay" id="overlay"></div>
 
-        </p>
+<header class="top-header">
 
-        <p>
+    <div class="menu-btn">
+        <i class="fas fa-bars"></i>
+    </div>
 
-            <strong>Data:</strong>
-            28 de Maio de 2026
+    <div class="logo-area">
+        <h1>Relatórios</h1>
+    </div>
 
-        </p>
+</header>
 
-        <p>
+<main class="relatorios-container">
 
-            <strong>Horário:</strong>
-            08h00
-
-        </p>
-
-        <p>
-
-            <strong>Local:</strong>
-            UBS Jorge Brito
-
-        </p>
-
-    </section>
-
-    <!-- TEXTO -->
-
-    <section class="texto-relatorio">
-
-        <p>
-
-            Aos vinte e oito dias do mês de maio
-            do ano de dois mil e vinte e seis,
-            às oito horas,
-            foi realizada cobertura institucional
-            da ação promovida pela Secretaria Municipal
-            de Saúde no UBS Jorge Brito.
-
-        </p>
-
-        <p>
-
-            A equipe do Departamento de Mídia realizou
-            registros fotográficos,
-            cobertura audiovisual,
-            captação de imagens institucionais
-            e produção de conteúdo para divulgação
-            oficial das ações executadas pela SEMSA.
-
-        </p>
-
-        <p>
-
-            A cobertura teve como objetivo
-            fortalecer a comunicação institucional,
-            promover transparência pública
-            e ampliar o acesso às informações
-            relacionadas às atividades desenvolvidas
-            pela Secretaria Municipal de Saúde.
-
-        </p>
-
-    </section>
-
-    <!-- TABELA -->
-
-    <section class="tabela-atividades">
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                    Atividade
-                    </th>
-
-                    <th>
-                    Quantidade
-                    </th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                <tr>
-
-                    <td>
-                    Fotografias
-                    </td>
-
-                    <td>
-                    56
-                    </td>
-
-                </tr>
-
-                <tr>
-
-                    <td>
-                    Vídeos
-                    </td>
-
-                    <td>
-                    12
-                    </td>
-
-                </tr>
-
-                <tr>
-
-                    <td>
-                    Artes Produzidas
-                    </td>
-
-                    <td>
-                    04
-                    </td>
-
-                </tr>
-
-            </tbody>
-
-        </table>
-
-    </section>
-
-    <!-- ASSINATURAS -->
-
-    <section class="assinaturas">
+    <section class="relatorios-header">
 
         <div>
-
-            ____________________________________
-
-            <p>
-            Responsável pela Cobertura
-            </p>
-
+            <h2>Relatórios de Atividades</h2>
+            <p>Produções, publicações, eventos e solicitações registradas pelo Departamento de Mídia.</p>
         </div>
 
-        <div>
+        <button class="primary-btn" id="atualizarRelatorios">
+            Atualizar Dados
+        </button>
 
-            ____________________________________
+    </section>
 
-            <p>
-            Coordenação do Departamento de Mídia
-            </p>
+    <section class="resumo-relatorios">
 
+        <div class="resumo-card">
+            <strong id="totalEventos">0</strong>
+            <span>Eventos</span>
+        </div>
+
+        <div class="resumo-card">
+            <strong id="totalSolicitacoes">0</strong>
+            <span>Solicitações</span>
+        </div>
+
+        <div class="resumo-card">
+            <strong id="totalProducoes">0</strong>
+            <span>Produções</span>
+        </div>
+
+        <div class="resumo-card">
+            <strong id="totalPublicacoes">0</strong>
+            <span>Publicações</span>
         </div>
 
     </section>
 
-</section>
-<script src="../assets/js/relatorio.js"></script>
+    <section class="relatorio-filtros">
+
+        <input
+        type="text"
+        id="pesquisaRelatorio"
+        placeholder="Pesquisar por título, local, responsável, evento ou tipo...">
+
+        <select id="tipoRelatorio">
+            <option value="Todos">Todos</option>
+            <option value="Eventos">Eventos</option>
+            <option value="Solicitações">Solicitações</option>
+            <option value="Produções">Produções</option>
+            <option value="Publicações">Publicações</option>
+        </select>
+
+    </section>
+
+    <section class="lista-relatorios">
+
+        <h3>Atividades Registradas</h3>
+
+        <div id="listaRelatorios">
+            <p>Nenhuma atividade encontrada.</p>
+        </div>
+
+    </section>
+
+</main>
+
+<nav class="bottom-nav">
+
+    <a href="../dashboard.html">
+        <i class="fas fa-house"></i>
+        <span>Início</span>
+    </a>
+
+    <a href="solicitacoes.html">
+        <i class="fas fa-file-lines"></i>
+        <span>Solicitações</span>
+    </a>
+
+    <a href="agenda.html">
+        <i class="fas fa-calendar"></i>
+        <span>Agenda</span>
+    </a>
+
+    <a href="relatorio.html" class="active">
+        <i class="fas fa-chart-line"></i>
+        <span>Relatórios</span>
+    </a>
+
+    <a href="mais.html">
+        <i class="fas fa-ellipsis"></i>
+        <span>Mais</span>
+    </a>
+
+</nav>
+
+<script src="../assets/js/sidebar.js"></script>
+<script src="../assets/js/relatorios.js"></script>
+<script type="module" src="../assets/js/auth.js"></script>
+
 </body>
 
 </html>

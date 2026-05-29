@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Relatório para Impressão</title>
+
+<link rel="stylesheet" href="../assets/css/relatorio-impressao.css">
+
+</head>
+
+<body>
+
+<div class="print-actions">
+
+    <button onclick="window.print()">
+        Imprimir Relatório
+    </button>
+
+    <a href="relatorios.html">
+        Voltar
+    </a>
+
+</div>
+
+<section class="documento">
+
+    <header class="cabecalho-imagem">
+
+        <img
+        src="../assets/img/cabecalho-semsa.png"
+        alt="Cabeçalho SEMSA">
+
+    </header>
+
+    <section class="titulo-documento">
+
+        <h1>RELATÓRIO DE ATIVIDADE DO DEPARTAMENTO DE MÍDIA</h1>
+
+    </section>
+
+    <section class="identificacao">
+
+        <p>
+            <strong>Atividade:</strong>
+            <span id="impTitulo">Atividade não selecionada</span>
+        </p>
+
+        <p>
+            <strong>Tipo:</strong>
+            <span id="impTipo">Não informado</span>
+        </p>
+
+        <p>
+            <strong>Data:</strong>
+            <span id="impData">Não informado</span>
+        </p>
+
+        <p>
+            <strong>Horário:</strong>
+            <span id="impHora">Não informado</span>
+        </p>
+
+        <p>
+            <strong>Local:</strong>
+            <span id="impLocal">Não informado</span>
+        </p>
+
+        <p>
+            <strong>Responsável:</strong>
+            <span id="impResponsavel">Departamento de Mídia</span>
+        </p>
+
+    </section>
+
+    <section class="texto-relatorio">
+
+        <p id="textoPrincipal">
+            Selecione uma atividade na tela de relatórios para gerar o documento de impressão.
+        </p>
+
+        <p>
+            Durante a atividade, o Departamento de Mídia realizou o acompanhamento institucional, registros de imagem, organização de conteúdo e demais ações necessárias para a divulgação oficial das atividades desenvolvidas pela Secretaria Municipal de Saúde.
+        </p>
+
+        <p>
+            O material produzido contribui para o fortalecimento da comunicação institucional, transparência pública e registro das ações realizadas junto à população.
+        </p>
+
+    </section>
+
+    <section class="tabela-atividades">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantidade / Informação</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>Fotografias</td>
+                    <td id="impFotos">0</td>
+                </tr>
+
+                <tr>
+                    <td>Vídeos</td>
+                    <td id="impVideos">0</td>
+                </tr>
+
+                <tr>
+                    <td>Artes / Carrosséis</td>
+                    <td id="impArtes">0</td>
+                </tr>
+
+                <tr>
+                    <td>Plataforma</td>
+                    <td id="impPlataforma">Não informado</td>
+                </tr>
+
+                <tr>
+                    <td>Status</td>
+                    <td id="impStatus">Não informado</td>
+                </tr>
+            </tbody>
+
+        </table>
+
+    </section>
+
+    <section class="observacoes">
+
+        <h3>Descrição / Observações</h3>
+
+        <p id="impDescricao">
+            Nenhuma descrição informada.
+        </p>
+
+    </section>
+
+    <section class="assinaturas">
+
+        <div>
+            ____________________________________
+            <p>Responsável pela Atividade</p>
+        </div>
+
+        <div>
+            ____________________________________
+            <p>Coordenação do Departamento de Mídia</p>
+        </div>
+
+    </section>
+
+</section>
+
+<script src="../assets/js/relatorio-impressao.js"></script>
+
+</body>
+
+</html>

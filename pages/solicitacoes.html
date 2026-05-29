@@ -4,73 +4,82 @@
 <head>
 
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Solicitações</title>
 
-<link rel="stylesheet"
-href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/sidebar.css">
+<link rel="stylesheet" href="../assets/css/solicitacoes.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
 
-<link rel="stylesheet"
-href="../assets/css/solicitacoes.css">
-
-<link rel="stylesheet"
-href="../assets/css/sidebar.css">
-
-<link rel="stylesheet"
-href="../assets/css/responsive.css">
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
 </head>
 
 <body>
-
-<!-- SIDEBAR -->
 
 <aside class="sidebar" id="sidebar">
 
     <div class="sidebar-header">
 
         <img
-        src="../assets/img/user.png">
+        src="../assets/img/user.png"
+        alt="Usuário"
+        class="user-photo"
+        id="fotoUsuario">
 
-        <h3>Diego</h3>
+        <h3 class="user-name" id="nomeUsuario">
+            Usuário
+        </h3>
 
-        <p>Departamento de Mídia</p>
+        <p class="user-email" id="emailUsuario">
+            email@usuario.com
+        </p>
 
     </div>
 
     <nav class="sidebar-menu">
 
-        <a href="../index.html">
-
+        <a href="../dashboard.html">
             <i class="fas fa-house"></i>
-
             Dashboard
-
         </a>
 
         <a href="agenda.html">
-
             <i class="fas fa-calendar"></i>
-
             Agenda
+        </a>
 
+        <a href="solicitacoes.html">
+            <i class="fas fa-file-lines"></i>
+            Solicitações
+        </a>
+
+        <a href="publicacoes.html">
+            <i class="fas fa-bullhorn"></i>
+            Publicações
+        </a>
+
+        <a href="producoes.html">
+            <i class="fas fa-video"></i>
+            Produções
         </a>
 
         <a href="relatorio.html">
-
             <i class="fas fa-chart-line"></i>
-
             Relatórios
-
         </a>
 
-        
+        <a href="configs.html">
+            <i class="fas fa-gear"></i>
+            Configurações
+        </a>
+
+        <a href="#" onclick="logout()">
+            <i class="fas fa-right-from-bracket"></i>
+            Sair
+        </a>
 
     </nav>
 
@@ -78,90 +87,56 @@ rel="stylesheet">
 
 <div class="overlay" id="overlay"></div>
 
-<!-- HEADER -->
-
 <header class="top-header">
 
     <div class="menu-btn">
-
         <i class="fas fa-bars"></i>
-
     </div>
 
     <div class="logo-area">
-
         <h1>Solicitações</h1>
-
     </div>
 
 </header>
 
-<!-- CONTEÚDO -->
-
 <section class="page-content">
-
-    <!-- TOPO -->
 
     <div class="solicitacoes-top">
 
         <input
         type="text"
         id="pesquisaSolicitacao"
-        placeholder="Pesquisar solicitação...">
+        placeholder="Pesquisar por título, solicitante ou local...">
 
-        <button
-        class="primary-btn"
-        id="abrirModal">
-
+        <button class="primary-btn" id="abrirModal">
             Nova Solicitação
-
         </button>
 
     </div>
-
-    <!-- FILTROS -->
 
     <div class="filtros">
 
-        <button class="filtro-btn active"
-        data-status="Todos">
-
+        <button class="filtro-btn active" data-status="Todos">
             Todos
-
         </button>
 
-        <button class="filtro-btn"
-        data-status="Pendente">
-
+        <button class="filtro-btn" data-status="Pendente">
             Pendentes
-
         </button>
 
-        <button class="filtro-btn"
-        data-status="Andamento">
-
+        <button class="filtro-btn" data-status="Andamento">
             Andamento
-
         </button>
 
-        <button class="filtro-btn"
-        data-status="Concluído">
-
+        <button class="filtro-btn" data-status="Concluído">
             Concluídos
-
         </button>
 
     </div>
 
-    <!-- LISTA -->
-
-    <div id="listaSolicitacoes">
-
-    </div>
+    <div id="listaSolicitacoes"></div>
 
 </section>
-
-<!-- MODAL -->
 
 <div class="modal" id="modalSolicitacao">
 
@@ -169,56 +144,36 @@ rel="stylesheet">
 
         <h2>Nova Solicitação</h2>
 
-        <input
-        type="text"
-        id="titulo"
-        placeholder="Título da Solicitação">
+        <input type="text" id="titulo" placeholder="Título da solicitação">
 
-        <input
-        type="text"
-        id="solicitante"
-        placeholder="Solicitante">
+        <input type="text" id="solicitante" placeholder="Solicitante / Departamento">
 
-        <input
-        type="date"
-        id="data">
+        <input type="date" id="data">
 
-        <input
-        type="time"
-        id="hora">
+        <input type="time" id="hora">
 
-        <input
-        type="text"
-        id="local"
-        placeholder="Local da ação">
+        <input type="text" id="local" placeholder="Local da ação">
+
+        <input type="text" id="responsavel" placeholder="Responsável pela ação">
 
         <select id="status">
-
             <option>Pendente</option>
-
             <option>Andamento</option>
-
             <option>Concluído</option>
-
         </select>
 
         <textarea
         id="descricao"
-        placeholder="Descrição da atividade">
-        </textarea>
+        placeholder="Descrição: A ação ocorrerá em tal dia, tal horário, no local informado, com acompanhamento do responsável e do departamento solicitante."></textarea>
 
         <div class="modal-actions">
 
             <button id="salvarSolicitacao">
-
                 Salvar
-
             </button>
 
             <button id="fecharModal">
-
                 Cancelar
-
             </button>
 
         </div>
@@ -227,39 +182,38 @@ rel="stylesheet">
 
 </div>
 
-<!-- MENU INFERIOR -->
-
 <nav class="bottom-nav">
 
-    <a href="../index.html">
-
+    <a href="../dashboard.html">
         <i class="fas fa-house"></i>
-
         <span>Início</span>
+    </a>
 
+    <a href="solicitacoes.html" class="active">
+        <i class="fas fa-file-lines"></i>
+        <span>Solicitações</span>
     </a>
 
     <a href="agenda.html">
-
         <i class="fas fa-calendar"></i>
-
         <span>Agenda</span>
-
     </a>
 
     <a href="relatorio.html">
-
         <i class="fas fa-chart-line"></i>
-
         <span>Relatórios</span>
+    </a>
 
+    <a href="mais.html">
+        <i class="fas fa-ellipsis"></i>
+        <span>Mais</span>
     </a>
 
 </nav>
 
 <script src="../assets/js/sidebar.js"></script>
-
 <script src="../assets/js/solicitacoes.js"></script>
+<script type="module" src="../assets/js/auth.js"></script>
 
 </body>
 
