@@ -1,250 +1,207 @@
-body{
-
-    margin:0;
-
-    background:#dbe2ea;
-
-    font-family:
-    "Times New Roman",
-    serif;
+.relatorios-container {
+    margin-left: 260px;
+    padding: 100px 30px 90px;
+    min-height: 100vh;
+    background: #f4f7fb;
 }
 
-.documento{
-
-    width:210mm;
-
-    min-height:297mm;
-
-    margin:20px auto;
-
-    background:white;
-
-    padding:25mm;
-
-    box-sizing:border-box;
+.relatorios-header {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    margin-bottom: 25px;
 }
 
-.cabecalho{
-
-    display:flex;
-
-    align-items:flex-start;
-
-    justify-content:space-between;
+.relatorios-header h2 {
+    margin: 0 0 8px;
+    color: #1f2937;
+    font-size: 24px;
 }
 
-.logo{
-
-    width:85px;
+.relatorios-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 15px;
 }
 
-.cabecalho-texto{
-
-    flex:1;
-
-    text-align:center;
-
-    padding:0 20px;
+.primary-btn {
+    border: none;
+    background: #2563eb;
+    color: #ffffff;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-.cabecalho-texto p{
-
-    margin:0;
-
-    font-size:14px;
+.primary-btn:hover {
+    background: #1d4ed8;
 }
 
-.cabecalho-texto h1{
-
-    margin:3px 0;
-
-    font-size:20px;
-
-    font-weight:bold;
+.resumo-relatorios {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
 }
 
-.cabecalho-texto h2{
-
-    margin:3px 0;
-
-    font-size:18px;
-
-    font-weight:bold;
+.resumo-card {
+    background: #ffffff;
+    padding: 24px 20px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
-.cabecalho-texto span{
-
-    display:block;
-
-    font-size:13px;
-
-    margin-top:2px;
+.resumo-card strong {
+    display: block;
+    font-size: 34px;
+    color: #2563eb;
+    margin-bottom: 6px;
 }
 
-hr{
-
-    border:none;
-
-    border-top:1px solid black;
-
-    margin:15px 0 25px;
+.resumo-card span {
+    color: #374151;
+    font-weight: 600;
+    font-size: 15px;
 }
 
-.titulo-documento{
-
-    text-align:center;
-
-    margin-bottom:35px;
+.relatorio-filtros {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 18px;
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
-.titulo-documento h1{
-
-    font-size:20px;
-
-    text-transform:uppercase;
-
-    margin:0;
+.relatorio-filtros input,
+.relatorio-filtros select {
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 13px 14px;
+    font-size: 14px;
+    outline: none;
+    background: #ffffff;
 }
 
-.identificacao{
-
-    margin-bottom:30px;
-
-    font-size:16px;
+.relatorio-filtros input {
+    flex: 1;
 }
 
-.identificacao p{
-
-    margin:8px 0;
+.relatorio-filtros select {
+    width: 220px;
 }
 
-.texto-relatorio{
-
-    text-align:justify;
-
-    font-size:16px;
-
-    line-height:1.8;
+.relatorio-filtros input:focus,
+.relatorio-filtros select:focus {
+    border-color: #2563eb;
 }
 
-.texto-relatorio p{
-
-    margin-bottom:20px;
-
-    text-indent:40px;
+.lista-relatorios {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
-.tabela-atividades{
-
-    margin-top:40px;
+.lista-relatorios h3 {
+    margin: 0 0 20px;
+    color: #1f2937;
+    font-size: 20px;
 }
 
-table{
-
-    width:100%;
-
-    border-collapse:collapse;
-
-    font-size:15px;
+#listaRelatorios {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-table th,
-table td{
-
-    border:1px solid black;
-
-    padding:10px;
-
-    text-align:left;
+#listaRelatorios > p {
+    margin: 0;
+    color: #6b7280;
 }
 
-table th{
-
-    background:#f3f3f3;
+.relatorio-item {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-left: 5px solid #2563eb;
+    border-radius: 14px;
+    padding: 18px;
 }
 
-.assinaturas{
-
-    margin-top:90px;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    text-align:center;
-
-    font-size:15px;
+.relatorio-item h4 {
+    margin: 0 0 8px;
+    color: #111827;
+    font-size: 17px;
 }
 
-.assinaturas div{
-
-    width:40%;
+.relatorio-item p {
+    margin: 5px 0;
+    color: #4b5563;
+    font-size: 14px;
 }
 
-.print-button{
-
-    text-align:center;
-
-    margin:20px;
+.relatorio-tipo {
+    display: inline-block;
+    margin-top: 10px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
 }
 
-.print-button button{
-
-    padding:12px 24px;
-
-    border:none;
-
-    background:black;
-
-    color:white;
-
-    cursor:pointer;
-
-    font-size:15px;
-}
-
-.cabecalho-imagem{
-
-    width:100%;
-
-    margin-bottom:35px;
-
-    border:none;
-
-    outline:none;
-}
-
-.cabecalho-imagem img{
-
-    width:100%;
-
-    display:block;
-
-    border:none;
-
-    outline:none;
-}
-
-@media print{
-
-    body{
-
-        background:white;
+@media (max-width: 900px) {
+    .relatorios-container {
+        margin-left: 0;
+        padding: 90px 18px 90px;
     }
 
-    .print-button{
-
-        display:none;
+    .relatorios-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    .documento{
+    .primary-btn {
+        width: 100%;
+    }
 
-        margin:0;
+    .resumo-relatorios {
+        grid-template-columns: repeat(2, 1fr);
+    }
 
-        width:100%;
+    .relatorio-filtros {
+        flex-direction: column;
+    }
 
-        min-height:auto;
+    .relatorio-filtros select {
+        width: 100%;
+    }
+}
 
-        padding:20mm;
+@media (max-width: 480px) {
+    .relatorios-container {
+        padding: 85px 14px 85px;
+    }
+
+    .resumo-relatorios {
+        grid-template-columns: 1fr;
+    }
+
+    .relatorios-header h2 {
+        font-size: 21px;
+    }
+
+    .lista-relatorios {
+        padding: 20px;
     }
 }
