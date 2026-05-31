@@ -792,3 +792,33 @@ body{
     background:#dc2626;
 }
 }
+#modalSolicitacao{
+    position:fixed !important;
+    inset:0 !important;
+    background:rgba(15,23,42,.55) !important;
+    display:none;
+    align-items:center !important;
+    justify-content:center !important;
+    z-index:999999 !important;
+    padding:20px !important;
+}
+
+#modalSolicitacao.active{
+    display:flex !important;
+}
+
+#modalSolicitacao .modal-content{
+    width:100% !important;
+    max-width:900px !important;
+    max-height:90vh !important;
+    overflow-y:auto !important;
+}
+
+.mapa-solicitacao{
+    width:100%;
+    height:260px;
+    border-radius:14px;
+    border:1px solid #d1d5db;
+    margin-bottom:14px;
+    overflow:hidden;
+}

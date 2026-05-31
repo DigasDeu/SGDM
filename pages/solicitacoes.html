@@ -94,9 +94,15 @@
             <p>Gerencie e acompanhe as solicitações de cobertura de mídia.</p>
         </div>
 
-        <button type="button" class="primary-btn" id="abrirModal">
+        <button
+        type="button"
+        class="primary-btn"
+        id="abrirModal"
+        onclick="abrirModalSolicitacaoManual()">
+
             <i class="fas fa-plus"></i>
             Nova Solicitação
+
         </button>
 
     </header>
@@ -296,6 +302,70 @@
 <script src="../assets/js/solicitacoes.js"></script>
 <script src="../assets/js/sidebar.js"></script>
 <script type="module" src="../assets/js/auth.js"></script>
+
+<script>
+
+function abrirModalSolicitacaoManual() {
+
+    const modal = document.getElementById("modalSolicitacao");
+
+    if (!modal) {
+        alert("Modal de solicitação não encontrado.");
+        return;
+    }
+
+    modal.classList.add("active");
+    modal.style.display = "flex";
+
+    setTimeout(() => {
+
+        if (
+            window.mapaSolicitacao &&
+            typeof window.mapaSolicitacao.invalidateSize === "function"
+        ) {
+            window.mapaSolicitacao.invalidateSize();
+        }
+
+    }, 300);
+}
+
+function fecharModalSolicitacaoManual() {
+
+    const modal = document.getElementById("modalSolicitacao");
+
+    if (!modal) return;
+
+    modal.classList.remove("active");
+    modal.style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const fechar = document.getElementById("fecharModal");
+
+    const modal = document.getElementById("modalSolicitacao");
+
+    if (fechar) {
+
+        fechar.addEventListener("click", () => {
+            fecharModalSolicitacaoManual();
+        });
+    }
+
+    if (modal) {
+
+        modal.addEventListener("click", (event) => {
+
+            if (event.target === modal) {
+                fecharModalSolicitacaoManual();
+            }
+
+        });
+    }
+
+});
+
+</script>
 
 </body>
 
