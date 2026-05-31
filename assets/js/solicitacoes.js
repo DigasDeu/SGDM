@@ -9,7 +9,6 @@ let filtroAtual = "Todos";
 
 let mapaSolicitacao = null;
 let marcadorSolicitacao = null;
-let geocoder = null;
 
 function buscarLista(chave) {
     return JSON.parse(localStorage.getItem(chave)) || [];
@@ -67,8 +66,11 @@ function abrirModalSolicitacao() {
 
     setTimeout(() => {
 
-        if (typeof google !== "undefined" && mapaSolicitacao) {
-            google.maps.event.trigger(mapaSolicitacao, "resize");
+        if (!mapaSolicitacao) {
+            iniciarMapaSolicitacao();
+        }
+        else {
+            mapaSolicitacao.invalidateSize();
         }
 
     }, 300);
@@ -105,7 +107,7 @@ if (modal) {
     });
 }
 
-/* GOOGLE MAPS */
+/* MAPA GRATUITO - LEAFLET + OPENSTREETMAP */
 
 function iniciarMapaSolicitacao() {
 
@@ -113,57 +115,54 @@ function iniciarMapaSolicitacao() {
 
     if (!mapaElemento) return;
 
-    if (typeof google === "undefined") {
-        console.log("Google Maps ainda não carregou.");
+    if (typeof L === "undefined") {
+        console.log("Leaflet ainda não carregou.");
         return;
     }
 
-    const maues = {
-        lat: -3.3836,
-        lng: -57.7186
-    };
+    const maues = [-3.3836, -57.7186];
 
-    geocoder = new google.maps.Geocoder();
+    mapaSolicitacao = L.map("mapaSolicitacao", {
+        dragging: true,
+        tap: false,
+        scrollWheelZoom: false
+    }).setView(maues, 15);
 
-    mapaSolicitacao = new google.maps.Map(mapaElemento, {
-        center: maues,
-        zoom: 15,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: true
-    });
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap",
+        maxZoom: 19
+    }).addTo(mapaSolicitacao);
 
-    marcadorSolicitacao = new google.maps.Marker({
-        position: maues,
-        map: mapaSolicitacao,
+    marcadorSolicitacao = L.marker(maues, {
         draggable: true
-    });
+    }).addTo(mapaSolicitacao);
 
-    preencherCoordenadas(maues.lat, maues.lng);
+    preencherCoordenadas(maues[0], maues[1]);
 
-    mapaSolicitacao.addListener("click", (event) => {
+    mapaSolicitacao.on("click", (event) => {
 
-        const lat = event.latLng.lat();
-        const lng = event.latLng.lng();
+        const lat = event.latlng.lat;
+        const lng = event.latlng.lng;
 
-        marcadorSolicitacao.setPosition(event.latLng);
-
-        preencherCoordenadas(lat, lng);
-
-        buscarEnderecoPorCoordenadas(lat, lng);
-    });
-
-    marcadorSolicitacao.addListener("dragend", () => {
-
-        const posicao = marcadorSolicitacao.getPosition();
-
-        const lat = posicao.lat();
-        const lng = posicao.lng();
+        marcadorSolicitacao.setLatLng([lat, lng]);
 
         preencherCoordenadas(lat, lng);
 
         buscarEnderecoPorCoordenadas(lat, lng);
     });
+
+    marcadorSolicitacao.on("dragend", () => {
+
+        const posicao = marcadorSolicitacao.getLatLng();
+
+        preencherCoordenadas(posicao.lat, posicao.lng);
+
+        buscarEnderecoPorCoordenadas(posicao.lat, posicao.lng);
+    });
+
+    setTimeout(() => {
+        mapaSolicitacao.invalidateSize();
+    }, 500);
 }
 
 function preencherCoordenadas(lat, lng) {
@@ -180,32 +179,33 @@ function preencherCoordenadas(lat, lng) {
     }
 }
 
-function buscarEnderecoPorCoordenadas(lat, lng) {
+async function buscarEnderecoPorCoordenadas(lat, lng) {
 
-    if (!geocoder) return;
+    const local = document.getElementById("local");
 
-    geocoder.geocode(
-        {
-            location: {
-                lat,
-                lng
+    try {
+
+        const url =
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+
+        const resposta = await fetch(url, {
+            headers: {
+                "Accept": "application/json"
             }
-        },
-        (results, status) => {
+        });
 
-            if (status === "OK" && results[0]) {
+        const dados = await resposta.json();
 
-                const local = document.getElementById("local");
-
-                if (local) {
-                    local.value = results[0].formatted_address;
-                }
-            }
+        if (dados.display_name && local) {
+            local.value = dados.display_name;
         }
-    );
+
+    } catch (error) {
+        console.log("Erro ao buscar endereço:", error);
+    }
 }
 
-function buscarLocalNoMapa() {
+async function buscarLocalNoMapa() {
 
     const local = document.getElementById("local");
 
@@ -218,38 +218,49 @@ function buscarLocalNoMapa() {
         return;
     }
 
-    if (!geocoder || !mapaSolicitacao || !marcadorSolicitacao) {
+    if (!mapaSolicitacao || !marcadorSolicitacao) {
         alert("Mapa ainda não carregou.");
         return;
     }
 
-    geocoder.geocode(
-        {
-            address: `${endereco}, Maués, Amazonas, Brasil`
-        },
-        (results, status) => {
+    try {
 
-            if (status === "OK" && results[0]) {
+        const query =
+        encodeURIComponent(`${endereco}, Maués, Amazonas, Brasil`);
 
-                const posicao = results[0].geometry.location;
+        const url =
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${query}&limit=1`;
 
-                mapaSolicitacao.setCenter(posicao);
-                mapaSolicitacao.setZoom(17);
-
-                marcadorSolicitacao.setPosition(posicao);
-
-                preencherCoordenadas(
-                    posicao.lat(),
-                    posicao.lng()
-                );
-
-                local.value = results[0].formatted_address;
+        const resposta = await fetch(url, {
+            headers: {
+                "Accept": "application/json"
             }
-            else {
-                alert("Local não encontrado. Tente escrever de outra forma.");
-            }
+        });
+
+        const dados = await resposta.json();
+
+        if (!dados.length) {
+            alert("Local não encontrado. Tente escrever de outra forma.");
+            return;
         }
-    );
+
+        const resultado = dados[0];
+
+        const lat = parseFloat(resultado.lat);
+        const lng = parseFloat(resultado.lon);
+
+        mapaSolicitacao.setView([lat, lng], 17);
+
+        marcadorSolicitacao.setLatLng([lat, lng]);
+
+        preencherCoordenadas(lat, lng);
+
+        local.value = resultado.display_name;
+
+    } catch (error) {
+        console.log("Erro ao buscar local:", error);
+        alert("Erro ao buscar localização.");
+    }
 }
 
 function usarMinhaLocalizacao() {
@@ -270,15 +281,9 @@ function usarMinhaLocalizacao() {
             const lat = posicao.coords.latitude;
             const lng = posicao.coords.longitude;
 
-            const localAtual = {
-                lat,
-                lng
-            };
+            mapaSolicitacao.setView([lat, lng], 17);
 
-            mapaSolicitacao.setCenter(localAtual);
-            mapaSolicitacao.setZoom(17);
-
-            marcadorSolicitacao.setPosition(localAtual);
+            marcadorSolicitacao.setLatLng([lat, lng]);
 
             preencherCoordenadas(lat, lng);
 
@@ -376,8 +381,13 @@ if (formSolicitacao) {
         const latitudeInput = document.getElementById("latitude");
         const longitudeInput = document.getElementById("longitude");
 
-        if (latitudeInput) latitudeInput.value = "";
-        if (longitudeInput) longitudeInput.value = "";
+        if (latitudeInput) {
+            latitudeInput.value = "";
+        }
+
+        if (longitudeInput) {
+            longitudeInput.value = "";
+        }
 
         fecharModalSolicitacao();
     });
@@ -388,6 +398,7 @@ if (formSolicitacao) {
 function gerarEventoAgenda(id) {
 
     const solicitacoes = buscarSolicitacoes();
+
     const eventos = buscarLista("eventos");
 
     const solicitacao =
@@ -606,7 +617,6 @@ function carregarSolicitacoes() {
 /* FILTROS */
 
 if (pesquisa) {
-
     pesquisa.addEventListener("input", carregarSolicitacoes);
 }
 
@@ -630,7 +640,6 @@ document
 
 /* FUNÇÕES GLOBAIS */
 
-window.iniciarMapaSolicitacao = iniciarMapaSolicitacao;
 window.gerarEventoAgenda = gerarEventoAgenda;
 window.excluirSolicitacao = excluirSolicitacao;
 
