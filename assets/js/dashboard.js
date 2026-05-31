@@ -1,5 +1,4 @@
 function buscarLista(chave) {
-
     return JSON.parse(
         localStorage.getItem(chave)
     ) || [];
@@ -131,7 +130,7 @@ function carregarEventos(eventos) {
         container.innerHTML += `
             <div class="event-card">
 
-                <strong>${evento.titulo}</strong>
+                <strong>${evento.titulo || "Evento sem título"}</strong>
 
                 <p>${evento.data || "Sem data"} • ${evento.hora || "Sem horário"}</p>
 
@@ -172,7 +171,7 @@ function carregarDemandasHoje(eventos) {
         container.innerHTML += `
             <div class="event-card">
 
-                <strong>${evento.titulo}</strong>
+                <strong>${evento.titulo || "Atividade sem título"}</strong>
 
                 <p>${evento.hora || "Sem horário"}</p>
 
@@ -184,6 +183,10 @@ function carregarDemandasHoje(eventos) {
         `;
     });
 }
+
+/* ===============================
+   NOTIFICAÇÕES DO DASHBOARD
+================================ */
 
 function carregarNotificacoesDashboard(
     solicitacoes,
@@ -197,96 +200,211 @@ function carregarNotificacoesDashboard(
 
     if (!container) return;
 
-    container.innerHTML = "";
-
-    const notificacoes =
+    const notificacoesSalvas =
     buscarLista("notificacoes");
 
-    if (notificacoes.length > 0) {
+    const notificacoesAutomaticas =
+    montarNotificacoesAutomaticas(
+        solicitacoes,
+        eventos,
+        publicacoes,
+        producoes
+    );
 
-        notificacoes
-        .slice(0, 5)
-        .forEach(item => {
+    const notificacoes =
+    [
+        ...notificacoesSalvas,
+        ...notificacoesAutomaticas
+    ];
 
-            container.innerHTML += `
-                <div class="event-card">
+    container.innerHTML = "";
 
-                    <strong>${item.titulo || "Notificação"}</strong>
+    if (notificacoes.length === 0) {
 
-                    <p>${item.descricao || item.texto || ""}</p>
+        container.innerHTML = `
+            <div class="notification-empty-dashboard">
+                <i class="far fa-bell"></i>
 
-                    <small>${item.data || ""}</small>
+                <strong>Nenhuma notificação no momento</strong>
 
-                </div>
-            `;
-        });
+                <p>
+                    Quando houver novas solicitações, eventos, produções ou publicações,
+                    elas aparecerão aqui.
+                </p>
+            </div>
+        `;
 
         return;
     }
 
-    if (solicitacoes.length > 0) {
+    notificacoes
+    .slice(0, 5)
+    .forEach(item => {
+
+        const visual =
+        obterVisualNotificacao(item.tipo);
 
         container.innerHTML += `
-            <div class="event-card">
+            <div class="dashboard-notification ${visual.classe}">
 
-                <strong>Solicitações Registradas</strong>
+                <div class="notification-icon-box">
+                    <i class="fas ${visual.icone}"></i>
+                </div>
 
-                <p>Existem ${solicitacoes.length} solicitações no sistema.</p>
+                <div class="notification-content">
+
+                    <div class="notification-top">
+
+                        <strong>
+                            ${item.titulo || "Notificação"}
+                        </strong>
+
+                        <span class="notification-type">
+                            ${item.tipo || "Sistema"}
+                        </span>
+
+                    </div>
+
+                    <p>
+                        ${item.descricao || item.texto || "Sem descrição."}
+                    </p>
+
+                    <small>
+                        <i class="far fa-clock"></i>
+                        ${item.data || "Data não informada"}
+                    </small>
+
+                </div>
 
             </div>
         `;
-    }
+    });
 
-    if (eventos.length > 0) {
-
-        container.innerHTML += `
-            <div class="event-card">
-
-                <strong>Eventos Agendados</strong>
-
-                <p>${eventos.length} eventos cadastrados.</p>
-
-            </div>
-        `;
-    }
-
-    if (publicacoes.length > 0) {
+    if (notificacoes.length > 5) {
 
         container.innerHTML += `
-            <div class="event-card">
-
-                <strong>Publicações</strong>
-
-                <p>${publicacoes.length} publicações registradas.</p>
-
+            <div class="notification-more">
+                +${notificacoes.length - 5} notificações adicionais
             </div>
         `;
-    }
-
-    if (producoes.length > 0) {
-
-        container.innerHTML += `
-            <div class="event-card">
-
-                <strong>Produções</strong>
-
-                <p>${producoes.length} produções registradas.</p>
-
-            </div>
-        `;
-    }
-
-    if (
-        solicitacoes.length === 0 &&
-        eventos.length === 0 &&
-        publicacoes.length === 0 &&
-        producoes.length === 0
-    ) {
-
-        container.innerHTML =
-        "<p>Nenhuma notificação.</p>";
     }
 }
+
+function montarNotificacoesAutomaticas(
+    solicitacoes,
+    eventos,
+    publicacoes,
+    producoes
+) {
+
+    const automaticas = [];
+
+    solicitacoes
+    .filter(item => item.status === "Pendente")
+    .slice(-3)
+    .forEach(item => {
+
+        automaticas.push({
+            id: `auto-solicitacao-${item.id}`,
+            titulo: "Solicitação pendente",
+            descricao: item.titulo || "Nova solicitação aguardando atendimento.",
+            tipo: "Solicitação",
+            data: item.data || "",
+            automatica: true
+        });
+    });
+
+    eventos
+    .slice(-3)
+    .forEach(item => {
+
+        automaticas.push({
+            id: `auto-evento-${item.id}`,
+            titulo: "Evento agendado",
+            descricao: `${item.titulo || "Evento"} • ${item.local || "Local não informado"}`,
+            tipo: "Agenda",
+            data: item.data || "",
+            automatica: true
+        });
+    });
+
+    producoes
+    .slice(-3)
+    .forEach(item => {
+
+        automaticas.push({
+            id: `auto-producao-${item.id}`,
+            titulo: "Produção registrada",
+            descricao: `${item.titulo || "Produção"} • ${item.tipo || "Tipo não informado"}`,
+            tipo: "Produção",
+            data: item.data || "",
+            automatica: true
+        });
+    });
+
+    publicacoes
+    .slice(-3)
+    .forEach(item => {
+
+        automaticas.push({
+            id: `auto-publicacao-${item.id}`,
+            titulo: "Publicação registrada",
+            descricao: `${item.titulo || "Publicação"} • ${item.plataforma || "Plataforma não informada"}`,
+            tipo: "Publicação",
+            data: item.data || "",
+            automatica: true
+        });
+    });
+
+    return automaticas;
+}
+
+function obterVisualNotificacao(tipo) {
+
+    if (tipo === "Solicitação") {
+        return {
+            classe: "solicitacao",
+            icone: "fa-file-lines"
+        };
+    }
+
+    if (tipo === "Agenda") {
+        return {
+            classe: "agenda",
+            icone: "fa-calendar-check"
+        };
+    }
+
+    if (tipo === "Produção") {
+        return {
+            classe: "producao",
+            icone: "fa-video"
+        };
+    }
+
+    if (tipo === "Publicação") {
+        return {
+            classe: "publicacao",
+            icone: "fa-bullhorn"
+        };
+    }
+
+    if (tipo === "Relatório") {
+        return {
+            classe: "relatorio",
+            icone: "fa-chart-line"
+        };
+    }
+
+    return {
+        classe: "sistema",
+        icone: "fa-bell"
+    };
+}
+
+/* ===============================
+   ATIVIDADES RECENTES
+================================ */
 
 function carregarAtividadesRecentes(
     eventos,
@@ -362,6 +480,10 @@ function carregarAtividadesRecentes(
         `;
     });
 }
+
+/* ===============================
+   INICIALIZAÇÃO
+================================ */
 
 document.addEventListener(
     "DOMContentLoaded",
