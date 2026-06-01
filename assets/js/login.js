@@ -1,44 +1,68 @@
 import { auth } from "./firebase.js";
 
 import {
-    signInWithEmailAndPassword,
-    GoogleAuthProvider,
-    signInWithPopup
+    onAuthStateChanged,
+    signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-/* ==========================================
-   LOGIN - SGDM
-   Fluxo com cadastro de funcionário/local
-========================================== */
+function estaNaPastaPages() {
+    return window.location.pathname.includes("/pages/");
+}
 
-const loginBtn =
-document.getElementById("loginBtn");
+function paginaAtualNome() {
+    return window.location.pathname.split("/").pop();
+}
 
-const googleLogin =
-document.getElementById("googleLogin");
+function caminhoLogin() {
+    return estaNaPastaPages() ? "../login.html" : "login.html";
+}
 
-function buscarUsuarioSalvo() {
+function caminhoDashboard() {
+    return estaNaPastaPages() ? "../dashboard.html" : "dashboard.html";
+}
+
+function caminhoCadastroFuncionario() {
+    return estaNaPastaPages()
+        ? "cadastro-funcionario.html"
+        : "pages/cadastro-funcionario.html";
+}
+
+function caminhoCadastroLocal() {
+    return estaNaPastaPages()
+        ? "cadastro-local.html"
+        : "pages/cadastro-local.html";
+}
+
+function caminhoAgenda() {
+    return estaNaPastaPages()
+        ? "agenda.html"
+        : "pages/agenda.html";
+}
+
+function caminhoFotoPadrao() {
+    return estaNaPastaPages()
+        ? "../assets/img/user.png"
+        : "assets/img/user.png";
+}
+
+function buscarUsuarioLocal() {
     return JSON.parse(localStorage.getItem("usuarioLogado")) || {};
+}
+
+function salvarUsuarioLocal(usuario) {
+    localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
 }
 
 function buscarFuncionariosSistema() {
     return JSON.parse(localStorage.getItem("funcionariosSistema")) || [];
 }
 
-function salvarUsuarioLogado(usuario) {
-    localStorage.setItem(
-        "usuarioLogado",
-        JSON.stringify(usuario)
-    );
-}
-
-function buscarCadastroFuncionarioPorEmail(email) {
-    const funcionarios =
-    buscarFuncionariosSistema();
+function buscarFuncionarioPorEmail(email) {
+    const funcionarios = buscarFuncionariosSistema();
 
     return funcionarios.find(funcionario =>
         funcionario.email &&
-        funcionario.email.toLowerCase() === email.toLowerCase()
+        funcionario.email.toLowerCase() === String(email).toLowerCase()
     );
 }
 
@@ -54,273 +78,241 @@ function perfilRestrito(tipoAcesso) {
     return perfisRestritos.includes(tipoAcesso);
 }
 
-function definirRotaInicial(usuario) {
+function paginaLivre() {
+    const paginaAtual = window.location.pathname;
 
-    if (!usuario.cadastroFuncionarioCompleto) {
-        window.location.href = "pages/cadastro-funcionario.html";
+    return (
+        paginaAtual.includes("login.html") ||
+        paginaAtual.includes("cadastro.html") ||
+        paginaAtual.endsWith("/") ||
+        paginaAtual.includes("index.html")
+    );
+}
+
+function paginaCadastroFuncionario() {
+    return paginaAtualNome() === "cadastro-funcionario.html";
+}
+
+function paginaCadastroLocal() {
+    return paginaAtualNome() === "cadastro-local.html";
+}
+
+function montarUsuarioSistema(user) {
+    const usuarioAntigo = buscarUsuarioLocal();
+
+    const funcionarioSalvo =
+    buscarFuncionarioPorEmail(user.email);
+
+    const usuarioBase = {
+        ...usuarioAntigo,
+
+        nome:
+        funcionarioSalvo?.nome ||
+        usuarioAntigo.nome ||
+        user.displayName ||
+        "Usuário",
+
+        email:
+        user.email ||
+        usuarioAntigo.email ||
+        "",
+
+        foto:
+        user.photoURL ||
+        usuarioAntigo.foto ||
+        caminhoFotoPadrao(),
+
+        uid: user.uid,
+        login: true
+    };
+
+    if (funcionarioSalvo) {
+        return {
+            ...usuarioBase,
+
+            codigoFuncionario:
+            funcionarioSalvo.codigoFuncionario || usuarioAntigo.codigoFuncionario || "",
+
+            telefone:
+            funcionarioSalvo.telefone || usuarioAntigo.telefone || "",
+
+            cargos:
+            funcionarioSalvo.cargos || usuarioAntigo.cargos || [],
+
+            cargoPrincipal:
+            funcionarioSalvo.cargoPrincipal || usuarioAntigo.cargoPrincipal || "",
+
+            tipoAcesso:
+            funcionarioSalvo.tipoAcesso || usuarioAntigo.tipoAcesso || "",
+
+            statusFuncionario:
+            funcionarioSalvo.statusFuncionario || usuarioAntigo.statusFuncionario || "Pendente",
+
+            unidade:
+            funcionarioSalvo.unidade || usuarioAntigo.unidade || "",
+
+            tipoUnidade:
+            funcionarioSalvo.tipoUnidade || usuarioAntigo.tipoUnidade || "",
+
+            localId:
+            usuarioAntigo.localId || funcionarioSalvo.localId || "",
+
+            codigoLocal:
+            usuarioAntigo.codigoLocal || "",
+
+            localVinculado:
+            usuarioAntigo.localVinculado || "",
+
+            unidadeVinculada:
+            usuarioAntigo.unidadeVinculada || "",
+
+            cadastroFuncionarioCompleto: true,
+
+            cadastroLocalCompleto:
+            usuarioAntigo.cadastroLocalCompleto || false
+        };
+    }
+
+    return {
+        ...usuarioBase,
+
+        codigoFuncionario:
+        usuarioAntigo.codigoFuncionario || "",
+
+        telefone:
+        usuarioAntigo.telefone || "",
+
+        cargos:
+        usuarioAntigo.cargos || [],
+
+        cargoPrincipal:
+        usuarioAntigo.cargoPrincipal || "",
+
+        tipoAcesso:
+        usuarioAntigo.tipoAcesso || "",
+
+        statusFuncionario:
+        usuarioAntigo.statusFuncionario || "Pendente",
+
+        unidade:
+        usuarioAntigo.unidade || "",
+
+        tipoUnidade:
+        usuarioAntigo.tipoUnidade || "",
+
+        localId:
+        usuarioAntigo.localId || "",
+
+        codigoLocal:
+        usuarioAntigo.codigoLocal || "",
+
+        localVinculado:
+        usuarioAntigo.localVinculado || "",
+
+        unidadeVinculada:
+        usuarioAntigo.unidadeVinculada || "",
+
+        cadastroFuncionarioCompleto:
+        usuarioAntigo.cadastroFuncionarioCompleto || false,
+
+        cadastroLocalCompleto:
+        usuarioAntigo.cadastroLocalCompleto || false
+    };
+}
+
+function controlarFluxoCadastro(usuario) {
+    if (!usuario) return;
+
+    if (paginaLivre()) return;
+
+    if (
+        !usuario.cadastroFuncionarioCompleto &&
+        !paginaCadastroFuncionario()
+    ) {
+        window.location.href = caminhoCadastroFuncionario();
         return;
     }
 
     if (
         usuario.cadastroFuncionarioCompleto &&
-        !usuario.cadastroLocalCompleto
+        !usuario.cadastroLocalCompleto &&
+        !paginaCadastroLocal()
     ) {
-        window.location.href = "pages/cadastro-local.html";
+        window.location.href = caminhoCadastroLocal();
         return;
     }
 
-    if (perfilRestrito(usuario.tipoAcesso)) {
-        window.location.href = "pages/agenda.html";
-        return;
-    }
-
-    window.location.href = "dashboard.html";
-}
-
-function montarUsuarioLogado(user) {
-
-    const usuarioAnterior =
-    buscarUsuarioSalvo();
-
-    const funcionarioCadastrado =
-    buscarCadastroFuncionarioPorEmail(user.email);
-
-    if (funcionarioCadastrado) {
-
-        return {
-            ...usuarioAnterior,
-
-            uid: user.uid,
-            nome:
-            funcionarioCadastrado.nome ||
-            user.displayName ||
-            "Usuário",
-
-            email: user.email,
-
-            foto:
-            user.photoURL ||
-            usuarioAnterior.foto ||
-            "assets/img/user.png",
-
-            login: true,
-
-            codigoFuncionario:
-            funcionarioCadastrado.codigoFuncionario || "",
-
-            telefone:
-            funcionarioCadastrado.telefone || "",
-
-            cargos:
-            funcionarioCadastrado.cargos || [],
-
-            cargoPrincipal:
-            funcionarioCadastrado.cargoPrincipal || "",
-
-            tipoAcesso:
-            funcionarioCadastrado.tipoAcesso || "",
-
-            statusFuncionario:
-            funcionarioCadastrado.statusFuncionario || "Pendente",
-
-            unidade:
-            funcionarioCadastrado.unidade || "",
-
-            tipoUnidade:
-            funcionarioCadastrado.tipoUnidade || "",
-
-            localId:
-            funcionarioCadastrado.localId || "",
-
-            cadastroFuncionarioCompleto:
-            funcionarioCadastrado.cadastroFuncionarioCompleto || true,
-
-            cadastroLocalCompleto:
-            usuarioAnterior.cadastroLocalCompleto || false,
-
-            codigoLocal:
-            usuarioAnterior.codigoLocal || "",
-
-            localVinculado:
-            usuarioAnterior.localVinculado || "",
-
-            unidadeVinculada:
-            usuarioAnterior.unidadeVinculada || ""
-        };
-    }
-
-    return {
-        ...usuarioAnterior,
-
-        uid: user.uid,
-
-        nome:
-        user.displayName ||
-        usuarioAnterior.nome ||
-        "Usuário",
-
-        email: user.email,
-
-        foto:
-        user.photoURL ||
-        usuarioAnterior.foto ||
-        "assets/img/user.png",
-
-        login: true,
-
-        codigoFuncionario:
-        usuarioAnterior.codigoFuncionario || "",
-
-        telefone:
-        usuarioAnterior.telefone || "",
-
-        cargos:
-        usuarioAnterior.cargos || [],
-
-        cargoPrincipal:
-        usuarioAnterior.cargoPrincipal || "",
-
-        tipoAcesso:
-        usuarioAnterior.tipoAcesso || "",
-
-        statusFuncionario:
-        usuarioAnterior.statusFuncionario || "Pendente",
-
-        unidade:
-        usuarioAnterior.unidade || "",
-
-        tipoUnidade:
-        usuarioAnterior.tipoUnidade || "",
-
-        localId:
-        usuarioAnterior.localId || "",
-
-        codigoLocal:
-        usuarioAnterior.codigoLocal || "",
-
-        localVinculado:
-        usuarioAnterior.localVinculado || "",
-
-        unidadeVinculada:
-        usuarioAnterior.unidadeVinculada || "",
-
-        cadastroFuncionarioCompleto:
-        usuarioAnterior.cadastroFuncionarioCompleto || false,
-
-        cadastroLocalCompleto:
-        usuarioAnterior.cadastroLocalCompleto || false
-    };
-}
-
-function mostrarErro(error) {
-
-    console.log(
-        "ERRO FIREBASE:",
-        error.code,
-        error.message
-    );
-
-    if (error.code === "auth/unauthorized-domain") {
-        alert("Domínio não autorizado no Firebase. Adicione digasdeu.github.io em Authorized domains.");
-    }
-    else if (error.code === "auth/operation-not-allowed") {
-        alert("Login Google não está ativado no Firebase Authentication.");
-    }
-    else if (error.code === "auth/popup-closed-by-user") {
-        alert("Login cancelado antes de concluir.");
-    }
-    else if (error.code === "auth/invalid-api-key") {
-        alert("Configuração do Firebase está incorreta. Verifique o firebase.js.");
-    }
-    else if (
-        error.code === "auth/invalid-credential" ||
-        error.code === "auth/wrong-password" ||
-        error.code === "auth/user-not-found"
+    if (
+        usuario.cadastroFuncionarioCompleto &&
+        usuario.cadastroLocalCompleto &&
+        (
+            paginaCadastroFuncionario() ||
+            paginaCadastroLocal()
+        )
     ) {
-        alert("E-mail ou senha incorretos.");
-    }
-    else {
-        alert("Erro: " + error.code);
-    }
-}
-
-/* LOGIN COM E-MAIL E SENHA */
-
-if (loginBtn) {
-
-    loginBtn.addEventListener("click", () => {
-
-        const email =
-        document.getElementById("email").value.trim();
-
-        const senha =
-        document.getElementById("senha").value;
-
-        if (email === "" || senha === "") {
-            alert("Preencha email e senha.");
+        if (perfilRestrito(usuario.tipoAcesso)) {
+            window.location.href = caminhoAgenda();
             return;
         }
 
-        loginBtn.disabled = true;
-        loginBtn.textContent = "Entrando...";
-
-        signInWithEmailAndPassword(
-            auth,
-            email,
-            senha
-        )
-        .then((userCredential) => {
-
-            const user =
-            userCredential.user;
-
-            const usuarioSistema =
-            montarUsuarioLogado(user);
-
-            salvarUsuarioLogado(usuarioSistema);
-
-            definirRotaInicial(usuarioSistema);
-        })
-        .catch(mostrarErro)
-        .finally(() => {
-            loginBtn.disabled = false;
-            loginBtn.textContent = "Entrar";
-        });
-    });
+        window.location.href = caminhoDashboard();
+    }
 }
 
-/* LOGIN COM GOOGLE */
+function atualizarUsuarioNaTela(usuario) {
+    const fotoUsuario = document.getElementById("fotoUsuario");
 
-if (googleLogin) {
+    if (fotoUsuario) {
+        fotoUsuario.src = usuario.foto || caminhoFotoPadrao();
+    }
 
-    googleLogin.addEventListener("click", () => {
+    const nomeUsuario = document.getElementById("nomeUsuario");
 
-        const provider =
-        new GoogleAuthProvider();
+    if (nomeUsuario) {
+        nomeUsuario.textContent = usuario.nome || "Usuário";
+    }
 
-        googleLogin.disabled = true;
-        googleLogin.textContent = "Entrando com Google...";
+    const emailUsuario = document.getElementById("emailUsuario");
 
-        signInWithPopup(
-            auth,
-            provider
-        )
-        .then((result) => {
+    if (emailUsuario) {
+        emailUsuario.textContent = usuario.email || "";
+    }
 
-            const user =
-            result.user;
+    const saudacaoUsuario = document.getElementById("saudacaoUsuario");
 
-            const usuarioSistema =
-            montarUsuarioLogado(user);
-
-            salvarUsuarioLogado(usuarioSistema);
-
-            definirRotaInicial(usuarioSistema);
-        })
-        .catch(mostrarErro)
-        .finally(() => {
-            googleLogin.disabled = false;
-            googleLogin.textContent = "Entrar com Google";
-        });
-    });
+    if (saudacaoUsuario) {
+        saudacaoUsuario.textContent = `Olá, ${usuario.nome || "Usuário"}`;
+    }
 }
+
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        if (!paginaLivre()) {
+            window.location.href = caminhoLogin();
+        }
+
+        return;
+    }
+
+    const usuario = montarUsuarioSistema(user);
+
+    salvarUsuarioLocal(usuario);
+
+    atualizarUsuarioNaTela(usuario);
+
+    controlarFluxoCadastro(usuario);
+});
+
+window.logout = function () {
+    signOut(auth)
+    .then(() => {
+        localStorage.removeItem("usuarioLogado");
+
+        window.location.href = caminhoLogin();
+    })
+    .catch((error) => {
+        console.log(error);
+
+        alert("Erro ao sair do sistema.");
+    });
+};
