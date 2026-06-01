@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Cadastro do Funcionário</title>
+
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/cadastro-funcionario.css">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<main class="func-page">
+
+    <section class="func-card">
+
+        <div class="func-header">
+
+            <div class="func-icon">
+                <i class="fas fa-id-card"></i>
+            </div>
+
+            <div>
+                <h1>Cadastro do Funcionário</h1>
+                <p>Identificação funcional para acesso ao SGDM.</p>
+            </div>
+
+        </div>
+
+        <form id="formFuncionario">
+
+            <section class="func-section">
+
+                <h2>Identificação institucional</h2>
+
+                <div class="func-grid">
+
+                    <div class="form-group">
+                        <label>Código institucional</label>
+                        <input type="text" id="codigoFuncionario" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status administrativo</label>
+                        <select id="statusFuncionario">
+                            <option value="Pendente">Pendente</option>
+                            <option value="Ativo">Ativo</option>
+                            <option value="Inativo">Inativo</option>
+                            <option value="Bloqueado">Bloqueado</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="func-section">
+
+                <h2>Dados pessoais</h2>
+
+                <div class="func-grid">
+
+                    <div class="form-group">
+                        <label>Nome completo *</label>
+                        <input type="text" id="nomeFuncionario" placeholder="Nome completo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>E-mail / Gmail *</label>
+                        <input type="email" id="emailFuncionario" placeholder="email@gmail.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Telefone / WhatsApp *</label>
+                        <input type="tel" id="telefoneFuncionario" placeholder="(92) 99999-9999" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Matrícula / Identificação interna</label>
+                        <input type="text" id="matriculaFuncionario" placeholder="Matrícula, CPF ou identificação">
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="func-section">
+
+                <h2>Cargos e funções</h2>
+
+                <div class="form-group">
+                    <label>Cargos / Funções *</label>
+
+                    <div class="checkbox-grid">
+
+                        <label>
+                            <input type="checkbox" name="cargosFuncionario" value="Gerente">
+                            Gerente
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="cargosFuncionario" value="Coordenador">
+                            Coordenador
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="cargosFuncionario" value="Secretário(a)">
+                            Secretário(a)
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="cargosFuncionario" value="Funcionário">
+                            Funcionário
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="cargosFuncionario" value="Médico">
+                            Médico
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="cargosFuncionario" value="Enfermeiro">
+                            Enfermeiro
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="cargosFuncionario" value="Técnico de Enfermagem">
+                            Técnico de Enfermagem
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="cargosFuncionario" value="Dentista">
+                            Dentista
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="cargosFuncionario" value="Farmacêutico">
+                            Farmacêutico
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="cargosFuncionario" value="Fisioterapeuta">
+                            Fisioterapeuta
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="cargosFuncionario" value="Responsável Técnico">
+                            Responsável Técnico
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="cargosFuncionario" value="Outro">
+                            Outro
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <div class="func-grid">
+
+                    <div class="form-group">
+                        <label>Cargo principal *</label>
+                        <select id="cargoPrincipal" required>
+                            <option value="">Selecione</option>
+                            <option value="Gerente">Gerente</option>
+                            <option value="Coordenador">Coordenador</option>
+                            <option value="Secretário(a)">Secretário(a)</option>
+                            <option value="Funcionário">Funcionário</option>
+                            <option value="Médico">Médico</option>
+                            <option value="Enfermeiro">Enfermeiro</option>
+                            <option value="Técnico de Enfermagem">Técnico de Enfermagem</option>
+                            <option value="Dentista">Dentista</option>
+                            <option value="Farmacêutico">Farmacêutico</option>
+                            <option value="Fisioterapeuta">Fisioterapeuta</option>
+                            <option value="Responsável Técnico">Responsável Técnico</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de acesso *</label>
+                        <select id="tipoAcesso" required>
+                            <option value="">Selecione</option>
+                            <option value="Gerente de Unidade">Gerente de Unidade</option>
+                            <option value="Coordenador">Coordenador</option>
+                            <option value="Secretaria">Secretaria</option>
+                            <option value="Funcionário">Funcionário</option>
+                            <option value="Solicitante">Solicitante</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="func-section">
+
+                <h2>Identificação profissional</h2>
+
+                <div class="func-grid">
+
+                    <div class="form-group">
+                        <label>Conselho profissional</label>
+                        <select id="conselhoProfissional">
+                            <option value="Não se aplica">Não se aplica</option>
+                            <option value="CRM">CRM</option>
+                            <option value="COREN">COREN</option>
+                            <option value="CRO">CRO</option>
+                            <option value="CRF">CRF</option>
+                            <option value="CREFITO">CREFITO</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Número do registro</label>
+                        <input type="text" id="numeroRegistro" placeholder="Número do conselho ou registro">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Especialidade / área</label>
+                        <input type="text" id="especialidade" placeholder="Ex: Clínico geral, enfermagem, odontologia">
+                    </div>
+
+                    <div class="form-group">
+                        <label>É responsável técnico?</label>
+                        <select id="responsavelTecnico">
+                            <option value="Não">Não</option>
+                            <option value="Sim">Sim</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="func-section">
+
+                <h2>Unidade vinculada</h2>
+
+                <div class="func-grid">
+
+                    <div class="form-group">
+                        <label>Unidade / Local principal *</label>
+                        <select id="unidadeFuncionario" required>
+                            <option value="">Selecione</option>
+                            <option value="Biodiagnóstico">Biodiagnóstico</option>
+                            <option value="CTA">CTA</option>
+                            <option value="CEO (Odonto)">CEO (Odonto)</option>
+                            <option value="Centro de Fisioterapia">Centro de Fisioterapia</option>
+                            <option value="Vigilância">Vigilância</option>
+                            <option value="UBS 1">UBS 1</option>
+                            <option value="UBS 2">UBS 2</option>
+                            <option value="UBS 3">UBS 3</option>
+                            <option value="UBS 4">UBS 4</option>
+                            <option value="UBS 5">UBS 5</option>
+                            <option value="UBS 6">UBS 6</option>
+                            <option value="UBS Fluvial">UBS Fluvial</option>
+                            <option value="Hospital">Hospital</option>
+                            <option value="AMAEMI">AMAEMI</option>
+                            <option value="PNI">PNI</option>
+                            <option value="CAF">CAF</option>
+                            <option value="Central de Regulação">Central de Regulação</option>
+                            <option value="Centro de Saúde da Mulher">Centro de Saúde da Mulher</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de unidade</label>
+                        <select id="tipoUnidade">
+                            <option value="Unidade de Saúde">Unidade de Saúde</option>
+                            <option value="Centro Especializado">Centro Especializado</option>
+                            <option value="Hospital">Hospital</option>
+                            <option value="Setor Administrativo">Setor Administrativo</option>
+                            <option value="Programa">Programa</option>
+                            <option value="Serviço de Apoio">Serviço de Apoio</option>
+                            <option value="Vigilância">Vigilância</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="func-section">
+
+                <h2>Observações</h2>
+
+                <div class="form-group">
+                    <textarea id="observacoesFuncionario" placeholder="Observações administrativas sobre o funcionário"></textarea>
+                </div>
+
+            </section>
+
+            <div class="func-actions">
+
+                <button type="button" class="secondary-btn" id="voltarBtn">
+                    <i class="fas fa-arrow-left"></i>
+                    Voltar
+                </button>
+
+                <button type="submit" class="primary-btn">
+                    <i class="fas fa-save"></i>
+                    Salvar Funcionário
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+<script src="../assets/js/cadastro-funcionario.js"></script>
+
+</body>
+
+</html>

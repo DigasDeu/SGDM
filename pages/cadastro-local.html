@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Cadastro de Local</title>
+
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/cadastro-local.css">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<main class="local-page">
+
+    <section class="local-card">
+
+        <div class="local-header">
+
+            <div class="local-icon">
+                <i class="fas fa-location-dot"></i>
+            </div>
+
+            <div>
+                <h1>Cadastro de Local</h1>
+                <p>Registre unidades, setores, domicílios, propriedades urbanas e locais de ação vinculados ao SGDM.</p>
+            </div>
+
+        </div>
+
+        <form id="formLocal">
+
+            <section class="local-section">
+
+                <h2>Identificação do local</h2>
+
+                <div class="local-grid">
+
+                    <div class="form-group">
+                        <label>Código do local</label>
+                        <input type="text" id="codigoLocal" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Classificação do local *</label>
+                        <select id="classificacaoLocal" required>
+                            <option value="">Selecione</option>
+                            <option value="Unidade base">Unidade base</option>
+                            <option value="Setor de unidade">Setor de unidade</option>
+                            <option value="Local vinculado">Local vinculado</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de registro *</label>
+                        <select id="tipoRegistro" required>
+                            <option value="">Selecione</option>
+                            <option value="UBS">UBS</option>
+                            <option value="UBS Fluvial">UBS Fluvial</option>
+                            <option value="Hospital">Hospital</option>
+                            <option value="Centro Especializado">Centro Especializado</option>
+                            <option value="Setor Administrativo">Setor Administrativo</option>
+                            <option value="Setor de Unidade">Setor de Unidade</option>
+                            <option value="Domicílio urbano">Domicílio urbano</option>
+                            <option value="Propriedade urbana">Propriedade urbana</option>
+                            <option value="Domicílio e propriedade">Domicílio e propriedade</option>
+                            <option value="Prédio público">Prédio público</option>
+                            <option value="Unidade de saúde">Unidade de saúde</option>
+                            <option value="Local de ação">Local de ação</option>
+                            <option value="Ponto de apoio">Ponto de apoio</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nome / identificação do local *</label>
+                        <input type="text" id="nomeLocal" placeholder="Ex: UBS Jangibito, Sala de Vacina, Residência Família Silva" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sigla do local</label>
+                        <input type="text" id="siglaLocal" placeholder="Ex: JB, SV, AC, FS">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="statusLocal">
+                            <option value="Ativo">Ativo</option>
+                            <option value="Pendente">Pendente</option>
+                            <option value="Inativo">Inativo</option>
+                            <option value="A inaugurar">A inaugurar</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Zona</label>
+                        <select id="zonaLocal">
+                            <option value="Urbana">Urbana</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="local-section">
+
+                <h2>Vínculo com unidade / responsável</h2>
+
+                <div class="local-grid">
+
+                    <div class="form-group">
+                        <label>Responsável / protetor do domicílio</label>
+                        <input type="text" id="responsavelLocal" placeholder="Nome do responsável pelo local">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Telefone do responsável</label>
+                        <input type="tel" id="telefoneResponsavel" placeholder="(92) 99999-9999">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Unidade vinculada</label>
+                        <select id="unidadeVinculada">
+                            <option value="">Não se aplica / selecione</option>
+                            <option value="Biodiagnóstico">Biodiagnóstico</option>
+                            <option value="CTA">CTA</option>
+                            <option value="CEO (Odonto)">CEO (Odonto)</option>
+                            <option value="Centro de Fisioterapia">Centro de Fisioterapia</option>
+                            <option value="Vigilância">Vigilância</option>
+                            <option value="UBS 1">UBS 1</option>
+                            <option value="UBS 2">UBS 2</option>
+                            <option value="UBS 3">UBS 3</option>
+                            <option value="UBS 4">UBS 4</option>
+                            <option value="UBS 5">UBS 5</option>
+                            <option value="UBS 6">UBS 6</option>
+                            <option value="UBS Fluvial">UBS Fluvial</option>
+                            <option value="Hospital">Hospital</option>
+                            <option value="AMAEMI">AMAEMI</option>
+                            <option value="PNI">PNI</option>
+                            <option value="CAF">CAF</option>
+                            <option value="Central de Regulação">Central de Regulação</option>
+                            <option value="Centro de Saúde da Mulher">Centro de Saúde da Mulher</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="local-section">
+
+                <h2>Endereço urbano</h2>
+
+                <div class="local-grid">
+
+                    <div class="form-group">
+                        <label>Endereço / Rua *</label>
+                        <input type="text" id="enderecoLocal" placeholder="Ex: Rua São José" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bairro *</label>
+                        <input type="text" id="bairroLocal" placeholder="Ex: Centro" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Número</label>
+                        <input type="text" id="numeroLocal" placeholder="Ex: 123 ou S/N">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Complemento</label>
+                        <input type="text" id="complementoLocal" placeholder="Ex: Casa azul, sala 02">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label>Ponto de referência</label>
+                    <input type="text" id="referenciaLocal" placeholder="Ex: Próximo à escola, ao lado da praça">
+                </div>
+
+            </section>
+
+            <section class="local-section">
+
+                <h2>Localização no mapa</h2>
+
+                <div class="location-row">
+
+                    <input type="text" id="buscaMapa" placeholder="Digite endereço, bairro ou ponto de referência">
+
+                    <button type="button" class="map-btn" id="buscarEndereco">
+                        <i class="fas fa-search-location"></i>
+                        Buscar
+                    </button>
+
+                    <button type="button" class="map-btn green" id="usarLocalizacao">
+                        <i class="fas fa-crosshairs"></i>
+                        Minha localização
+                    </button>
+
+                </div>
+
+                <div id="mapaCadastroLocal" class="mapa-local"></div>
+
+                <div class="local-grid">
+
+                    <div class="form-group">
+                        <label>Latitude</label>
+                        <input type="text" id="latitudeLocal" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Longitude</label>
+                        <input type="text" id="longitudeLocal" readonly>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="local-section">
+
+                <h2>Observações</h2>
+
+                <div class="form-group">
+                    <textarea id="observacoesLocal" placeholder="Observações importantes sobre o local, setor, domicílio ou propriedade urbana"></textarea>
+                </div>
+
+            </section>
+
+            <div class="local-actions">
+
+                <button type="button" class="secondary-btn" id="voltarBtn">
+                    <i class="fas fa-arrow-left"></i>
+                    Voltar
+                </button>
+
+                <button type="button" class="secondary-btn" id="limparBtn">
+                    <i class="fas fa-eraser"></i>
+                    Limpar
+                </button>
+
+                <button type="submit" class="primary-btn">
+                    <i class="fas fa-save"></i>
+                    Salvar Local
+                </button>
+
+            </div>
+
+        </form>
+
+        <section class="local-list-section">
+
+            <h2>Locais cadastrados</h2>
+
+            <div class="local-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="pesquisaLocal" placeholder="Pesquisar por nome, código, bairro, responsável, classificação ou tipo...">
+            </div>
+
+            <div id="listaLocais" class="lista-locais">
+                <p>Nenhum local cadastrado.</p>
+            </div>
+
+        </section>
+
+    </section>
+
+</main>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="../assets/js/cadastro-local.js"></script>
+
+</body>
+
+</html>
