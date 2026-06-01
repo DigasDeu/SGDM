@@ -23,21 +23,45 @@
 
     <h1>Criar Conta</h1>
 
-    <div class="login-box">
+    <p class="login-subtitle">
+        Crie sua conta para iniciar a identificação funcional no SGDM.
+    </p>
 
-        <input type="text" id="nome" placeholder="Nome completo">
+    <form class="login-box" id="formCadastro">
 
-        <input type="email" id="email" placeholder="Seu e-mail">
+        <input
+        type="text"
+        id="nome"
+        placeholder="Nome completo"
+        autocomplete="name"
+        required>
 
-        <input type="password" id="senha" placeholder="Crie uma senha">
+        <input
+        type="email"
+        id="email"
+        placeholder="Seu e-mail / Gmail"
+        autocomplete="email"
+        required>
 
-        <input type="password" id="confirmarSenha" placeholder="Confirmar senha">
+        <input
+        type="password"
+        id="senha"
+        placeholder="Crie uma senha"
+        autocomplete="new-password"
+        required>
 
-        <button id="cadastroBtn">
+        <input
+        type="password"
+        id="confirmarSenha"
+        placeholder="Confirmar senha"
+        autocomplete="new-password"
+        required>
+
+        <button type="submit" id="cadastroBtn">
             Criar Conta
         </button>
 
-    </div>
+    </form>
 
     <p class="cadastro-link">
         Já possui conta?
