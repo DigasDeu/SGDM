@@ -1,56 +1,33 @@
 import { auth } from "./firebase.js";
 
 import {
-    onAuthStateChanged,
-    signOut
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-function estaNaPastaPages() {
-    return window.location.pathname.includes("/pages/");
-}
+/* ==========================================
+   LOGIN - SGDM
+========================================== */
 
-function paginaAtualNome() {
-    return window.location.pathname.split("/").pop();
-}
+const loginForm =
+document.getElementById("loginForm");
 
-function caminhoLogin() {
-    return estaNaPastaPages() ? "../login.html" : "login.html";
-}
+const loginBtn =
+document.getElementById("loginBtn");
 
-function caminhoDashboard() {
-    return estaNaPastaPages() ? "../dashboard.html" : "dashboard.html";
-}
-
-function caminhoCadastroFuncionario() {
-    return estaNaPastaPages()
-        ? "cadastro-funcionario.html"
-        : "pages/cadastro-funcionario.html";
-}
-
-function caminhoCadastroLocal() {
-    return estaNaPastaPages()
-        ? "cadastro-local.html"
-        : "pages/cadastro-local.html";
-}
-
-function caminhoAgenda() {
-    return estaNaPastaPages()
-        ? "agenda.html"
-        : "pages/agenda.html";
-}
-
-function caminhoFotoPadrao() {
-    return estaNaPastaPages()
-        ? "../assets/img/user.png"
-        : "assets/img/user.png";
-}
+const googleLogin =
+document.getElementById("googleLogin");
 
 function buscarUsuarioLocal() {
     return JSON.parse(localStorage.getItem("usuarioLogado")) || {};
 }
 
-function salvarUsuarioLocal(usuario) {
-    localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
+function salvarUsuarioLogado(usuario) {
+    localStorage.setItem(
+        "usuarioLogado",
+        JSON.stringify(usuario)
+    );
 }
 
 function buscarFuncionariosSistema() {
@@ -58,7 +35,9 @@ function buscarFuncionariosSistema() {
 }
 
 function buscarFuncionarioPorEmail(email) {
-    const funcionarios = buscarFuncionariosSistema();
+
+    const funcionarios =
+    buscarFuncionariosSistema();
 
     return funcionarios.find(funcionario =>
         funcionario.email &&
@@ -67,6 +46,7 @@ function buscarFuncionarioPorEmail(email) {
 }
 
 function perfilRestrito(tipoAcesso) {
+
     const perfisRestritos = [
         "Gerente de Unidade",
         "Coordenador",
@@ -78,139 +58,105 @@ function perfilRestrito(tipoAcesso) {
     return perfisRestritos.includes(tipoAcesso);
 }
 
-function paginaLivre() {
-    const paginaAtual = window.location.pathname;
+function definirRotaInicial(usuario) {
 
-    return (
-        paginaAtual.includes("login.html") ||
-        paginaAtual.includes("cadastro.html") ||
-        paginaAtual.endsWith("/") ||
-        paginaAtual.includes("index.html")
-    );
-}
+    if (!usuario.cadastroFuncionarioCompleto) {
+        window.location.href = "pages/cadastro-funcionario.html";
+        return;
+    }
 
-function paginaCadastroFuncionario() {
-    return paginaAtualNome() === "cadastro-funcionario.html";
-}
+    if (
+        usuario.cadastroFuncionarioCompleto &&
+        !usuario.cadastroLocalCompleto &&
+        usuario.tipoAcesso !== "Equipe de Mídia"
+    ) {
+        window.location.href = "pages/cadastro-local.html";
+        return;
+    }
 
-function paginaCadastroLocal() {
-    return paginaAtualNome() === "cadastro-local.html";
+    if (perfilRestrito(usuario.tipoAcesso)) {
+        window.location.href = "pages/solicitacoes.html";
+        return;
+    }
+
+    window.location.href = "dashboard.html";
 }
 
 function montarUsuarioSistema(user) {
-    const usuarioAntigo = buscarUsuarioLocal();
 
-    const funcionarioSalvo =
+    const usuarioAntigo =
+    buscarUsuarioLocal();
+
+    const funcionario =
     buscarFuncionarioPorEmail(user.email);
 
-    const usuarioBase = {
-        ...usuarioAntigo,
+    if (funcionario) {
 
-        nome:
-        funcionarioSalvo?.nome ||
-        usuarioAntigo.nome ||
-        user.displayName ||
-        "Usuário",
-
-        email:
-        user.email ||
-        usuarioAntigo.email ||
-        "",
-
-        foto:
-        user.photoURL ||
-        usuarioAntigo.foto ||
-        caminhoFotoPadrao(),
-
-        uid: user.uid,
-        login: true
-    };
-
-    if (funcionarioSalvo) {
         return {
-            ...usuarioBase,
+            ...usuarioAntigo,
 
-            codigoFuncionario:
-            funcionarioSalvo.codigoFuncionario || usuarioAntigo.codigoFuncionario || "",
+            uid: user.uid,
+            nome: funcionario.nome || user.displayName || "Usuário",
+            email: user.email,
+            foto: user.photoURL || usuarioAntigo.foto || "assets/img/user.png",
+            login: true,
 
-            telefone:
-            funcionarioSalvo.telefone || usuarioAntigo.telefone || "",
+            codigoFuncionario: funcionario.codigoFuncionario || "",
+            telefone: funcionario.telefone || "",
+            cargos: funcionario.cargos || [],
+            cargoPrincipal: funcionario.cargoPrincipal || "",
+            tipoAcesso: funcionario.tipoAcesso || "",
+            statusFuncionario: funcionario.statusFuncionario || "Pendente",
 
-            cargos:
-            funcionarioSalvo.cargos || usuarioAntigo.cargos || [],
+            equipeMidia:
+            funcionario.equipeMidia ||
+            funcionario.tipoAcesso === "Equipe de Mídia",
 
-            cargoPrincipal:
-            funcionarioSalvo.cargoPrincipal || usuarioAntigo.cargoPrincipal || "",
+            unidade: funcionario.unidade || "",
+            tipoUnidade: funcionario.tipoUnidade || "",
+            localId: funcionario.localId || usuarioAntigo.localId || "",
 
-            tipoAcesso:
-            funcionarioSalvo.tipoAcesso || usuarioAntigo.tipoAcesso || "",
+            codigoLocal: usuarioAntigo.codigoLocal || "",
+            localVinculado: usuarioAntigo.localVinculado || "",
+            unidadeVinculada: usuarioAntigo.unidadeVinculada || "",
 
-            statusFuncionario:
-            funcionarioSalvo.statusFuncionario || usuarioAntigo.statusFuncionario || "Pendente",
-
-            unidade:
-            funcionarioSalvo.unidade || usuarioAntigo.unidade || "",
-
-            tipoUnidade:
-            funcionarioSalvo.tipoUnidade || usuarioAntigo.tipoUnidade || "",
-
-            localId:
-            usuarioAntigo.localId || funcionarioSalvo.localId || "",
-
-            codigoLocal:
-            usuarioAntigo.codigoLocal || "",
-
-            localVinculado:
-            usuarioAntigo.localVinculado || "",
-
-            unidadeVinculada:
-            usuarioAntigo.unidadeVinculada || "",
-
-            cadastroFuncionarioCompleto: true,
+            cadastroFuncionarioCompleto:
+            funcionario.cadastroFuncionarioCompleto || true,
 
             cadastroLocalCompleto:
-            usuarioAntigo.cadastroLocalCompleto || false
+            funcionario.tipoAcesso === "Equipe de Mídia"
+            ? true
+            : usuarioAntigo.cadastroLocalCompleto ||
+              funcionario.cadastroLocalCompleto ||
+              false
         };
     }
 
     return {
-        ...usuarioBase,
+        ...usuarioAntigo,
 
-        codigoFuncionario:
-        usuarioAntigo.codigoFuncionario || "",
+        uid: user.uid,
+        nome: user.displayName || usuarioAntigo.nome || "Usuário",
+        email: user.email,
+        foto: user.photoURL || usuarioAntigo.foto || "assets/img/user.png",
+        login: true,
 
-        telefone:
-        usuarioAntigo.telefone || "",
+        codigoFuncionario: usuarioAntigo.codigoFuncionario || "",
+        telefone: usuarioAntigo.telefone || "",
+        cargos: usuarioAntigo.cargos || [],
+        cargoPrincipal: usuarioAntigo.cargoPrincipal || "",
+        tipoAcesso: usuarioAntigo.tipoAcesso || "",
+        statusFuncionario: usuarioAntigo.statusFuncionario || "Pendente",
 
-        cargos:
-        usuarioAntigo.cargos || [],
+        equipeMidia: usuarioAntigo.equipeMidia || false,
 
-        cargoPrincipal:
-        usuarioAntigo.cargoPrincipal || "",
+        unidade: usuarioAntigo.unidade || "",
+        tipoUnidade: usuarioAntigo.tipoUnidade || "",
+        localId: usuarioAntigo.localId || "",
 
-        tipoAcesso:
-        usuarioAntigo.tipoAcesso || "",
-
-        statusFuncionario:
-        usuarioAntigo.statusFuncionario || "Pendente",
-
-        unidade:
-        usuarioAntigo.unidade || "",
-
-        tipoUnidade:
-        usuarioAntigo.tipoUnidade || "",
-
-        localId:
-        usuarioAntigo.localId || "",
-
-        codigoLocal:
-        usuarioAntigo.codigoLocal || "",
-
-        localVinculado:
-        usuarioAntigo.localVinculado || "",
-
-        unidadeVinculada:
-        usuarioAntigo.unidadeVinculada || "",
+        codigoLocal: usuarioAntigo.codigoLocal || "",
+        localVinculado: usuarioAntigo.localVinculado || "",
+        unidadeVinculada: usuarioAntigo.unidadeVinculada || "",
 
         cadastroFuncionarioCompleto:
         usuarioAntigo.cadastroFuncionarioCompleto || false,
@@ -220,99 +166,136 @@ function montarUsuarioSistema(user) {
     };
 }
 
-function controlarFluxoCadastro(usuario) {
-    if (!usuario) return;
+function mostrarErro(error) {
 
-    if (paginaLivre()) return;
+    console.log("ERRO FIREBASE:", error.code, error.message);
 
-    if (
-        !usuario.cadastroFuncionarioCompleto &&
-        !paginaCadastroFuncionario()
-    ) {
-        window.location.href = caminhoCadastroFuncionario();
-        return;
+    if (error.code === "auth/unauthorized-domain") {
+        alert("Domínio não autorizado no Firebase. Adicione seu domínio em Authentication > Settings > Authorized domains.");
     }
-
-    if (
-        usuario.cadastroFuncionarioCompleto &&
-        !usuario.cadastroLocalCompleto &&
-        !paginaCadastroLocal()
-    ) {
-        window.location.href = caminhoCadastroLocal();
-        return;
+    else if (error.code === "auth/operation-not-allowed") {
+        alert("Esse método de login não está ativado no Firebase Authentication.");
     }
-
-    if (
-        usuario.cadastroFuncionarioCompleto &&
-        usuario.cadastroLocalCompleto &&
-        (
-            paginaCadastroFuncionario() ||
-            paginaCadastroLocal()
-        )
+    else if (error.code === "auth/popup-closed-by-user") {
+        alert("Login cancelado antes de concluir.");
+    }
+    else if (error.code === "auth/invalid-api-key") {
+        alert("Configuração do Firebase incorreta. Verifique o arquivo firebase.js.");
+    }
+    else if (
+        error.code === "auth/invalid-credential" ||
+        error.code === "auth/wrong-password" ||
+        error.code === "auth/user-not-found"
     ) {
-        if (perfilRestrito(usuario.tipoAcesso)) {
-            window.location.href = caminhoAgenda();
+        alert("E-mail ou senha incorretos.");
+    }
+    else {
+        alert("Erro ao entrar: " + error.code);
+    }
+}
+
+/* LOGIN COM E-MAIL E SENHA */
+
+if (loginForm) {
+
+    loginForm.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
+
+        const emailInput =
+        document.getElementById("email");
+
+        const senhaInput =
+        document.getElementById("senha");
+
+        const email =
+        emailInput ? emailInput.value.trim() : "";
+
+        const senha =
+        senhaInput ? senhaInput.value : "";
+
+        if (!email || !senha) {
+            alert("Preencha e-mail e senha.");
             return;
         }
 
-        window.location.href = caminhoDashboard();
-    }
-}
+        try {
 
-function atualizarUsuarioNaTela(usuario) {
-    const fotoUsuario = document.getElementById("fotoUsuario");
+            loginBtn.disabled = true;
+            loginBtn.textContent = "Entrando...";
 
-    if (fotoUsuario) {
-        fotoUsuario.src = usuario.foto || caminhoFotoPadrao();
-    }
+            const userCredential =
+            await signInWithEmailAndPassword(
+                auth,
+                email,
+                senha
+            );
 
-    const nomeUsuario = document.getElementById("nomeUsuario");
+            const user =
+            userCredential.user;
 
-    if (nomeUsuario) {
-        nomeUsuario.textContent = usuario.nome || "Usuário";
-    }
+            const usuarioSistema =
+            montarUsuarioSistema(user);
 
-    const emailUsuario = document.getElementById("emailUsuario");
+            salvarUsuarioLogado(usuarioSistema);
 
-    if (emailUsuario) {
-        emailUsuario.textContent = usuario.email || "";
-    }
+            definirRotaInicial(usuarioSistema);
 
-    const saudacaoUsuario = document.getElementById("saudacaoUsuario");
+        } catch (error) {
 
-    if (saudacaoUsuario) {
-        saudacaoUsuario.textContent = `Olá, ${usuario.nome || "Usuário"}`;
-    }
-}
+            mostrarErro(error);
 
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        if (!paginaLivre()) {
-            window.location.href = caminhoLogin();
+        } finally {
+
+            loginBtn.disabled = false;
+            loginBtn.textContent = "Entrar";
         }
-
-        return;
-    }
-
-    const usuario = montarUsuarioSistema(user);
-
-    salvarUsuarioLocal(usuario);
-
-    atualizarUsuarioNaTela(usuario);
-
-    controlarFluxoCadastro(usuario);
-});
-
-window.logout = function () {
-    signOut(auth)
-    .then(() => {
-        localStorage.removeItem("usuarioLogado");
-
-        window.location.href = caminhoLogin();
-    })
-    .catch((error) => {
-        console.log(error);
-
-        alert("Erro ao sair do sistema.");
     });
-};
+}
+
+/* LOGIN COM GOOGLE */
+
+if (googleLogin) {
+
+    googleLogin.addEventListener("click", async () => {
+
+        try {
+
+            googleLogin.disabled = true;
+            googleLogin.innerHTML = `
+                Entrando...
+            `;
+
+            const provider =
+            new GoogleAuthProvider();
+
+            const result =
+            await signInWithPopup(
+                auth,
+                provider
+            );
+
+            const user =
+            result.user;
+
+            const usuarioSistema =
+            montarUsuarioSistema(user);
+
+            salvarUsuarioLogado(usuarioSistema);
+
+            definirRotaInicial(usuarioSistema);
+
+        } catch (error) {
+
+            mostrarErro(error);
+
+        } finally {
+
+            googleLogin.disabled = false;
+            googleLogin.innerHTML = `
+                <img src="assets/img/google.png" alt="Google">
+                Entrar com Google
+            `;
+        }
+    });
+}

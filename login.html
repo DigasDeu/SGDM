@@ -5,16 +5,13 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Login</title>
 
-<link rel="stylesheet"
-href="assets/css/login.css">
+<link rel="stylesheet" href="assets/css/login.css">
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
 </head>
 
@@ -22,51 +19,42 @@ rel="stylesheet">
 
 <div class="login-container">
 
-    <img
-    src="assets/img/semsa-logo.png"
-    class="logo">
-    <!-- LOGIN EMAIL -->
+    <img src="assets/img/semsa-logo.png" class="logo" alt="Logo SEMSA">
 
-    <div class="login-box">
+    <h1>Entrar no SGDM</h1>
+
+    <form class="login-box" id="loginForm">
 
         <input
         type="email"
         id="email"
-        placeholder="Seu email">
+        placeholder="Seu e-mail"
+        autocomplete="email"
+        required>
 
         <input
         type="password"
         id="senha"
-        placeholder="Sua senha">
+        placeholder="Sua senha"
+        autocomplete="current-password"
+        required>
 
-        <button id="loginBtn">
-
+        <button type="submit" id="loginBtn">
             Entrar
-
         </button>
 
-    </div>
+    </form>
 
     <p class="cadastro-link">
-
         Não possui conta?
-
         <a href="pages/cadastro.html">
-
             Criar conta
-
         </a>
-
     </p>
 
-    <!-- GOOGLE -->
+    <button type="button" class="google-btn" id="googleLogin">
 
-    <button
-    class="google-btn"
-    id="googleLogin">
-
-        <img
-        src="assets/img/google.png">
+        <img src="assets/img/google.png" alt="Google">
 
         Entrar com Google
 
@@ -74,9 +62,7 @@ rel="stylesheet">
 
 </div>
 
-<script type="module"
-src="assets/js/login.js">
-</script>
+<script type="module" src="assets/js/login.js"></script>
 
 </body>
 
