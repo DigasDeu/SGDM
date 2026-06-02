@@ -6,28 +6,28 @@ import {
     signInWithPopup
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-/* ==========================================
-   LOGIN - SGDM
-========================================== */
+console.log("LOGIN.JS CARREGADO COM SUCESSO");
 
-const loginForm =
-document.getElementById("loginForm");
+const loginBtn = document.getElementById("loginBtn");
+const googleLogin = document.getElementById("googleLogin");
+const loginForm = document.getElementById("loginForm");
 
-const loginBtn =
-document.getElementById("loginBtn");
+console.log("BOTÃO LOGIN:", loginBtn);
+console.log("BOTÃO GOOGLE:", googleLogin);
+console.log("FORM LOGIN:", loginForm);
 
-const googleLogin =
-document.getElementById("googleLogin");
-
-function buscarUsuarioLocal() {
-    return JSON.parse(localStorage.getItem("usuarioLogado")) || {};
+function salvarUsuario(usuario) {
+    localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
 }
 
-function salvarUsuarioLogado(usuario) {
-    localStorage.setItem(
-        "usuarioLogado",
-        JSON.stringify(usuario)
-    );
+function perfilRestrito(tipoAcesso) {
+    return [
+        "Gerente de Unidade",
+        "Coordenador",
+        "Secretaria",
+        "Funcionário",
+        "Solicitante"
+    ].includes(tipoAcesso);
 }
 
 function buscarFuncionariosSistema() {
@@ -35,9 +35,7 @@ function buscarFuncionariosSistema() {
 }
 
 function buscarFuncionarioPorEmail(email) {
-
-    const funcionarios =
-    buscarFuncionariosSistema();
+    const funcionarios = buscarFuncionariosSistema();
 
     return funcionarios.find(funcionario =>
         funcionario.email &&
@@ -45,20 +43,63 @@ function buscarFuncionarioPorEmail(email) {
     );
 }
 
-function perfilRestrito(tipoAcesso) {
+function montarUsuario(user) {
+    const funcionario = buscarFuncionarioPorEmail(user.email);
 
-    const perfisRestritos = [
-        "Gerente de Unidade",
-        "Coordenador",
-        "Secretaria",
-        "Funcionário",
-        "Solicitante"
-    ];
+    if (funcionario) {
+        return {
+            uid: user.uid,
+            nome: funcionario.nome || user.displayName || "Usuário",
+            email: user.email,
+            foto: user.photoURL || "assets/img/user.png",
+            login: true,
 
-    return perfisRestritos.includes(tipoAcesso);
+            codigoFuncionario: funcionario.codigoFuncionario || "",
+            telefone: funcionario.telefone || "",
+            cargos: funcionario.cargos || [],
+            cargoPrincipal: funcionario.cargoPrincipal || "",
+            tipoAcesso: funcionario.tipoAcesso || "",
+            statusFuncionario: funcionario.statusFuncionario || "Pendente",
+            equipeMidia: funcionario.tipoAcesso === "Equipe de Mídia",
+
+            unidade: funcionario.unidade || "",
+            tipoUnidade: funcionario.tipoUnidade || "",
+            localId: funcionario.localId || "",
+
+            cadastroFuncionarioCompleto: true,
+            cadastroLocalCompleto:
+                funcionario.tipoAcesso === "Equipe de Mídia"
+                ? true
+                : funcionario.cadastroLocalCompleto || false
+        };
+    }
+
+    return {
+        uid: user.uid,
+        nome: user.displayName || "Usuário",
+        email: user.email,
+        foto: user.photoURL || "assets/img/user.png",
+        login: true,
+
+        codigoFuncionario: "",
+        telefone: "",
+        cargos: [],
+        cargoPrincipal: "",
+        tipoAcesso: "",
+        statusFuncionario: "Pendente",
+        equipeMidia: false,
+
+        unidade: "",
+        tipoUnidade: "",
+        localId: "",
+
+        cadastroFuncionarioCompleto: false,
+        cadastroLocalCompleto: false
+    };
 }
 
-function definirRotaInicial(usuario) {
+function redirecionar(usuario) {
+    console.log("USUÁRIO LOGADO:", usuario);
 
     if (!usuario.cadastroFuncionarioCompleto) {
         window.location.href = "pages/cadastro-funcionario.html";
@@ -82,111 +123,22 @@ function definirRotaInicial(usuario) {
     window.location.href = "dashboard.html";
 }
 
-function montarUsuarioSistema(user) {
-
-    const usuarioAntigo =
-    buscarUsuarioLocal();
-
-    const funcionario =
-    buscarFuncionarioPorEmail(user.email);
-
-    if (funcionario) {
-
-        return {
-            ...usuarioAntigo,
-
-            uid: user.uid,
-            nome: funcionario.nome || user.displayName || "Usuário",
-            email: user.email,
-            foto: user.photoURL || usuarioAntigo.foto || "assets/img/user.png",
-            login: true,
-
-            codigoFuncionario: funcionario.codigoFuncionario || "",
-            telefone: funcionario.telefone || "",
-            cargos: funcionario.cargos || [],
-            cargoPrincipal: funcionario.cargoPrincipal || "",
-            tipoAcesso: funcionario.tipoAcesso || "",
-            statusFuncionario: funcionario.statusFuncionario || "Pendente",
-
-            equipeMidia:
-            funcionario.equipeMidia ||
-            funcionario.tipoAcesso === "Equipe de Mídia",
-
-            unidade: funcionario.unidade || "",
-            tipoUnidade: funcionario.tipoUnidade || "",
-            localId: funcionario.localId || usuarioAntigo.localId || "",
-
-            codigoLocal: usuarioAntigo.codigoLocal || "",
-            localVinculado: usuarioAntigo.localVinculado || "",
-            unidadeVinculada: usuarioAntigo.unidadeVinculada || "",
-
-            cadastroFuncionarioCompleto:
-            funcionario.cadastroFuncionarioCompleto || true,
-
-            cadastroLocalCompleto:
-            funcionario.tipoAcesso === "Equipe de Mídia"
-            ? true
-            : usuarioAntigo.cadastroLocalCompleto ||
-              funcionario.cadastroLocalCompleto ||
-              false
-        };
-    }
-
-    return {
-        ...usuarioAntigo,
-
-        uid: user.uid,
-        nome: user.displayName || usuarioAntigo.nome || "Usuário",
-        email: user.email,
-        foto: user.photoURL || usuarioAntigo.foto || "assets/img/user.png",
-        login: true,
-
-        codigoFuncionario: usuarioAntigo.codigoFuncionario || "",
-        telefone: usuarioAntigo.telefone || "",
-        cargos: usuarioAntigo.cargos || [],
-        cargoPrincipal: usuarioAntigo.cargoPrincipal || "",
-        tipoAcesso: usuarioAntigo.tipoAcesso || "",
-        statusFuncionario: usuarioAntigo.statusFuncionario || "Pendente",
-
-        equipeMidia: usuarioAntigo.equipeMidia || false,
-
-        unidade: usuarioAntigo.unidade || "",
-        tipoUnidade: usuarioAntigo.tipoUnidade || "",
-        localId: usuarioAntigo.localId || "",
-
-        codigoLocal: usuarioAntigo.codigoLocal || "",
-        localVinculado: usuarioAntigo.localVinculado || "",
-        unidadeVinculada: usuarioAntigo.unidadeVinculada || "",
-
-        cadastroFuncionarioCompleto:
-        usuarioAntigo.cadastroFuncionarioCompleto || false,
-
-        cadastroLocalCompleto:
-        usuarioAntigo.cadastroLocalCompleto || false
-    };
-}
-
 function mostrarErro(error) {
+    console.error("ERRO FIREBASE COMPLETO:", error);
 
-    console.log("ERRO FIREBASE:", error.code, error.message);
-
-    if (error.code === "auth/unauthorized-domain") {
-        alert("Domínio não autorizado no Firebase. Adicione seu domínio em Authentication > Settings > Authorized domains.");
+    if (error.code === "auth/invalid-api-key") {
+        alert("Erro no firebase.js: API Key inválida.");
+    }
+    else if (error.code === "auth/unauthorized-domain") {
+        alert("Domínio não autorizado no Firebase.");
     }
     else if (error.code === "auth/operation-not-allowed") {
-        alert("Esse método de login não está ativado no Firebase Authentication.");
+        alert("Método de login não ativado no Firebase.");
     }
     else if (error.code === "auth/popup-closed-by-user") {
-        alert("Login cancelado antes de concluir.");
+        alert("Login Google cancelado.");
     }
-    else if (error.code === "auth/invalid-api-key") {
-        alert("Configuração do Firebase incorreta. Verifique o arquivo firebase.js.");
-    }
-    else if (
-        error.code === "auth/invalid-credential" ||
-        error.code === "auth/wrong-password" ||
-        error.code === "auth/user-not-found"
-    ) {
+    else if (error.code === "auth/invalid-credential") {
         alert("E-mail ou senha incorretos.");
     }
     else {
@@ -194,25 +146,14 @@ function mostrarErro(error) {
     }
 }
 
-/* LOGIN COM E-MAIL E SENHA */
-
 if (loginForm) {
-
     loginForm.addEventListener("submit", async (event) => {
-
         event.preventDefault();
 
-        const emailInput =
-        document.getElementById("email");
+        console.log("CLICOU EM ENTRAR");
 
-        const senhaInput =
-        document.getElementById("senha");
-
-        const email =
-        emailInput ? emailInput.value.trim() : "";
-
-        const senha =
-        senhaInput ? senhaInput.value : "";
+        const email = document.getElementById("email").value.trim();
+        const senha = document.getElementById("senha").value;
 
         if (!email || !senha) {
             alert("Preencha e-mail e senha.");
@@ -220,77 +161,79 @@ if (loginForm) {
         }
 
         try {
-
             loginBtn.disabled = true;
             loginBtn.textContent = "Entrando...";
 
-            const userCredential =
-            await signInWithEmailAndPassword(
-                auth,
-                email,
-                senha
-            );
+            const userCredential = await signInWithEmailAndPassword(auth, email, senha);
 
-            const user =
-            userCredential.user;
+            const usuario = montarUsuario(userCredential.user);
 
-            const usuarioSistema =
-            montarUsuarioSistema(user);
+            salvarUsuario(usuario);
 
-            salvarUsuarioLogado(usuarioSistema);
-
-            definirRotaInicial(usuarioSistema);
+            redirecionar(usuario);
 
         } catch (error) {
-
             mostrarErro(error);
-
         } finally {
+            loginBtn.disabled = false;
+            loginBtn.textContent = "Entrar";
+        }
+    });
+}
+else if (loginBtn) {
+    loginBtn.addEventListener("click", async () => {
+        console.log("CLICOU EM ENTRAR SEM FORM");
 
+        const email = document.getElementById("email").value.trim();
+        const senha = document.getElementById("senha").value;
+
+        if (!email || !senha) {
+            alert("Preencha e-mail e senha.");
+            return;
+        }
+
+        try {
+            loginBtn.disabled = true;
+            loginBtn.textContent = "Entrando...";
+
+            const userCredential = await signInWithEmailAndPassword(auth, email, senha);
+
+            const usuario = montarUsuario(userCredential.user);
+
+            salvarUsuario(usuario);
+
+            redirecionar(usuario);
+
+        } catch (error) {
+            mostrarErro(error);
+        } finally {
             loginBtn.disabled = false;
             loginBtn.textContent = "Entrar";
         }
     });
 }
 
-/* LOGIN COM GOOGLE */
-
 if (googleLogin) {
-
     googleLogin.addEventListener("click", async () => {
+        console.log("CLICOU EM GOOGLE");
 
         try {
-
             googleLogin.disabled = true;
-            googleLogin.innerHTML = `
-                Entrando...
-            `;
+            googleLogin.textContent = "Entrando...";
 
-            const provider =
-            new GoogleAuthProvider();
+            const provider = new GoogleAuthProvider();
 
-            const result =
-            await signInWithPopup(
-                auth,
-                provider
-            );
+            const result = await signInWithPopup(auth, provider);
 
-            const user =
-            result.user;
+            const usuario = montarUsuario(result.user);
 
-            const usuarioSistema =
-            montarUsuarioSistema(user);
+            salvarUsuario(usuario);
 
-            salvarUsuarioLogado(usuarioSistema);
-
-            definirRotaInicial(usuarioSistema);
+            redirecionar(usuario);
 
         } catch (error) {
-
             mostrarErro(error);
-
         } finally {
-
             googleLogin.disabled = false;
             googleLogin.innerHTML = `
                 <img src="assets/img/google.png" alt="Google">
