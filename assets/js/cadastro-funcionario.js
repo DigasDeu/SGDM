@@ -28,8 +28,14 @@ function gerarCodigoFuncionario() {
     const ano =
     new Date().getFullYear();
 
+    const codigosAno =
+    funcionarios.filter(funcionario =>
+        funcionario.codigoFuncionario &&
+        funcionario.codigoFuncionario.includes(`SEMSA-${ano}`)
+    );
+
     const proximoNumero =
-    funcionarios.length + 1;
+    codigosAno.length + 1;
 
     const numeroFormatado =
     String(proximoNumero).padStart(4, "0");
@@ -91,14 +97,11 @@ function validarCargoPrincipal(cargos, cargoPrincipal) {
     return cargos.includes(cargoPrincipal);
 }
 
-function buscarFuncionarioExistente(funcionarios, email, codigoFuncionario) {
+function encontrarFuncionarioPorEmail(funcionarios, email) {
 
-    return funcionarios.find(funcionario =>
-        funcionario.codigoFuncionario === codigoFuncionario ||
-        (
-            funcionario.email &&
-            funcionario.email.toLowerCase() === email.toLowerCase()
-        )
+    return funcionarios.findIndex(funcionario =>
+        funcionario.email &&
+        funcionario.email.toLowerCase() === email.toLowerCase()
     );
 }
 
@@ -135,18 +138,6 @@ function salvarCadastroFuncionario(event) {
 
     const statusFuncionario =
     document.getElementById("statusFuncionario").value;
-
-    const conselho =
-    document.getElementById("conselhoProfissional").value;
-
-    const numeroRegistro =
-    document.getElementById("numeroRegistro").value.trim();
-
-    const especialidade =
-    document.getElementById("especialidade").value.trim();
-
-    const responsavelTecnico =
-    document.getElementById("responsavelTecnico").value;
 
     const unidade =
     document.getElementById("unidadeFuncionario").value;
@@ -190,22 +181,23 @@ function salvarCadastroFuncionario(event) {
     const funcionarios =
     buscarLista("funcionariosSistema");
 
-    const funcionarioExistente =
-    buscarFuncionarioExistente(
-        funcionarios,
-        email,
-        codigoFuncionario
-    );
+    const funcionarioIndex =
+    encontrarFuncionarioPorEmail(funcionarios, email);
 
-    if (funcionarioExistente) {
-        alert("Este funcionário já está cadastrado no sistema.");
-        return;
-    }
+    const funcionarioAnterior =
+    funcionarioIndex >= 0
+    ? funcionarios[funcionarioIndex]
+    : null;
 
     const funcionario = {
-        id: Date.now(),
+        id:
+        funcionarioAnterior?.id || Date.now(),
 
-        codigoFuncionario,
+        uid:
+        usuarioAtual.uid || funcionarioAnterior?.uid || "",
+
+        codigoFuncionario:
+        funcionarioAnterior?.codigoFuncionario || codigoFuncionario,
 
         nome,
         email,
@@ -218,41 +210,63 @@ function salvarCadastroFuncionario(event) {
         tipoAcesso,
         statusFuncionario,
 
-        equipeMidia: ehEquipeMidia,
+        equipeMidia:
+        ehEquipeMidia,
 
-        identificacaoProfissional: {
-            conselho,
-            numeroRegistro,
-            especialidade,
-            responsavelTecnico:
-            responsavelTecnico === "Sim"
-        },
+        unidade:
+        ehEquipeMidia
+        ? "Departamento de Mídia"
+        : unidade,
 
-        unidade: ehEquipeMidia ? "Departamento de Mídia" : unidade,
-        tipoUnidade: ehEquipeMidia ? "Setor Administrativo" : tipoUnidade,
-        localId: ehEquipeMidia ? "" : usuarioAtual.localId || "",
+        tipoUnidade:
+        ehEquipeMidia
+        ? "Setor Administrativo"
+        : tipoUnidade,
+
+        localId:
+        ehEquipeMidia
+        ? ""
+        : funcionarioAnterior?.localId || usuarioAtual.localId || "",
 
         observacoes,
 
-        cadastroFuncionarioCompleto: true,
-        cadastroLocalCompleto: ehEquipeMidia,
+        cadastroFuncionarioCompleto:
+        true,
 
-        criadoEm: new Date().toLocaleString("pt-BR"),
-        atualizadoEm: new Date().toLocaleString("pt-BR")
+        cadastroLocalCompleto:
+        ehEquipeMidia
+        ? true
+        : funcionarioAnterior?.cadastroLocalCompleto || false,
+
+        criadoEm:
+        funcionarioAnterior?.criadoEm || new Date().toLocaleString("pt-BR"),
+
+        atualizadoEm:
+        new Date().toLocaleString("pt-BR")
     };
 
-    funcionarios.push(funcionario);
+    if (funcionarioIndex >= 0) {
+        funcionarios[funcionarioIndex] =
+        funcionario;
+    }
+    else {
+        funcionarios.push(funcionario);
+    }
 
     salvarLista("funcionariosSistema", funcionarios);
 
     const usuarioAtualizado = {
         ...usuarioAtual,
 
+        uid:
+        usuarioAtual.uid || funcionario.uid || "",
+
         nome,
         email,
         telefone,
 
-        codigoFuncionario,
+        codigoFuncionario:
+        funcionario.codigoFuncionario,
 
         cargos,
         cargoPrincipal,
@@ -260,27 +274,40 @@ function salvarCadastroFuncionario(event) {
         tipoAcesso,
         statusFuncionario,
 
-        equipeMidia: ehEquipeMidia,
+        equipeMidia:
+        ehEquipeMidia,
 
-        unidade: funcionario.unidade,
-        tipoUnidade: funcionario.tipoUnidade,
-        localId: funcionario.localId,
+        unidade:
+        funcionario.unidade,
 
-        cadastroFuncionarioCompleto: true,
-        cadastroLocalCompleto: ehEquipeMidia
+        tipoUnidade:
+        funcionario.tipoUnidade,
+
+        localId:
+        funcionario.localId,
+
+        cadastroFuncionarioCompleto:
+        true,
+
+        cadastroLocalCompleto:
+        ehEquipeMidia
+        ? true
+        : funcionario.cadastroLocalCompleto || false
     };
 
     salvarUsuarioLogado(usuarioAtualizado);
 
     alert(
-        `Funcionário cadastrado com sucesso!\nCódigo: ${codigoFuncionario}`
+        `Funcionário salvo com sucesso!\nCódigo: ${funcionario.codigoFuncionario}`
     );
 
     if (ehEquipeMidia) {
-        window.location.href = "../dashboard.html";
+        window.location.href =
+        "../dashboard.html";
     }
     else {
-        window.location.href = "cadastro-local.html";
+        window.location.href =
+        "cadastro-local.html";
     }
 }
 
@@ -293,7 +320,8 @@ if (formFuncionario) {
 
 if (voltarBtn) {
     voltarBtn.addEventListener("click", () => {
-        window.location.href = "../dashboard.html";
+        window.location.href =
+        "../dashboard.html";
     });
 }
 
