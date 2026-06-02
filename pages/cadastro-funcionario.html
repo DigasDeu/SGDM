@@ -189,6 +189,7 @@
                         <label>Tipo de acesso *</label>
                         <select id="tipoAcesso" required>
                             <option value="">Selecione</option>
+                            <option value="Equipe de Mídia">Equipe de Mídia</option>
                             <option value="Gerente de Unidade">Gerente de Unidade</option>
                             <option value="Coordenador">Coordenador</option>
                             <option value="Secretaria">Secretaria</option>
@@ -249,8 +250,8 @@
                 <div class="func-grid">
 
                     <div class="form-group">
-                        <label>Unidade / Local principal *</label>
-                        <select id="unidadeFuncionario" required>
+                        <label>Unidade / Local principal</label>
+                        <select id="unidadeFuncionario">
                             <option value="">Selecione</option>
                             <option value="Biodiagnóstico">Biodiagnóstico</option>
                             <option value="CTA">CTA</option>
@@ -277,6 +278,7 @@
                     <div class="form-group">
                         <label>Tipo de unidade</label>
                         <select id="tipoUnidade">
+                            <option value="">Selecione</option>
                             <option value="Unidade de Saúde">Unidade de Saúde</option>
                             <option value="Centro Especializado">Centro Especializado</option>
                             <option value="Hospital">Hospital</option>
@@ -289,6 +291,10 @@
                     </div>
 
                 </div>
+
+                <p class="func-note">
+                    Para Equipe de Mídia, a unidade vinculada não é obrigatória.
+                </p>
 
             </section>
 

@@ -31,12 +31,24 @@ function irParaDashboard() {
     }
 }
 
+function irParaSolicitacoes() {
+    if (estaEmPastaPages()) {
+        window.location.href = "solicitacoes.html";
+    } else {
+        window.location.href = "pages/solicitacoes.html";
+    }
+}
+
 function irParaAgenda() {
     if (estaEmPastaPages()) {
         window.location.href = "agenda.html";
     } else {
         window.location.href = "pages/agenda.html";
     }
+}
+
+function perfilEquipeMidia(tipoAcesso) {
+    return tipoAcesso === "Equipe de Mídia";
 }
 
 function perfilRestrito(tipoAcesso) {
@@ -53,6 +65,7 @@ function perfilRestrito(tipoAcesso) {
 
 function paginaPermitidaParaRestrito(pagina) {
     const paginasPermitidas = [
+        "solicitacoes.html",
         "agenda.html",
         "cadastro-funcionario.html",
         "cadastro-local.html"
@@ -61,10 +74,37 @@ function paginaPermitidaParaRestrito(pagina) {
     return paginasPermitidas.includes(pagina);
 }
 
+function paginaCadastro(pagina) {
+    return (
+        pagina === "cadastro-funcionario.html" ||
+        pagina === "cadastro-local.html"
+    );
+}
+
 function verificarCadastroObrigatorio(usuario) {
     const pagina = paginaAtual();
 
     if (!usuario) return;
+
+    if (perfilEquipeMidia(usuario.tipoAcesso)) {
+        if (
+            !usuario.cadastroFuncionarioCompleto &&
+            pagina !== "cadastro-funcionario.html"
+        ) {
+            irParaPagina("cadastro-funcionario.html");
+            return;
+        }
+
+        if (
+            usuario.cadastroFuncionarioCompleto &&
+            paginaCadastro(pagina)
+        ) {
+            irParaDashboard();
+            return;
+        }
+
+        return;
+    }
 
     if (
         !usuario.cadastroFuncionarioCompleto &&
@@ -86,13 +126,10 @@ function verificarCadastroObrigatorio(usuario) {
     if (
         usuario.cadastroFuncionarioCompleto &&
         usuario.cadastroLocalCompleto &&
-        (
-            pagina === "cadastro-funcionario.html" ||
-            pagina === "cadastro-local.html"
-        )
+        paginaCadastro(pagina)
     ) {
         if (perfilRestrito(usuario.tipoAcesso)) {
-            irParaAgenda();
+            irParaSolicitacoes();
             return;
         }
 
@@ -112,10 +149,14 @@ function protegerPaginasPorPerfil(usuario) {
         return;
     }
 
+    if (perfilEquipeMidia(usuario.tipoAcesso)) {
+        return;
+    }
+
     if (perfilRestrito(usuario.tipoAcesso)) {
         if (!paginaPermitidaParaRestrito(pagina)) {
-            alert("Seu perfil possui acesso somente à Agenda e Coberturas Agendadas.");
-            irParaAgenda();
+            alert("Seu perfil possui acesso somente às Solicitações e Agenda.");
+            irParaSolicitacoes();
         }
     }
 }
@@ -123,7 +164,13 @@ function protegerPaginasPorPerfil(usuario) {
 function ajustarMenuPorPerfil(usuario) {
     if (!usuario) return;
 
-    if (!perfilRestrito(usuario.tipoAcesso)) return;
+    if (perfilEquipeMidia(usuario.tipoAcesso)) {
+        return;
+    }
+
+    if (!perfilRestrito(usuario.tipoAcesso)) {
+        return;
+    }
 
     const links = document.querySelectorAll(".sidebar-menu a, .bottom-nav a");
 
@@ -131,6 +178,7 @@ function ajustarMenuPorPerfil(usuario) {
         const href = link.getAttribute("href") || "";
 
         const permitido =
+            href.includes("solicitacoes.html") ||
             href.includes("agenda.html") ||
             href.includes("cadastro-funcionario.html") ||
             href.includes("cadastro-local.html") ||

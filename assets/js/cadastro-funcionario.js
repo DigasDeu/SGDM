@@ -82,48 +82,6 @@ function obterCargosSelecionados() {
     );
 }
 
-function gerarLocalVinculado(
-    unidade,
-    tipoUnidade
-) {
-
-    const locais =
-    buscarLista("locaisSistema");
-
-    const localExistente =
-    locais.find(local =>
-        local.nome &&
-        local.nome.toLowerCase() === unidade.toLowerCase()
-    );
-
-    if (localExistente) {
-        return localExistente;
-    }
-
-    const novoLocal = {
-        id: Date.now(),
-        nome: unidade,
-        nomeLocal: unidade,
-        tipo: tipoUnidade || "Unidade de Saúde",
-        tipoRegistro: tipoUnidade || "Unidade de Saúde",
-        classificacaoLocal: "Unidade base",
-        zona: "Urbana",
-        endereco: "",
-        bairroComunidade: "",
-        referencia: "",
-        latitude: "",
-        longitude: "",
-        status: "Ativo",
-        criadoEm: new Date().toLocaleString("pt-BR")
-    };
-
-    locais.push(novoLocal);
-
-    salvarLista("locaisSistema", locais);
-
-    return novoLocal;
-}
-
 function validarCargoPrincipal(cargos, cargoPrincipal) {
 
     if (!cargoPrincipal) return false;
@@ -131,6 +89,17 @@ function validarCargoPrincipal(cargos, cargoPrincipal) {
     if (cargos.length === 0) return false;
 
     return cargos.includes(cargoPrincipal);
+}
+
+function buscarFuncionarioExistente(funcionarios, email, codigoFuncionario) {
+
+    return funcionarios.find(funcionario =>
+        funcionario.codigoFuncionario === codigoFuncionario ||
+        (
+            funcionario.email &&
+            funcionario.email.toLowerCase() === email.toLowerCase()
+        )
+    );
 }
 
 function salvarCadastroFuncionario(event) {
@@ -188,16 +157,23 @@ function salvarCadastroFuncionario(event) {
     const observacoes =
     document.getElementById("observacoesFuncionario").value.trim();
 
+    const ehEquipeMidia =
+    tipoAcesso === "Equipe de Mídia";
+
     if (
         !codigoFuncionario ||
         !nome ||
         !email ||
         !telefone ||
         !cargoPrincipal ||
-        !tipoAcesso ||
-        !unidade
+        !tipoAcesso
     ) {
         alert("Preencha os campos obrigatórios.");
+        return;
+    }
+
+    if (!ehEquipeMidia && !unidade) {
+        alert("Selecione a unidade vinculada do funcionário.");
         return;
     }
 
@@ -214,32 +190,17 @@ function salvarCadastroFuncionario(event) {
     const funcionarios =
     buscarLista("funcionariosSistema");
 
-    const codigoExiste =
-    funcionarios.some(funcionario =>
-        funcionario.codigoFuncionario === codigoFuncionario
+    const funcionarioExistente =
+    buscarFuncionarioExistente(
+        funcionarios,
+        email,
+        codigoFuncionario
     );
 
-    if (codigoExiste) {
-        alert("Este código institucional já existe. Atualize a página para gerar outro código.");
+    if (funcionarioExistente) {
+        alert("Este funcionário já está cadastrado no sistema.");
         return;
     }
-
-    const emailExiste =
-    funcionarios.some(funcionario =>
-        funcionario.email &&
-        funcionario.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (emailExiste) {
-        alert("Este e-mail já está vinculado a outro funcionário.");
-        return;
-    }
-
-    const localVinculado =
-    gerarLocalVinculado(
-        unidade,
-        tipoUnidade
-    );
 
     const funcionario = {
         id: Date.now(),
@@ -257,6 +218,8 @@ function salvarCadastroFuncionario(event) {
         tipoAcesso,
         statusFuncionario,
 
+        equipeMidia: ehEquipeMidia,
+
         identificacaoProfissional: {
             conselho,
             numeroRegistro,
@@ -265,14 +228,14 @@ function salvarCadastroFuncionario(event) {
             responsavelTecnico === "Sim"
         },
 
-        unidade,
-        tipoUnidade,
-        localId: localVinculado.id,
+        unidade: ehEquipeMidia ? "Departamento de Mídia" : unidade,
+        tipoUnidade: ehEquipeMidia ? "Setor Administrativo" : tipoUnidade,
+        localId: ehEquipeMidia ? "" : usuarioAtual.localId || "",
 
         observacoes,
 
         cadastroFuncionarioCompleto: true,
-        cadastroLocalCompleto: false,
+        cadastroLocalCompleto: ehEquipeMidia,
 
         criadoEm: new Date().toLocaleString("pt-BR"),
         atualizadoEm: new Date().toLocaleString("pt-BR")
@@ -297,12 +260,14 @@ function salvarCadastroFuncionario(event) {
         tipoAcesso,
         statusFuncionario,
 
-        unidade,
-        tipoUnidade,
-        localId: localVinculado.id,
+        equipeMidia: ehEquipeMidia,
+
+        unidade: funcionario.unidade,
+        tipoUnidade: funcionario.tipoUnidade,
+        localId: funcionario.localId,
 
         cadastroFuncionarioCompleto: true,
-        cadastroLocalCompleto: false
+        cadastroLocalCompleto: ehEquipeMidia
     };
 
     salvarUsuarioLogado(usuarioAtualizado);
@@ -311,7 +276,12 @@ function salvarCadastroFuncionario(event) {
         `Funcionário cadastrado com sucesso!\nCódigo: ${codigoFuncionario}`
     );
 
-    window.location.href = "cadastro-local.html";
+    if (ehEquipeMidia) {
+        window.location.href = "../dashboard.html";
+    }
+    else {
+        window.location.href = "cadastro-local.html";
+    }
 }
 
 if (formFuncionario) {

@@ -46,7 +46,7 @@
             Dashboard
         </a>
 
-        <a href="agenda.html">
+        <a href="agenda.html" class="active">
             <i class="fas fa-calendar"></i>
             Agenda
         </a>
@@ -105,6 +105,19 @@
 </header>
 
 <main class="agenda-container">
+
+    <section class="resumo-responsaveis-section">
+
+        <h3>
+            <i class="fas fa-users"></i>
+            Agendamentos por responsável
+        </h3>
+
+        <div id="resumoResponsaveis" class="resumo-responsaveis">
+            <p>Nenhum responsável encontrado.</p>
+        </div>
+
+    </section>
 
     <div class="calendar-header">
 
@@ -172,7 +185,9 @@
 
             <input type="text" id="local" placeholder="Local" required>
 
-            <input type="text" id="responsavel" placeholder="Responsável pela cobertura">
+            <select id="responsavel" required>
+                <option value="">Selecione o responsável pela cobertura</option>
+            </select>
 
             <textarea id="descricao" placeholder="Descrição da atividade"></textarea>
 
@@ -225,6 +240,7 @@
 
 <script src="../assets/js/agenda.js"></script>
 <script src="../assets/js/sidebar.js"></script>
+<script src="../assets/js/permissoes.js"></script>
 <script type="module" src="../assets/js/auth.js"></script>
 
 </body>
