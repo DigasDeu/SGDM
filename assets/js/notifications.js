@@ -1,3 +1,15 @@
+import {
+    adicionarDocumento,
+    excluirDocumento,
+    observarColecao
+} from "./db.js";
+
+/* ==========================================
+   NOTIFICAÇÕES - FIRESTORE + LOCALSTORAGE
+========================================== */
+
+let notificacoesOnline = [];
+
 document.addEventListener("DOMContentLoaded", () => {
 
     const notificationBtn =
@@ -6,17 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const notificationDropdown =
     document.getElementById("notificationDropdown");
 
-    const notificationList =
-    document.getElementById("notificationList");
-
-    const notificationCount =
-    document.getElementById("notificationCount");
-
     if (
         !notificationBtn ||
-        !notificationDropdown ||
-        !notificationList ||
-        !notificationCount
+        !notificationDropdown
     ) {
         return;
     }
@@ -39,7 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     carregarNotificacoes();
+
+    iniciarEscutaNotificacoesFirestore();
 });
+
+/* ==========================================
+   LOCALSTORAGE
+========================================== */
 
 function buscarDados(chave) {
 
@@ -56,24 +66,90 @@ function salvarDados(chave, dados) {
     );
 }
 
-function criarNotificacao(titulo, descricao, tipo = "Sistema") {
+/* ==========================================
+   FIRESTORE
+========================================== */
+
+function iniciarEscutaNotificacoesFirestore() {
+
+    try {
+
+        observarColecao("notificacoes", (dados) => {
+
+            notificacoesOnline =
+            dados;
+
+            salvarDados(
+                "notificacoes",
+                dados
+            );
+
+            carregarNotificacoes();
+        });
+
+    } catch (error) {
+
+        console.log(
+            "Erro ao observar notificações:",
+            error
+        );
+    }
+}
+
+/* ==========================================
+   CRIAR NOTIFICAÇÃO
+========================================== */
+
+async function criarNotificacao(
+    titulo,
+    descricao,
+    tipo = "Sistema"
+) {
 
     const notificacoes =
     buscarDados("notificacoes");
 
-    notificacoes.unshift({
+    const novaNotificacao = {
         id: Date.now(),
         titulo,
         descricao,
         tipo,
         data: new Date().toLocaleString("pt-BR"),
         lida: false
-    });
+    };
 
-    salvarDados("notificacoes", notificacoes);
+    notificacoes.unshift(novaNotificacao);
+
+    salvarDados(
+        "notificacoes",
+        notificacoes
+    );
+
+    try {
+
+        const idFirebase =
+        await adicionarDocumento(
+            "notificacoes",
+            novaNotificacao
+        );
+
+        novaNotificacao.idFirebase =
+        idFirebase;
+
+    } catch (error) {
+
+        console.log(
+            "Erro ao salvar notificação no Firestore:",
+            error
+        );
+    }
 
     carregarNotificacoes();
 }
+
+/* ==========================================
+   NOTIFICAÇÕES AUTOMÁTICAS
+========================================== */
 
 function montarNotificacoesAutomaticas() {
 
@@ -96,9 +172,12 @@ function montarNotificacoesAutomaticas() {
     .forEach(item => {
 
         automaticas.push({
-            id: `solicitacao-${item.id}`,
+            id: `solicitacao-${item.idFirebase || item.id}`,
             titulo: "Solicitação pendente",
-            descricao: item.titulo || "Nova solicitação aguardando atendimento",
+            descricao:
+            item.titulo ||
+            "Nova solicitação aguardando atendimento",
+
             tipo: "Solicitação",
             data: item.data || "",
             automatica: true
@@ -110,9 +189,11 @@ function montarNotificacoesAutomaticas() {
     .forEach(item => {
 
         automaticas.push({
-            id: `evento-${item.id}`,
+            id: `evento-${item.idFirebase || item.id}`,
             titulo: "Evento agendado",
-            descricao: `${item.titulo || "Evento"} - ${item.data || "sem data"}`,
+            descricao:
+            `${item.titulo || "Evento"} - ${item.data || "sem data"}`,
+
             tipo: "Agenda",
             data: item.hora || "",
             automatica: true
@@ -124,9 +205,11 @@ function montarNotificacoesAutomaticas() {
     .forEach(item => {
 
         automaticas.push({
-            id: `publicacao-${item.id}`,
+            id: `publicacao-${item.idFirebase || item.id}`,
             titulo: "Publicação registrada",
-            descricao: `${item.titulo || "Publicação"} - ${item.plataforma || "Plataforma não informada"}`,
+            descricao:
+            `${item.titulo || "Publicação"} - ${item.plataforma || "Plataforma não informada"}`,
+
             tipo: "Publicação",
             data: item.data || "",
             automatica: true
@@ -138,9 +221,11 @@ function montarNotificacoesAutomaticas() {
     .forEach(item => {
 
         automaticas.push({
-            id: `producao-${item.id}`,
+            id: `producao-${item.idFirebase || item.id}`,
             titulo: "Produção registrada",
-            descricao: `${item.titulo || "Produção"} - ${item.tipo || "Tipo não informado"}`,
+            descricao:
+            `${item.titulo || "Produção"} - ${item.tipo || "Tipo não informado"}`,
+
             tipo: "Produção",
             data: item.data || "",
             automatica: true
@@ -149,6 +234,10 @@ function montarNotificacoesAutomaticas() {
 
     return automaticas;
 }
+
+/* ==========================================
+   CARREGAR NOTIFICAÇÕES
+========================================== */
 
 function carregarNotificacoes() {
 
@@ -161,7 +250,9 @@ function carregarNotificacoes() {
     if (!notificationList || !notificationCount) return;
 
     const notificacoesSalvas =
-    buscarDados("notificacoes");
+    notificacoesOnline.length > 0
+    ? notificacoesOnline
+    : buscarDados("notificacoes");
 
     const notificacoesAutomaticas =
     montarNotificacoesAutomaticas();
@@ -186,7 +277,7 @@ function carregarNotificacoes() {
     notificationList.innerHTML = `
         <div class="notification-actions">
             <button onclick="limparNotificacoes()" class="clear-notifications-btn">
-                Limpar notificações
+                Limpar notificações locais
             </button>
         </div>
     `;
@@ -195,17 +286,20 @@ function carregarNotificacoes() {
     .slice(0, 10)
     .forEach(item => {
 
+        const idAcao =
+        item.idFirebase || item.id;
+
         notificationList.innerHTML += `
             <div class="notification-item">
 
                 <div>
 
-                    <strong>${item.titulo}</strong>
+                    <strong>${item.titulo || "Notificação"}</strong>
 
-                    <p>${item.descricao}</p>
+                    <p>${item.descricao || "Sem descrição."}</p>
 
                     <small>
-                        ${item.tipo || ""}
+                        ${item.tipo || "Sistema"}
                         ${item.data ? " • " + item.data : ""}
                     </small>
 
@@ -215,7 +309,7 @@ function carregarNotificacoes() {
                     item.automatica
                     ? ""
                     : `
-                    <button class="delete-notification-btn" onclick="excluirNotificacao(${item.id})">
+                    <button class="delete-notification-btn" onclick="excluirNotificacao('${idAcao}')">
                         <i class="fas fa-times"></i>
                     </button>
                     `
@@ -226,35 +320,83 @@ function carregarNotificacoes() {
     });
 }
 
-function excluirNotificacao(id) {
+/* ==========================================
+   EXCLUIR NOTIFICAÇÃO
+========================================== */
+
+async function excluirNotificacao(id) {
 
     let notificacoes =
     buscarDados("notificacoes");
 
-    notificacoes =
-    notificacoes.filter(item => item.id !== id);
+    const itemExcluido =
+    notificacoes.find(item =>
+        String(item.id) === String(id) ||
+        String(item.idFirebase) === String(id)
+    );
 
-    salvarDados("notificacoes", notificacoes);
+    notificacoes =
+    notificacoes.filter(item =>
+        String(item.id) !== String(id) &&
+        String(item.idFirebase) !== String(id)
+    );
+
+    salvarDados(
+        "notificacoes",
+        notificacoes
+    );
+
+    if (itemExcluido && itemExcluido.idFirebase) {
+
+        try {
+
+            await excluirDocumento(
+                "notificacoes",
+                itemExcluido.idFirebase
+            );
+
+        } catch (error) {
+
+            console.log(
+                "Erro ao excluir notificação no Firestore:",
+                error
+            );
+        }
+    }
 
     carregarNotificacoes();
 }
 
+/* ==========================================
+   LIMPAR NOTIFICAÇÕES LOCAIS
+========================================== */
+
 function limparNotificacoes() {
 
     const confirmar =
-    confirm("Deseja limpar as notificações salvas?");
+    confirm("Deseja limpar as notificações locais?");
 
     if (!confirmar) return;
 
     localStorage.removeItem("notificacoes");
 
+    notificacoesOnline = [];
+
     carregarNotificacoes();
 }
 
-window.criarNotificacao = criarNotificacao;
+/* ==========================================
+   FUNÇÕES GLOBAIS
+========================================== */
 
-window.carregarNotificacoes = carregarNotificacoes;
+window.criarNotificacao =
+criarNotificacao;
 
-window.excluirNotificacao = excluirNotificacao;
+window.carregarNotificacoes =
+carregarNotificacoes;
 
-window.limparNotificacoes = limparNotificacoes;
+window.excluirNotificacao =
+excluirNotificacao;
+
+window.limparNotificacoes =
+limparNotificacoes;

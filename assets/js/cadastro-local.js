@@ -1,3 +1,9 @@
+import {
+    salvarDocumentoComId,
+    excluirDocumento,
+    observarColecao
+} from "./db.js";
+
 const formLocal =
 document.getElementById("formLocal");
 
@@ -16,6 +22,12 @@ document.getElementById("listaLocais");
 let mapaCadastroLocal = null;
 let marcadorCadastroLocal = null;
 
+let locaisOnline = [];
+
+/* ==========================================
+   LOCALSTORAGE
+========================================== */
+
 function buscarLista(chave) {
     return JSON.parse(localStorage.getItem(chave)) || [];
 }
@@ -23,6 +35,55 @@ function buscarLista(chave) {
 function salvarLista(chave, lista) {
     localStorage.setItem(chave, JSON.stringify(lista));
 }
+
+function buscarUsuarioLogado() {
+    return JSON.parse(localStorage.getItem("usuarioLogado")) || {};
+}
+
+function salvarUsuarioLogado(usuario) {
+    localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
+}
+
+/* ==========================================
+   FIRESTORE
+========================================== */
+
+function iniciarEscutaLocaisFirestore() {
+    try {
+        observarColecao("locaisSistema", (dados) => {
+            locaisOnline = dados;
+
+            salvarLista("locaisSistema", dados);
+
+            carregarLocais();
+
+            atualizarCodigoLocal();
+        });
+    }
+    catch (error) {
+        console.log("Erro ao observar locais no Firestore:", error);
+    }
+}
+
+function gerarIdLocal(codigoLocal) {
+    return String(codigoLocal || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "_");
+}
+
+function gerarIdFuncionario(usuario) {
+    if (usuario.uid) {
+        return usuario.uid;
+    }
+
+    return String(usuario.email || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "_");
+}
+
+/* ==========================================
+   CÓDIGO DO LOCAL
+========================================== */
 
 function normalizarSigla(sigla) {
     return String(sigla || "")
@@ -42,8 +103,12 @@ function normalizarTextoCodigo(texto) {
         .slice(0, 4);
 }
 
-function obterPrefixoCodigo(classificacaoLocal, tipoRegistro, siglaLocal, unidadeVinculada) {
-
+function obterPrefixoCodigo(
+    classificacaoLocal,
+    tipoRegistro,
+    siglaLocal,
+    unidadeVinculada
+) {
     const sigla =
     normalizarSigla(siglaLocal);
 
@@ -131,6 +196,14 @@ function obterPrefixoCodigo(classificacaoLocal, tipoRegistro, siglaLocal, unidad
     return `LOC${sigla || ""}`;
 }
 
+function buscarLocais() {
+    if (locaisOnline.length > 0) {
+        return locaisOnline;
+    }
+
+    return buscarLista("locaisSistema");
+}
+
 function gerarCodigoLocal() {
 
     const classificacaoLocal =
@@ -146,7 +219,7 @@ function gerarCodigoLocal() {
     document.getElementById("unidadeVinculada").value;
 
     const locais =
-    buscarLista("locaisSistema");
+    buscarLocais();
 
     const ano =
     new Date().getFullYear();
@@ -186,13 +259,20 @@ function atualizarCodigoLocal() {
     document.getElementById("tipoRegistro").value;
 
     if (!codigoLocal || !classificacaoLocal || !tipoRegistro) {
-        if (codigoLocal) codigoLocal.value = "";
+        if (codigoLocal) {
+            codigoLocal.value = "";
+        }
+
         return;
     }
 
     codigoLocal.value =
     gerarCodigoLocal();
 }
+
+/* ==========================================
+   MAPA
+========================================== */
 
 function iniciarMapaCadastroLocal() {
 
@@ -211,22 +291,22 @@ function iniciarMapaCadastroLocal() {
 
     mapaCadastroLocal =
     L.map("mapaCadastroLocal", {
-        dragging:true,
-        tap:false,
-        scrollWheelZoom:false
+        dragging: true,
+        tap: false,
+        scrollWheelZoom: false
     }).setView(maues, 15);
 
     L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
-            attribution:"© OpenStreetMap",
-            maxZoom:19
+            attribution: "© OpenStreetMap",
+            maxZoom: 19
         }
     ).addTo(mapaCadastroLocal);
 
     marcadorCadastroLocal =
     L.marker(maues, {
-        draggable:true
+        draggable: true
     }).addTo(mapaCadastroLocal);
 
     preencherCoordenadas(
@@ -296,8 +376,8 @@ async function buscarEnderecoPorCoordenadas(lat, lng) {
 
         const resposta =
         await fetch(url, {
-            headers:{
-                "Accept":"application/json"
+            headers: {
+                "Accept": "application/json"
             }
         });
 
@@ -373,8 +453,8 @@ async function buscarLocalNoMapa() {
 
         const resposta =
         await fetch(url, {
-            headers:{
-                "Accept":"application/json"
+            headers: {
+                "Accept": "application/json"
             }
         });
 
@@ -466,8 +546,14 @@ function usarMinhaLocalizacao() {
     );
 }
 
-function validarVinculo(classificacaoLocal, unidadeVinculada) {
+/* ==========================================
+   VALIDAÇÃO E SALVAMENTO
+========================================== */
 
+function validarVinculo(
+    classificacaoLocal,
+    unidadeVinculada
+) {
     if (
         classificacaoLocal === "Setor de unidade" &&
         !unidadeVinculada
@@ -487,7 +573,7 @@ function validarVinculo(classificacaoLocal, unidadeVinculada) {
     return true;
 }
 
-function salvarLocal(event) {
+async function salvarLocal(event) {
 
     event.preventDefault();
 
@@ -562,7 +648,7 @@ function salvarLocal(event) {
     }
 
     const locais =
-    buscarLista("locaisSistema");
+    buscarLocais();
 
     const codigoExiste =
     locais.some(local =>
@@ -574,8 +660,12 @@ function salvarLocal(event) {
         return;
     }
 
+    const idFirebase =
+    gerarIdLocal(codigoLocal);
+
     const novoLocal = {
         id: Date.now(),
+        idFirebase,
 
         codigoLocal,
         classificacaoLocal,
@@ -617,41 +707,84 @@ function salvarLocal(event) {
         atualizadoEm: new Date().toLocaleString("pt-BR")
     };
 
-    locais.push(novoLocal);
+    try {
 
-    salvarLista("locaisSistema", locais);
+        await salvarDocumentoComId(
+            "locaisSistema",
+            idFirebase,
+            novoLocal
+        );
 
-    const usuarioLogado =
-    JSON.parse(localStorage.getItem("usuarioLogado")) || {};
+        const locaisAtualizados =
+        buscarLista("locaisSistema");
 
-    const usuarioAtualizado = {
-        ...usuarioLogado,
-        cadastroLocalCompleto: true,
-        localId: novoLocal.id,
-        codigoLocal: novoLocal.codigoLocal,
-        localVinculado: novoLocal.nomeLocal || novoLocal.nome,
-        unidadeVinculada:
-        novoLocal.unidadeVinculada || novoLocal.nomeLocal
-    };
+        locaisAtualizados.push(novoLocal);
 
-    localStorage.setItem(
-        "usuarioLogado",
-        JSON.stringify(usuarioAtualizado)
-    );
+        salvarLista("locaisSistema", locaisAtualizados);
 
-    alert(
-        `Local cadastrado com sucesso!\nCódigo: ${codigoLocal}`
-    );
+        const usuarioLogado =
+        buscarUsuarioLogado();
 
-    window.location.href = "agenda.html";
+        const usuarioAtualizado = {
+            ...usuarioLogado,
+            cadastroLocalCompleto: true,
+            localId: novoLocal.id,
+            localFirebaseId: novoLocal.idFirebase,
+            codigoLocal: novoLocal.codigoLocal,
+            localVinculado: novoLocal.nomeLocal || novoLocal.nome,
+            unidadeVinculada:
+            novoLocal.unidadeVinculada || novoLocal.nomeLocal
+        };
+
+        salvarUsuarioLogado(usuarioAtualizado);
+
+        if (usuarioAtualizado.email) {
+
+            const idFuncionario =
+            gerarIdFuncionario(usuarioAtualizado);
+
+            await salvarDocumentoComId(
+                "funcionariosSistema",
+                idFuncionario,
+                {
+                    ...usuarioAtualizado,
+                    cadastroFuncionarioCompleto: true,
+                    cadastroLocalCompleto: true,
+                    localId: novoLocal.id,
+                    localFirebaseId: novoLocal.idFirebase,
+                    codigoLocal: novoLocal.codigoLocal,
+                    localVinculado: novoLocal.nomeLocal || novoLocal.nome,
+                    unidadeVinculada:
+                    novoLocal.unidadeVinculada || novoLocal.nomeLocal,
+                    atualizadoEm: new Date().toLocaleString("pt-BR")
+                }
+            );
+        }
+
+        alert(
+            `Local cadastrado com sucesso!\nCódigo: ${codigoLocal}`
+        );
+
+        window.location.href = "solicitacoes.html";
+
+    } catch (error) {
+
+        console.log("Erro ao salvar local no Firestore:", error);
+
+        alert("Erro ao salvar local no banco de dados. Verifique as regras do Firestore.");
+    }
 }
+
+/* ==========================================
+   LISTAGEM
+========================================== */
 
 function carregarLocais() {
 
     if (!listaLocais) return;
 
     const locais =
-    buscarLista("locaisSistema");
+    buscarLocais();
 
     const termo =
     pesquisaLocal
@@ -707,6 +840,9 @@ function carregarLocais() {
         ? `https://www.google.com/maps?q=${local.latitude},${local.longitude}`
         : "";
 
+        const idAcao =
+        local.idFirebase || local.id;
+
         listaLocais.innerHTML += `
             <div class="local-item">
 
@@ -745,7 +881,7 @@ function carregarLocais() {
                         : ""
                     }
 
-                    <button class="local-btn delete" onclick="excluirLocal(${local.id})">
+                    <button class="local-btn delete" onclick="excluirLocal('${idAcao}')">
                         <i class="fas fa-trash"></i>
                         Excluir
                     </button>
@@ -757,7 +893,7 @@ function carregarLocais() {
     });
 }
 
-function excluirLocal(id) {
+async function excluirLocal(id) {
 
     const confirmar =
     confirm("Tem certeza que deseja excluir este local?");
@@ -765,15 +901,40 @@ function excluirLocal(id) {
     if (!confirmar) return;
 
     let locais =
-    buscarLista("locaisSistema");
+    buscarLocais();
+
+    const localExcluido =
+    locais.find(local =>
+        String(local.id) === String(id) ||
+        String(local.idFirebase) === String(id)
+    );
 
     locais =
-    locais.filter(local => local.id !== id);
+    locais.filter(local =>
+        String(local.id) !== String(id) &&
+        String(local.idFirebase) !== String(id)
+    );
 
     salvarLista("locaisSistema", locais);
 
+    if (localExcluido && localExcluido.idFirebase) {
+        try {
+            await excluirDocumento(
+                "locaisSistema",
+                localExcluido.idFirebase
+            );
+        }
+        catch (error) {
+            console.log("Erro ao excluir local no Firestore:", error);
+        }
+    }
+
     carregarLocais();
 }
+
+/* ==========================================
+   FORMULÁRIO
+========================================== */
 
 function limparFormulario() {
 
@@ -790,6 +951,10 @@ function limparFormulario() {
     if (latitude) latitude.value = "";
     if (longitude) longitude.value = "";
 }
+
+/* ==========================================
+   EVENTOS
+========================================== */
 
 if (formLocal) {
     formLocal.addEventListener("submit", salvarLocal);
@@ -851,10 +1016,15 @@ if (usarLocalizacao) {
     usarLocalizacao.addEventListener("click", usarMinhaLocalizacao);
 }
 
+/* ==========================================
+   GLOBAIS E INICIALIZAÇÃO
+========================================== */
+
 window.excluirLocal = excluirLocal;
 
 document.addEventListener("DOMContentLoaded", () => {
     atualizarCodigoLocal();
     iniciarMapaCadastroLocal();
     carregarLocais();
+    iniciarEscutaLocaisFirestore();
 });

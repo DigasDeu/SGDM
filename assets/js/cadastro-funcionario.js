@@ -1,3 +1,7 @@
+import {
+    salvarDocumentoComId
+} from "./db.js";
+
 const formFuncionario =
 document.getElementById("formFuncionario");
 
@@ -105,7 +109,18 @@ function encontrarFuncionarioPorEmail(funcionarios, email) {
     );
 }
 
-function salvarCadastroFuncionario(event) {
+function gerarIdFuncionario(usuarioAtual, email) {
+
+    if (usuarioAtual.uid) {
+        return usuarioAtual.uid;
+    }
+
+    return String(email || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "_");
+}
+
+async function salvarCadastroFuncionario(event) {
 
     event.preventDefault();
 
@@ -189,9 +204,15 @@ function salvarCadastroFuncionario(event) {
     ? funcionarios[funcionarioIndex]
     : null;
 
+    const idFuncionario =
+    gerarIdFuncionario(usuarioAtual, email);
+
     const funcionario = {
         id:
         funcionarioAnterior?.id || Date.now(),
+
+        idFirebase:
+        idFuncionario,
 
         uid:
         usuarioAtual.uid || funcionarioAnterior?.uid || "",
@@ -245,69 +266,84 @@ function salvarCadastroFuncionario(event) {
         new Date().toLocaleString("pt-BR")
     };
 
-    if (funcionarioIndex >= 0) {
-        funcionarios[funcionarioIndex] =
-        funcionario;
-    }
-    else {
-        funcionarios.push(funcionario);
-    }
+    try {
 
-    salvarLista("funcionariosSistema", funcionarios);
+        await salvarDocumentoComId(
+            "funcionariosSistema",
+            idFuncionario,
+            funcionario
+        );
 
-    const usuarioAtualizado = {
-        ...usuarioAtual,
+        if (funcionarioIndex >= 0) {
+            funcionarios[funcionarioIndex] =
+            funcionario;
+        }
+        else {
+            funcionarios.push(funcionario);
+        }
 
-        uid:
-        usuarioAtual.uid || funcionario.uid || "",
+        salvarLista("funcionariosSistema", funcionarios);
 
-        nome,
-        email,
-        telefone,
+        const usuarioAtualizado = {
+            ...usuarioAtual,
 
-        codigoFuncionario:
-        funcionario.codigoFuncionario,
+            uid:
+            usuarioAtual.uid || funcionario.uid || "",
 
-        cargos,
-        cargoPrincipal,
+            nome,
+            email,
+            telefone,
 
-        tipoAcesso,
-        statusFuncionario,
+            codigoFuncionario:
+            funcionario.codigoFuncionario,
 
-        equipeMidia:
-        ehEquipeMidia,
+            cargos,
+            cargoPrincipal,
 
-        unidade:
-        funcionario.unidade,
+            tipoAcesso,
+            statusFuncionario,
 
-        tipoUnidade:
-        funcionario.tipoUnidade,
+            equipeMidia:
+            ehEquipeMidia,
 
-        localId:
-        funcionario.localId,
+            unidade:
+            funcionario.unidade,
 
-        cadastroFuncionarioCompleto:
-        true,
+            tipoUnidade:
+            funcionario.tipoUnidade,
 
-        cadastroLocalCompleto:
-        ehEquipeMidia
-        ? true
-        : funcionario.cadastroLocalCompleto || false
-    };
+            localId:
+            funcionario.localId,
 
-    salvarUsuarioLogado(usuarioAtualizado);
+            cadastroFuncionarioCompleto:
+            true,
 
-    alert(
-        `Funcionário salvo com sucesso!\nCódigo: ${funcionario.codigoFuncionario}`
-    );
+            cadastroLocalCompleto:
+            ehEquipeMidia
+            ? true
+            : funcionario.cadastroLocalCompleto || false
+        };
 
-    if (ehEquipeMidia) {
-        window.location.href =
-        "../dashboard.html";
-    }
-    else {
-        window.location.href =
-        "cadastro-local.html";
+        salvarUsuarioLogado(usuarioAtualizado);
+
+        alert(
+            `Funcionário salvo com sucesso!\nCódigo: ${funcionario.codigoFuncionario}`
+        );
+
+        if (ehEquipeMidia) {
+            window.location.href =
+            "../dashboard.html";
+        }
+        else {
+            window.location.href =
+            "cadastro-local.html";
+        }
+
+    } catch (error) {
+
+        console.log("Erro ao salvar funcionário no Firestore:", error);
+
+        alert("Erro ao salvar funcionário no banco de dados. Verifique as regras do Firestore.");
     }
 }
 

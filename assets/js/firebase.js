@@ -2,6 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 const firebaseConfig = {
     apiKey: "AIzaSyB9qDW4ogSZB666z7659ZaCw-asZUoQDUI",
     authDomain: "sistema-midia-semsa.firebaseapp.com",
@@ -15,4 +17,9 @@ const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 
-export { auth };
+const db = getFirestore(app);
+
+export {
+    auth,
+    db
+};

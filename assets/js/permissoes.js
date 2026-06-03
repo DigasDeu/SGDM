@@ -1,6 +1,6 @@
 /* ==========================================
-   PERMISSÕES E FLUXO DE ACESSO - SGDM
-   Controle temporário via localStorage
+   PERMISSÕES - SGDM
+   Usa usuarioLogado já montado pelo auth.js
 ========================================== */
 
 function buscarUsuarioLogado() {
@@ -15,37 +15,33 @@ function estaEmPastaPages() {
     return window.location.pathname.includes("/pages/");
 }
 
-function irParaPagina(pagina) {
-    if (estaEmPastaPages()) {
-        window.location.href = pagina;
-    } else {
-        window.location.href = `pages/${pagina}`;
-    }
+function caminhoDashboard() {
+    return estaEmPastaPages()
+        ? "../dashboard.html"
+        : "dashboard.html";
 }
 
-function irParaDashboard() {
-    if (estaEmPastaPages()) {
-        window.location.href = "../dashboard.html";
-    } else {
-        window.location.href = "dashboard.html";
-    }
+function caminhoSolicitacoes() {
+    return estaEmPastaPages()
+        ? "solicitacoes.html"
+        : "pages/solicitacoes.html";
 }
 
-function irParaSolicitacoes() {
-    if (estaEmPastaPages()) {
-        window.location.href = "solicitacoes.html";
-    } else {
-        window.location.href = "pages/solicitacoes.html";
-    }
+function caminhoCadastroFuncionario() {
+    return estaEmPastaPages()
+        ? "cadastro-funcionario.html"
+        : "pages/cadastro-funcionario.html";
 }
 
-function irParaAgenda() {
-    if (estaEmPastaPages()) {
-        window.location.href = "agenda.html";
-    } else {
-        window.location.href = "pages/agenda.html";
-    }
+function caminhoCadastroLocal() {
+    return estaEmPastaPages()
+        ? "cadastro-local.html"
+        : "pages/cadastro-local.html";
 }
+
+/* ==========================================
+   PERFIS
+========================================== */
 
 function perfilEquipeMidia(tipoAcesso) {
     return tipoAcesso === "Equipe de Mídia";
@@ -63,84 +59,77 @@ function perfilRestrito(tipoAcesso) {
     return perfisRestritos.includes(tipoAcesso);
 }
 
-function paginaPermitidaParaRestrito(pagina) {
-    const paginasPermitidas = [
-        "solicitacoes.html",
-        "agenda.html",
-        "cadastro-funcionario.html",
-        "cadastro-local.html"
-    ];
+function paginaCadastro() {
+    const pagina = paginaAtual();
 
-    return paginasPermitidas.includes(pagina);
-}
-
-function paginaCadastro(pagina) {
     return (
         pagina === "cadastro-funcionario.html" ||
         pagina === "cadastro-local.html"
     );
 }
 
-function verificarCadastroObrigatorio(usuario) {
+function paginaPermitidaParaRestrito() {
     const pagina = paginaAtual();
+
+    const permitidas = [
+        "solicitacoes.html",
+        "agenda.html",
+        "cadastro-funcionario.html",
+        "cadastro-local.html"
+    ];
+
+    return permitidas.includes(pagina);
+}
+
+/* ==========================================
+   CONTROLE DE CADASTRO
+========================================== */
+
+function verificarCadastroObrigatorio(usuario) {
 
     if (!usuario) return;
 
-    if (perfilEquipeMidia(usuario.tipoAcesso)) {
-        if (
-            !usuario.cadastroFuncionarioCompleto &&
-            pagina !== "cadastro-funcionario.html"
-        ) {
-            irParaPagina("cadastro-funcionario.html");
-            return;
-        }
-
-        if (
-            usuario.cadastroFuncionarioCompleto &&
-            paginaCadastro(pagina)
-        ) {
-            irParaDashboard();
-            return;
-        }
-
-        return;
-    }
+    const pagina = paginaAtual();
 
     if (
         !usuario.cadastroFuncionarioCompleto &&
         pagina !== "cadastro-funcionario.html"
     ) {
-        irParaPagina("cadastro-funcionario.html");
+        window.location.href = caminhoCadastroFuncionario();
         return;
     }
 
     if (
         usuario.cadastroFuncionarioCompleto &&
         !usuario.cadastroLocalCompleto &&
+        !perfilEquipeMidia(usuario.tipoAcesso) &&
         pagina !== "cadastro-local.html"
     ) {
-        irParaPagina("cadastro-local.html");
+        window.location.href = caminhoCadastroLocal();
         return;
     }
 
     if (
         usuario.cadastroFuncionarioCompleto &&
         usuario.cadastroLocalCompleto &&
-        paginaCadastro(pagina)
+        paginaCadastro()
     ) {
         if (perfilRestrito(usuario.tipoAcesso)) {
-            irParaSolicitacoes();
+            window.location.href = caminhoSolicitacoes();
             return;
         }
 
-        irParaDashboard();
+        window.location.href = caminhoDashboard();
     }
 }
 
-function protegerPaginasPorPerfil(usuario) {
-    if (!usuario) return;
+/* ==========================================
+   BLOQUEIO POR PERFIL
+========================================== */
 
-    const pagina = paginaAtual();
+function protegerPaginasPorPerfil(usuario) {
+
+    if (!usuario) return;
 
     if (
         !usuario.cadastroFuncionarioCompleto ||
@@ -154,14 +143,20 @@ function protegerPaginasPorPerfil(usuario) {
     }
 
     if (perfilRestrito(usuario.tipoAcesso)) {
-        if (!paginaPermitidaParaRestrito(pagina)) {
+
+        if (!paginaPermitidaParaRestrito()) {
             alert("Seu perfil possui acesso somente às Solicitações e Agenda.");
-            irParaSolicitacoes();
+            window.location.href = caminhoSolicitacoes();
         }
     }
 }
 
+/* ==========================================
+   AJUSTE DO MENU
+========================================== */
+
 function ajustarMenuPorPerfil(usuario) {
+
     if (!usuario) return;
 
     if (perfilEquipeMidia(usuario.tipoAcesso)) {
@@ -172,10 +167,13 @@ function ajustarMenuPorPerfil(usuario) {
         return;
     }
 
-    const links = document.querySelectorAll(".sidebar-menu a, .bottom-nav a");
+    const links =
+    document.querySelectorAll(".sidebar-menu a, .bottom-nav a");
 
     links.forEach(link => {
-        const href = link.getAttribute("href") || "";
+
+        const href =
+        link.getAttribute("href") || "";
 
         const permitido =
             href.includes("solicitacoes.html") ||
@@ -190,16 +188,28 @@ function ajustarMenuPorPerfil(usuario) {
     });
 }
 
-function iniciarControleDeAcesso() {
-    const usuario = buscarUsuarioLogado();
+/* ==========================================
+   INICIALIZAÇÃO
+========================================== */
+
+function iniciarPermissoes() {
+
+    const usuario =
+    buscarUsuarioLogado();
 
     if (!usuario) return;
 
     verificarCadastroObrigatorio(usuario);
+
     protegerPaginasPorPerfil(usuario);
+
     ajustarMenuPorPerfil(usuario);
 }
 
+/*
+   Espera o auth.js terminar de buscar o Firestore
+   e montar o usuarioLogado.
+*/
 document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(iniciarControleDeAcesso, 300);
+    setTimeout(iniciarPermissoes, 1200);
 });

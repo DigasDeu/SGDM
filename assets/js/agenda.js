@@ -1,3 +1,9 @@
+import {
+    adicionarDocumento,
+    excluirDocumento,
+    observarColecao
+} from "./db.js";
+
 const calendar =
 document.getElementById("calendar");
 
@@ -13,6 +19,8 @@ new Date();
 let eventos =
 JSON.parse(localStorage.getItem("eventos")) || [];
 
+let funcionariosOnline = [];
+
 /* ==========================================
    LOCALSTORAGE
 ========================================== */
@@ -25,75 +33,136 @@ function salvarLista(chave, lista) {
     localStorage.setItem(chave, JSON.stringify(lista));
 }
 
+function buscarUsuarioLogado() {
+    return JSON.parse(localStorage.getItem("usuarioLogado")) || {};
+}
+
 function salvarEventos() {
     localStorage.setItem("eventos", JSON.stringify(eventos));
 }
 
 /* ==========================================
-   EQUIPE DE MÍDIA
+   FIRESTORE - TEMPO REAL
 ========================================== */
 
-function inicializarEquipeMidiaPadrao() {
+function iniciarEscutaEventosFirestore() {
 
-    const funcionarios =
-    buscarLista("funcionariosSistema");
+    try {
 
-    const equipePadrao = [
-        "Diego",
-        "Alicia",
-        "Clarissa",
-        "Kelson"
-    ];
+        observarColecao("eventos", (dados) => {
 
-    let alterou = false;
+            eventos = dados;
 
-    equipePadrao.forEach(nome => {
+            salvarLista("eventos", dados);
 
-        const existe =
-        funcionarios.some(funcionario =>
-            funcionario.nome &&
-            funcionario.nome.toLowerCase() === nome.toLowerCase() &&
-            (
-                funcionario.tipoAcesso === "Equipe de Mídia" ||
-                funcionario.equipeMidia === true
-            )
-        );
+            renderCalendar();
 
-        if (!existe) {
+            const hoje =
+            new Date().toISOString().split("T")[0];
 
-            funcionarios.push({
-                id: Date.now() + Math.floor(Math.random() * 1000),
-                codigoFuncionario: "",
-                nome,
-                email: "",
-                telefone: "",
-                cargos: ["Funcionário"],
-                cargoPrincipal: "Funcionário",
-                tipoAcesso: "Equipe de Mídia",
-                statusFuncionario: "Ativo",
-                equipeMidia: true,
-                unidade: "Departamento de Mídia",
-                tipoUnidade: "Setor Administrativo",
-                cadastroFuncionarioCompleto: true,
-                cadastroLocalCompleto: true,
-                criadoEm: new Date().toLocaleString("pt-BR")
-            });
+            mostrarEventos(hoje);
 
-            alterou = true;
+            carregarResumoResponsaveis();
+        });
+
+    } catch (error) {
+
+        console.log("Erro ao observar eventos no Firestore:", error);
+    }
+}
+
+function iniciarEscutaFuncionariosFirestore() {
+
+    try {
+
+        observarColecao("funcionariosSistema", (dados) => {
+
+            funcionariosOnline = dados;
+
+            salvarLista("funcionariosSistema", dados);
+
+            carregarResponsaveisMidia();
+
+            carregarResumoResponsaveis();
+        });
+
+    } catch (error) {
+
+        console.log("Erro ao observar funcionários no Firestore:", error);
+    }
+}
+
+/* ==========================================
+   EQUIPE DE MÍDIA - SOMENTE CADASTRADOS
+========================================== */
+
+function removerDuplicadosEquipe(equipe) {
+
+    const equipeFinal = [];
+
+    equipe.forEach(pessoa => {
+
+        const emailPessoa =
+        String(pessoa.email || "").toLowerCase();
+
+        const codigoPessoa =
+        String(pessoa.codigoFuncionario || "").toLowerCase();
+
+        const nomePessoa =
+        String(pessoa.nome || "").toLowerCase();
+
+        const jaExiste =
+        equipeFinal.some(item => {
+
+            const emailItem =
+            String(item.email || "").toLowerCase();
+
+            const codigoItem =
+            String(item.codigoFuncionario || "").toLowerCase();
+
+            const nomeItem =
+            String(item.nome || "").toLowerCase();
+
+            return (
+                (
+                    emailPessoa &&
+                    emailItem &&
+                    emailPessoa === emailItem
+                ) ||
+                (
+                    codigoPessoa &&
+                    codigoItem &&
+                    codigoPessoa === codigoItem
+                ) ||
+                (
+                    nomePessoa &&
+                    nomeItem &&
+                    nomePessoa === nomeItem
+                )
+            );
+        });
+
+        if (!jaExiste) {
+            equipeFinal.push(pessoa);
         }
     });
 
-    if (alterou) {
-        salvarLista("funcionariosSistema", funcionarios);
-    }
+    return equipeFinal;
 }
 
 function buscarEquipeMidia() {
 
     const funcionarios =
-    buscarLista("funcionariosSistema");
+    funcionariosOnline.length > 0
+    ? funcionariosOnline
+    : buscarLista("funcionariosSistema");
 
-    return funcionarios.filter(funcionario =>
+    const usuarioLogado =
+    buscarUsuarioLogado();
+
+    let equipe =
+    funcionarios.filter(funcionario =>
+        funcionario.cadastroFuncionarioCompleto === true &&
         (
             funcionario.tipoAcesso === "Equipe de Mídia" ||
             funcionario.equipeMidia === true
@@ -101,6 +170,44 @@ function buscarEquipeMidia() {
         funcionario.statusFuncionario !== "Inativo" &&
         funcionario.statusFuncionario !== "Bloqueado"
     );
+
+    if (
+        usuarioLogado &&
+        usuarioLogado.cadastroFuncionarioCompleto === true &&
+        (
+            usuarioLogado.tipoAcesso === "Equipe de Mídia" ||
+            usuarioLogado.equipeMidia === true
+        )
+    ) {
+        const existeUsuario =
+        equipe.some(pessoa =>
+            pessoa.email &&
+            usuarioLogado.email &&
+            pessoa.email.toLowerCase() === usuarioLogado.email.toLowerCase()
+        );
+
+        if (!existeUsuario) {
+            equipe.push({
+                id: usuarioLogado.uid || Date.now(),
+                uid: usuarioLogado.uid || "",
+                codigoFuncionario: usuarioLogado.codigoFuncionario || "",
+                nome: usuarioLogado.nome || "Usuário da Mídia",
+                email: usuarioLogado.email || "",
+                telefone: usuarioLogado.telefone || "",
+                cargos: usuarioLogado.cargos || [],
+                cargoPrincipal: usuarioLogado.cargoPrincipal || "",
+                tipoAcesso: "Equipe de Mídia",
+                statusFuncionario: usuarioLogado.statusFuncionario || "Ativo",
+                equipeMidia: true,
+                unidade: "Departamento de Mídia",
+                tipoUnidade: "Setor Administrativo",
+                cadastroFuncionarioCompleto: true,
+                cadastroLocalCompleto: true
+            });
+        }
+    }
+
+    return removerDuplicadosEquipe(equipe);
 }
 
 function carregarResponsaveisMidia() {
@@ -110,8 +217,6 @@ function carregarResponsaveisMidia() {
 
     if (!selectResponsavel) return;
 
-    inicializarEquipeMidiaPadrao();
-
     const equipe =
     buscarEquipeMidia();
 
@@ -119,14 +224,30 @@ function carregarResponsaveisMidia() {
         <option value="">Selecione o responsável pela cobertura</option>
     `;
 
+    if (equipe.length === 0) {
+        selectResponsavel.innerHTML += `
+            <option value="" disabled>
+                Nenhuma pessoa da mídia cadastrada
+            </option>
+        `;
+        return;
+    }
+
     equipe.forEach(pessoa => {
+
+        const idPessoa =
+        pessoa.idFirebase ||
+        pessoa.id ||
+        pessoa.uid ||
+        pessoa.email ||
+        "";
 
         selectResponsavel.innerHTML += `
             <option
-                value="${pessoa.id}"
+                value="${idPessoa}"
                 data-nome="${pessoa.nome || ""}"
                 data-email="${pessoa.email || ""}">
-                ${pessoa.nome}
+                ${pessoa.nome || "Sem nome"}
             </option>
         `;
     });
@@ -159,6 +280,51 @@ function obterResponsavelSelecionado() {
    RESUMO POR RESPONSÁVEL
 ========================================== */
 
+function mesmoResponsavel(evento, pessoa) {
+
+    const pessoaId =
+    String(
+        pessoa.idFirebase ||
+        pessoa.id ||
+        pessoa.uid ||
+        pessoa.email ||
+        ""
+    );
+
+    const pessoaEmail =
+    String(pessoa.email || "").toLowerCase();
+
+    const pessoaNome =
+    String(pessoa.nome || "").toLowerCase();
+
+    const eventoResponsavelId =
+    String(evento.responsavelId || "");
+
+    const eventoResponsavelEmail =
+    String(evento.responsavelEmail || "").toLowerCase();
+
+    const eventoResponsavelNome =
+    String(evento.responsavel || "").toLowerCase();
+
+    return (
+        (
+            pessoaId &&
+            eventoResponsavelId &&
+            pessoaId === eventoResponsavelId
+        ) ||
+        (
+            pessoaEmail &&
+            eventoResponsavelEmail &&
+            pessoaEmail === eventoResponsavelEmail
+        ) ||
+        (
+            pessoaNome &&
+            eventoResponsavelNome &&
+            pessoaNome === eventoResponsavelNome
+        )
+    );
+}
+
 function contarAgendamentosPorResponsavel() {
 
     const equipe =
@@ -168,25 +334,18 @@ function contarAgendamentosPorResponsavel() {
 
         const totalAgendamentos =
         eventos.filter(evento =>
-            String(evento.responsavelId || "") === String(pessoa.id || "") ||
-            String(evento.responsavel || "").toLowerCase() === String(pessoa.nome || "").toLowerCase()
+            mesmoResponsavel(evento, pessoa)
         ).length;
 
+        const hoje =
+        new Date().toISOString().split("T")[0];
+
         const proximosAgendamentos =
-        eventos.filter(evento => {
-
-            const mesmoResponsavel =
-            String(evento.responsavelId || "") === String(pessoa.id || "") ||
-            String(evento.responsavel || "").toLowerCase() === String(pessoa.nome || "").toLowerCase();
-
-            if (!mesmoResponsavel || !evento.data) return false;
-
-            const hoje =
-            new Date().toISOString().split("T")[0];
-
-            return evento.data >= hoje;
-
-        }).length;
+        eventos.filter(evento =>
+            mesmoResponsavel(evento, pessoa) &&
+            evento.data &&
+            evento.data >= hoje
+        ).length;
 
         return {
             ...pessoa,
@@ -200,14 +359,12 @@ function carregarResumoResponsaveis() {
 
     if (!resumoResponsaveis) return;
 
-    inicializarEquipeMidiaPadrao();
-
     const resumo =
     contarAgendamentosPorResponsavel();
 
     if (resumo.length === 0) {
         resumoResponsaveis.innerHTML =
-        "<p>Nenhum responsável cadastrado.</p>";
+        "<p>Nenhuma pessoa da mídia cadastrada.</p>";
         return;
     }
 
@@ -223,7 +380,7 @@ function carregarResumoResponsaveis() {
                 </div>
 
                 <div class="resumo-info">
-                    <strong>${pessoa.nome}</strong>
+                    <strong>${pessoa.nome || "Sem nome"}</strong>
 
                     <span>
                         ${pessoa.totalAgendamentos} agendamento(s)
@@ -246,7 +403,7 @@ function carregarResumoResponsaveis() {
 function adicionarHistoricoExclusao(item, origem) {
 
     const historico =
-    JSON.parse(localStorage.getItem("historicoExclusoes")) || [];
+    buscarLista("historicoExclusoes");
 
     historico.unshift({
         id: Date.now(),
@@ -255,30 +412,31 @@ function adicionarHistoricoExclusao(item, origem) {
         dataExclusao: new Date().toLocaleString("pt-BR")
     });
 
-    localStorage.setItem(
-        "historicoExclusoes",
-        JSON.stringify(historico)
-    );
+    salvarLista("historicoExclusoes", historico);
 }
 
 function adicionarNotificacao(titulo, descricao) {
 
     const notificacoes =
-    JSON.parse(localStorage.getItem("notificacoes")) || [];
+    buscarLista("notificacoes");
 
-    notificacoes.unshift({
+    const novaNotificacao = {
         id: Date.now(),
         titulo,
         descricao,
         tipo: "Agenda",
         data: new Date().toLocaleString("pt-BR"),
         lida: false
-    });
+    };
 
-    localStorage.setItem(
-        "notificacoes",
-        JSON.stringify(notificacoes)
-    );
+    notificacoes.unshift(novaNotificacao);
+
+    salvarLista("notificacoes", notificacoes);
+
+    adicionarDocumento("notificacoes", novaNotificacao)
+    .catch(error => {
+        console.log("Erro ao salvar notificação no Firestore:", error);
+    });
 }
 
 /* ==========================================
@@ -288,9 +446,6 @@ function adicionarNotificacao(titulo, descricao) {
 function renderCalendar() {
 
     if (!calendar || !monthYear) return;
-
-    eventos =
-    JSON.parse(localStorage.getItem("eventos")) || [];
 
     calendar.innerHTML = "";
 
@@ -370,9 +525,6 @@ function mostrarEventos(data) {
 
     if (!container) return;
 
-    eventos =
-    JSON.parse(localStorage.getItem("eventos")) || [];
-
     const lista =
     eventos.filter(evento => evento.data === data);
 
@@ -387,6 +539,9 @@ function mostrarEventos(data) {
     container.innerHTML = "";
 
     lista.forEach(evento => {
+
+        const idAcao =
+        evento.idFirebase || evento.id;
 
         container.innerHTML += `
             <div class="event-card">
@@ -430,7 +585,7 @@ function mostrarEventos(data) {
 
                 <div class="card-actions">
 
-                    <button class="delete-btn" onclick="excluirEvento(${evento.id})">
+                    <button class="delete-btn" onclick="excluirEvento('${idAcao}')">
                         <i class="fas fa-trash"></i>
                         Excluir
                     </button>
@@ -446,7 +601,7 @@ function mostrarEventos(data) {
    EXCLUIR EVENTO
 ========================================== */
 
-function excluirEvento(id) {
+async function excluirEvento(id) {
 
     const confirmar =
     confirm("Tem certeza que deseja excluir este evento da agenda?");
@@ -454,25 +609,45 @@ function excluirEvento(id) {
     if (!confirmar) return;
 
     const itemExcluido =
-    eventos.find(evento => evento.id === id);
+    eventos.find(evento =>
+        String(evento.id) === String(id) ||
+        String(evento.idFirebase) === String(id)
+    );
+
+    if (!itemExcluido) {
+        alert("Evento não encontrado.");
+        return;
+    }
 
     eventos =
-    eventos.filter(evento => evento.id !== id);
+    eventos.filter(evento =>
+        String(evento.id) !== String(id) &&
+        String(evento.idFirebase) !== String(id)
+    );
 
     salvarEventos();
 
-    if (itemExcluido) {
-
-        adicionarHistoricoExclusao(
-            itemExcluido,
-            "Agenda"
-        );
-
-        adicionarNotificacao(
-            "Evento excluído",
-            `${itemExcluido.titulo} foi removido da agenda.`
-        );
+    if (itemExcluido.idFirebase) {
+        try {
+            await excluirDocumento(
+                "eventos",
+                itemExcluido.idFirebase
+            );
+        }
+        catch (error) {
+            console.log("Erro ao excluir evento no Firestore:", error);
+        }
     }
+
+    adicionarHistoricoExclusao(
+        itemExcluido,
+        "Agenda"
+    );
+
+    adicionarNotificacao(
+        "Evento excluído",
+        `${itemExcluido.titulo} foi removido da agenda.`
+    );
 
     renderCalendar();
 
@@ -480,6 +655,8 @@ function excluirEvento(id) {
     new Date().toISOString().split("T")[0];
 
     mostrarEventos(hoje);
+
+    carregarResumoResponsaveis();
 }
 
 /* ==========================================
@@ -570,7 +747,7 @@ document.getElementById("eventoForm");
 
 if (eventoForm) {
 
-    eventoForm.addEventListener("submit", function (event) {
+    eventoForm.addEventListener("submit", async function (event) {
 
         event.preventDefault();
 
@@ -632,28 +809,48 @@ if (eventoForm) {
             return;
         }
 
-        eventos.push(novoEvento);
+        try {
 
-        salvarEventos();
+            const idFirebase =
+            await adicionarDocumento(
+                "eventos",
+                novoEvento
+            );
 
-        adicionarNotificacao(
-            "Novo evento agendado",
-            `${novoEvento.titulo} em ${novoEvento.local}, no dia ${novoEvento.data} às ${novoEvento.hora}. Responsável: ${novoEvento.responsavel}.`
-        );
+            novoEvento.idFirebase =
+            idFirebase;
 
-        renderCalendar();
+            eventos.push(novoEvento);
 
-        mostrarEventos(novoEvento.data);
+            salvarEventos();
 
-        carregarResumoResponsaveis();
+            adicionarNotificacao(
+                "Novo evento agendado",
+                `${novoEvento.titulo} em ${novoEvento.local}, no dia ${novoEvento.data} às ${novoEvento.hora}. Responsável: ${novoEvento.responsavel}.`
+            );
 
-        if (modal) {
-            modal.style.display = "none";
+            renderCalendar();
+
+            mostrarEventos(novoEvento.data);
+
+            carregarResumoResponsaveis();
+
+            if (modal) {
+                modal.style.display = "none";
+            }
+
+            this.reset();
+
+            carregarResponsaveisMidia();
+
+            alert("Evento salvo no banco de dados com sucesso.");
+
+        } catch (error) {
+
+            console.log("Erro ao salvar evento no Firestore:", error);
+
+            alert("Erro ao salvar evento no banco de dados. Verifique as regras do Firestore.");
         }
-
-        this.reset();
-
-        carregarResponsaveisMidia();
     });
 }
 
@@ -666,8 +863,6 @@ excluirEvento;
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    inicializarEquipeMidiaPadrao();
-
     carregarResponsaveisMidia();
 
     renderCalendar();
@@ -678,4 +873,8 @@ document.addEventListener("DOMContentLoaded", () => {
     mostrarEventos(hoje);
 
     carregarResumoResponsaveis();
+
+    iniciarEscutaFuncionariosFirestore();
+
+    iniciarEscutaEventosFirestore();
 });

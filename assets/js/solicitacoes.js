@@ -1,3 +1,9 @@
+import {
+    adicionarDocumento,
+    excluirDocumento,
+    observarColecao
+} from "./db.js";
+
 const modal = document.getElementById("modalSolicitacao");
 const abrirModal = document.getElementById("abrirModal");
 const fecharModal = document.getElementById("fecharModal");
@@ -10,8 +16,11 @@ let filtroAtual = "Todos";
 let mapaSolicitacao = null;
 let marcadorSolicitacao = null;
 
+let solicitacoesOnline = [];
+let funcionariosOnline = [];
+
 /* ==========================================
-   FUNÇÕES BASE LOCALSTORAGE
+   LOCALSTORAGE
 ========================================== */
 
 function buscarLista(chave) {
@@ -22,7 +31,15 @@ function salvarLista(chave, lista) {
     localStorage.setItem(chave, JSON.stringify(lista));
 }
 
+function buscarUsuarioLogado() {
+    return JSON.parse(localStorage.getItem("usuarioLogado")) || {};
+}
+
 function buscarSolicitacoes() {
+    if (solicitacoesOnline.length > 0) {
+        return solicitacoesOnline;
+    }
+
     return buscarLista("solicitacoes");
 }
 
@@ -31,70 +48,110 @@ function salvarSolicitacoes(solicitacoes) {
 }
 
 /* ==========================================
-   EQUIPE DE MÍDIA
+   FIRESTORE - TEMPO REAL
 ========================================== */
 
-function inicializarEquipeMidiaPadrao() {
+function iniciarEscutaSolicitacoesFirestore() {
+    try {
+        observarColecao("solicitacoes", (dados) => {
+            solicitacoesOnline = dados;
 
-    const funcionarios =
-    buscarLista("funcionariosSistema");
+            salvarLista("solicitacoes", dados);
 
-    const equipePadrao = [
-        "Diego",
-        "Alicia",
-        "Clarissa",
-        "Kelson"
-    ];
+            carregarSolicitacoes();
+        });
+    }
+    catch (error) {
+        console.log("Erro ao observar solicitações no Firestore:", error);
+    }
+}
 
-    let alterou = false;
+function iniciarEscutaFuncionariosFirestore() {
+    try {
+        observarColecao("funcionariosSistema", (dados) => {
+            funcionariosOnline = dados;
 
-    equipePadrao.forEach(nome => {
+            salvarLista("funcionariosSistema", dados);
 
-        const existe =
-        funcionarios.some(funcionario =>
-            funcionario.nome &&
-            funcionario.nome.toLowerCase() === nome.toLowerCase() &&
-            (
-                funcionario.tipoAcesso === "Equipe de Mídia" ||
-                funcionario.equipeMidia === true
-            )
-        );
+            carregarResponsaveisMidia();
+        });
+    }
+    catch (error) {
+        console.log("Erro ao observar funcionários no Firestore:", error);
+    }
+}
 
-        if (!existe) {
+/* ==========================================
+   EQUIPE DE MÍDIA - SOMENTE CADASTRADOS
+========================================== */
 
-            funcionarios.push({
-                id: Date.now() + Math.floor(Math.random() * 1000),
-                codigoFuncionario: "",
-                nome,
-                email: "",
-                telefone: "",
-                cargos: ["Funcionário"],
-                cargoPrincipal: "Funcionário",
-                tipoAcesso: "Equipe de Mídia",
-                statusFuncionario: "Ativo",
-                equipeMidia: true,
-                unidade: "Departamento de Mídia",
-                tipoUnidade: "Setor Administrativo",
-                cadastroFuncionarioCompleto: true,
-                cadastroLocalCompleto: true,
-                criadoEm: new Date().toLocaleString("pt-BR")
-            });
+function removerDuplicadosEquipe(equipe) {
 
-            alterou = true;
+    const equipeFinal = [];
+
+    equipe.forEach(pessoa => {
+
+        const emailPessoa =
+        String(pessoa.email || "").toLowerCase();
+
+        const codigoPessoa =
+        String(pessoa.codigoFuncionario || "").toLowerCase();
+
+        const nomePessoa =
+        String(pessoa.nome || "").toLowerCase();
+
+        const jaExiste =
+        equipeFinal.some(item => {
+
+            const emailItem =
+            String(item.email || "").toLowerCase();
+
+            const codigoItem =
+            String(item.codigoFuncionario || "").toLowerCase();
+
+            const nomeItem =
+            String(item.nome || "").toLowerCase();
+
+            return (
+                (
+                    emailPessoa &&
+                    emailItem &&
+                    emailPessoa === emailItem
+                ) ||
+                (
+                    codigoPessoa &&
+                    codigoItem &&
+                    codigoPessoa === codigoItem
+                ) ||
+                (
+                    nomePessoa &&
+                    nomeItem &&
+                    nomePessoa === nomeItem
+                )
+            );
+        });
+
+        if (!jaExiste) {
+            equipeFinal.push(pessoa);
         }
     });
 
-    if (alterou) {
-        salvarLista("funcionariosSistema", funcionarios);
-    }
+    return equipeFinal;
 }
 
 function buscarEquipeMidia() {
 
     const funcionarios =
-    buscarLista("funcionariosSistema");
+    funcionariosOnline.length > 0
+    ? funcionariosOnline
+    : buscarLista("funcionariosSistema");
 
-    return funcionarios.filter(funcionario =>
+    const usuarioLogado =
+    buscarUsuarioLogado();
+
+    let equipe =
+    funcionarios.filter(funcionario =>
+        funcionario.cadastroFuncionarioCompleto === true &&
         (
             funcionario.tipoAcesso === "Equipe de Mídia" ||
             funcionario.equipeMidia === true
@@ -102,6 +159,44 @@ function buscarEquipeMidia() {
         funcionario.statusFuncionario !== "Inativo" &&
         funcionario.statusFuncionario !== "Bloqueado"
     );
+
+    if (
+        usuarioLogado &&
+        usuarioLogado.cadastroFuncionarioCompleto === true &&
+        (
+            usuarioLogado.tipoAcesso === "Equipe de Mídia" ||
+            usuarioLogado.equipeMidia === true
+        )
+    ) {
+        const existeUsuario =
+        equipe.some(pessoa =>
+            pessoa.email &&
+            usuarioLogado.email &&
+            pessoa.email.toLowerCase() === usuarioLogado.email.toLowerCase()
+        );
+
+        if (!existeUsuario) {
+            equipe.push({
+                id: usuarioLogado.uid || Date.now(),
+                uid: usuarioLogado.uid || "",
+                codigoFuncionario: usuarioLogado.codigoFuncionario || "",
+                nome: usuarioLogado.nome || "Usuário da Mídia",
+                email: usuarioLogado.email || "",
+                telefone: usuarioLogado.telefone || "",
+                cargos: usuarioLogado.cargos || [],
+                cargoPrincipal: usuarioLogado.cargoPrincipal || "",
+                tipoAcesso: "Equipe de Mídia",
+                statusFuncionario: usuarioLogado.statusFuncionario || "Ativo",
+                equipeMidia: true,
+                unidade: "Departamento de Mídia",
+                tipoUnidade: "Setor Administrativo",
+                cadastroFuncionarioCompleto: true,
+                cadastroLocalCompleto: true
+            });
+        }
+    }
+
+    return removerDuplicadosEquipe(equipe);
 }
 
 function carregarResponsaveisMidia() {
@@ -111,8 +206,6 @@ function carregarResponsaveisMidia() {
 
     if (!selectResponsavel) return;
 
-    inicializarEquipeMidiaPadrao();
-
     const equipe =
     buscarEquipeMidia();
 
@@ -120,14 +213,30 @@ function carregarResponsaveisMidia() {
         <option value="">Selecione o responsável pela cobertura</option>
     `;
 
+    if (equipe.length === 0) {
+        selectResponsavel.innerHTML += `
+            <option value="" disabled>
+                Nenhuma pessoa da mídia cadastrada
+            </option>
+        `;
+        return;
+    }
+
     equipe.forEach(pessoa => {
+
+        const idPessoa =
+        pessoa.idFirebase ||
+        pessoa.id ||
+        pessoa.uid ||
+        pessoa.email ||
+        "";
 
         selectResponsavel.innerHTML += `
             <option
-                value="${pessoa.id}"
+                value="${idPessoa}"
                 data-nome="${pessoa.nome || ""}"
                 data-email="${pessoa.email || ""}">
-                ${pessoa.nome}
+                ${pessoa.nome || "Sem nome"}
             </option>
         `;
     });
@@ -162,30 +271,41 @@ function obterResponsavelSelecionado() {
 
 function adicionarNotificacao(titulo, descricao, tipo = "Solicitação") {
 
-    const notificacoes = buscarLista("notificacoes");
+    const notificacoes =
+    buscarLista("notificacoes");
 
-    notificacoes.unshift({
+    const novaNotificacao = {
         id: Date.now(),
         titulo,
         descricao,
         tipo,
         data: new Date().toLocaleString("pt-BR"),
         lida: false
-    });
+    };
+
+    notificacoes.unshift(novaNotificacao);
 
     salvarLista("notificacoes", notificacoes);
+
+    adicionarDocumento("notificacoes", novaNotificacao)
+    .catch(error => {
+        console.log("Erro ao salvar notificação no Firestore:", error);
+    });
 }
 
 function adicionarHistoricoExclusao(item, origem) {
 
-    const historico = buscarLista("historicoExclusoes");
+    const historico =
+    buscarLista("historicoExclusoes");
 
-    historico.unshift({
+    const novoHistorico = {
         id: Date.now(),
         origem,
         item,
         dataExclusao: new Date().toLocaleString("pt-BR")
-    });
+    };
+
+    historico.unshift(novoHistorico);
 
     salvarLista("historicoExclusoes", historico);
 }
@@ -222,23 +342,19 @@ function fecharModalSolicitacao() {
 }
 
 if (abrirModal) {
-
     abrirModal.addEventListener("click", () => {
         abrirModalSolicitacao();
     });
 }
 
 if (fecharModal) {
-
     fecharModal.addEventListener("click", () => {
         fecharModalSolicitacao();
     });
 }
 
 if (modal) {
-
     modal.addEventListener("click", (event) => {
-
         if (event.target === modal) {
             fecharModalSolicitacao();
         }
@@ -489,7 +605,7 @@ if (usarLocalizacaoBtn) {
 
 if (formSolicitacao) {
 
-    formSolicitacao.addEventListener("submit", (event) => {
+    formSolicitacao.addEventListener("submit", async (event) => {
 
         event.preventDefault();
 
@@ -552,9 +668,6 @@ if (formSolicitacao) {
             `A solicitação "${titulo}" ocorrerá no dia ${data}, às ${hora}, no local ${local}.`;
         }
 
-        const solicitacoes =
-        buscarSolicitacoes();
-
         const novaSolicitacao = {
             id: Date.now(),
 
@@ -577,37 +690,60 @@ if (formSolicitacao) {
             criadoEm: new Date().toLocaleString("pt-BR")
         };
 
-        solicitacoes.push(novaSolicitacao);
+        try {
 
-        salvarSolicitacoes(solicitacoes);
+            const idFirebase =
+            await adicionarDocumento(
+                "solicitacoes",
+                novaSolicitacao
+            );
 
-        adicionarNotificacao(
-            "Nova Solicitação",
-            `${novaSolicitacao.titulo} • ${novaSolicitacao.data} • Responsável: ${novaSolicitacao.responsavel}`,
-            "Solicitação"
-        );
+            novaSolicitacao.idFirebase =
+            idFirebase;
 
-        carregarSolicitacoes();
+            const solicitacoes =
+            buscarLista("solicitacoes");
 
-        formSolicitacao.reset();
+            solicitacoes.push(novaSolicitacao);
 
-        carregarResponsaveisMidia();
+            salvarSolicitacoes(solicitacoes);
 
-        const latitudeInput =
-        document.getElementById("latitude");
+            adicionarNotificacao(
+                "Nova Solicitação",
+                `${novaSolicitacao.titulo} • ${novaSolicitacao.data} • Responsável: ${novaSolicitacao.responsavel}`,
+                "Solicitação"
+            );
 
-        const longitudeInput =
-        document.getElementById("longitude");
+            carregarSolicitacoes();
 
-        if (latitudeInput) {
-            latitudeInput.value = "";
+            formSolicitacao.reset();
+
+            carregarResponsaveisMidia();
+
+            const latitudeInput =
+            document.getElementById("latitude");
+
+            const longitudeInput =
+            document.getElementById("longitude");
+
+            if (latitudeInput) {
+                latitudeInput.value = "";
+            }
+
+            if (longitudeInput) {
+                longitudeInput.value = "";
+            }
+
+            fecharModalSolicitacao();
+
+            alert("Solicitação salva no banco de dados com sucesso.");
+
+        } catch (error) {
+
+            console.log("Erro ao salvar solicitação no Firestore:", error);
+
+            alert("Erro ao salvar no banco de dados. Verifique as regras do Firestore.");
         }
-
-        if (longitudeInput) {
-            longitudeInput.value = "";
-        }
-
-        fecharModalSolicitacao();
     });
 }
 
@@ -615,7 +751,7 @@ if (formSolicitacao) {
    GERAR EVENTO NA AGENDA
 ========================================== */
 
-function gerarEventoAgenda(id) {
+async function gerarEventoAgenda(id) {
 
     const solicitacoes =
     buscarSolicitacoes();
@@ -624,7 +760,10 @@ function gerarEventoAgenda(id) {
     buscarLista("eventos");
 
     const solicitacao =
-    solicitacoes.find(item => item.id === id);
+    solicitacoes.find(item =>
+        String(item.id) === String(id) ||
+        String(item.idFirebase) === String(id)
+    );
 
     if (!solicitacao) {
         alert("Solicitação não encontrada.");
@@ -632,7 +771,10 @@ function gerarEventoAgenda(id) {
     }
 
     const jaExiste =
-    eventos.some(evento => evento.solicitacaoId === id);
+    eventos.some(evento =>
+        String(evento.solicitacaoId) === String(solicitacao.id) ||
+        String(evento.solicitacaoFirebaseId || "") === String(solicitacao.idFirebase || "")
+    );
 
     if (jaExiste) {
         alert("Essa solicitação já foi enviada para a agenda.");
@@ -641,7 +783,9 @@ function gerarEventoAgenda(id) {
 
     const novoEvento = {
         id: Date.now(),
-        solicitacaoId: solicitacao.id,
+
+        solicitacaoId: solicitacao.id || "",
+        solicitacaoFirebaseId: solicitacao.idFirebase || "",
 
         titulo: solicitacao.titulo,
         tipo: "Cobertura de Mídia",
@@ -662,24 +806,42 @@ function gerarEventoAgenda(id) {
         criadoEm: new Date().toLocaleString("pt-BR")
     };
 
-    eventos.push(novoEvento);
+    try {
 
-    salvarLista("eventos", eventos);
+        const idFirebase =
+        await adicionarDocumento(
+            "eventos",
+            novoEvento
+        );
 
-    adicionarNotificacao(
-        "Evento gerado pela solicitação",
-        `${novoEvento.titulo} foi enviado para a agenda. Responsável: ${novoEvento.responsavel}`,
-        "Agenda"
-    );
+        novoEvento.idFirebase =
+        idFirebase;
 
-    alert("Evento enviado para a agenda com sucesso.");
+        eventos.push(novoEvento);
+
+        salvarLista("eventos", eventos);
+
+        adicionarNotificacao(
+            "Evento gerado pela solicitação",
+            `${novoEvento.titulo} foi enviado para a agenda. Responsável: ${novoEvento.responsavel}`,
+            "Agenda"
+        );
+
+        alert("Evento enviado para a agenda e salvo no banco de dados com sucesso.");
+
+    } catch (error) {
+
+        console.log("Erro ao salvar evento no Firestore:", error);
+
+        alert("Erro ao enviar para agenda no banco de dados.");
+    }
 }
 
 /* ==========================================
    EXCLUIR
 ========================================== */
 
-function excluirSolicitacao(id) {
+async function excluirSolicitacao(id) {
 
     const confirmar =
     confirm("Tem certeza que deseja excluir esta solicitação?");
@@ -690,26 +852,46 @@ function excluirSolicitacao(id) {
     buscarSolicitacoes();
 
     const itemExcluido =
-    solicitacoes.find(item => item.id === id);
+    solicitacoes.find(item =>
+        String(item.id) === String(id) ||
+        String(item.idFirebase) === String(id)
+    );
+
+    if (!itemExcluido) {
+        alert("Solicitação não encontrada.");
+        return;
+    }
 
     solicitacoes =
-    solicitacoes.filter(item => item.id !== id);
+    solicitacoes.filter(item =>
+        String(item.id) !== String(id) &&
+        String(item.idFirebase) !== String(id)
+    );
 
     salvarSolicitacoes(solicitacoes);
 
-    if (itemExcluido) {
-
-        adicionarHistoricoExclusao(
-            itemExcluido,
-            "Solicitações"
-        );
-
-        adicionarNotificacao(
-            "Solicitação excluída",
-            `${itemExcluido.titulo} foi removida do sistema.`,
-            "Solicitação"
-        );
+    if (itemExcluido.idFirebase) {
+        try {
+            await excluirDocumento(
+                "solicitacoes",
+                itemExcluido.idFirebase
+            );
+        }
+        catch (error) {
+            console.log("Erro ao excluir no Firestore:", error);
+        }
     }
+
+    adicionarHistoricoExclusao(
+        itemExcluido,
+        "Solicitações"
+    );
+
+    adicionarNotificacao(
+        "Solicitação excluída",
+        `${itemExcluido.titulo} foi removida do sistema.`,
+        "Solicitação"
+    );
 
     carregarSolicitacoes();
 }
@@ -786,6 +968,9 @@ function carregarSolicitacoes() {
         ? `https://www.google.com/maps?q=${item.latitude},${item.longitude}`
         : "#";
 
+        const idAcao =
+        item.idFirebase || item.id;
+
         listaSolicitacoes.innerHTML += `
             <tr>
 
@@ -823,7 +1008,7 @@ function carregarSolicitacoes() {
                 <td>
                     <div class="action-group">
 
-                        <button class="action-btn agenda" onclick="gerarEventoAgenda(${item.id})" title="Enviar para agenda">
+                        <button class="action-btn agenda" onclick="gerarEventoAgenda('${idAcao}')" title="Enviar para agenda">
                             <i class="fas fa-calendar-plus"></i>
                         </button>
 
@@ -837,7 +1022,7 @@ function carregarSolicitacoes() {
                             : ""
                         }
 
-                        <button class="action-btn delete" onclick="excluirSolicitacao(${item.id})" title="Excluir">
+                        <button class="action-btn delete" onclick="excluirSolicitacao('${idAcao}')" title="Excluir">
                             <i class="fas fa-trash"></i>
                         </button>
 
@@ -889,9 +1074,11 @@ window.excluirSolicitacao = excluirSolicitacao;
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    inicializarEquipeMidiaPadrao();
-
     carregarResponsaveisMidia();
 
     carregarSolicitacoes();
+
+    iniciarEscutaFuncionariosFirestore();
+
+    iniciarEscutaSolicitacoesFirestore();
 });

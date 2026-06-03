@@ -5,9 +5,14 @@ import {
     signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+import {
+    buscarDocumentoPorId,
+    listarDocumentos
+} from "./db.js";
+
 /* ==========================================
    AUTH - SGDM
-   Proteção + preservação do cadastro funcional
+   Proteção + integração com Firestore
 ========================================== */
 
 function estaNaPastaPages() {
@@ -44,6 +49,12 @@ function caminhoSolicitacoes() {
         : "pages/solicitacoes.html";
 }
 
+function caminhoAgenda() {
+    return estaNaPastaPages()
+        ? "agenda.html"
+        : "pages/agenda.html";
+}
+
 function caminhoFotoPadrao() {
     return estaNaPastaPages()
         ? "../assets/img/user.png"
@@ -55,21 +66,22 @@ function buscarUsuarioLocal() {
 }
 
 function salvarUsuarioLocal(usuario) {
-    localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
-}
-
-function buscarFuncionariosSistema() {
-    return JSON.parse(localStorage.getItem("funcionariosSistema")) || [];
-}
-
-function buscarFuncionarioPorEmail(email) {
-    const funcionarios = buscarFuncionariosSistema();
-
-    return funcionarios.find(funcionario =>
-        funcionario.email &&
-        funcionario.email.toLowerCase() === String(email || "").toLowerCase()
+    localStorage.setItem(
+        "usuarioLogado",
+        JSON.stringify(usuario)
     );
 }
+
+function salvarLista(chave, lista) {
+    localStorage.setItem(
+        chave,
+        JSON.stringify(lista)
+    );
+}
+
+/* ==========================================
+   PÁGINAS E PERFIS
+========================================== */
 
 function perfilRestrito(tipoAcesso) {
     const perfisRestritos = [
@@ -106,19 +118,79 @@ function paginaCadastroLocal() {
     return paginaAtualNome() === "cadastro-local.html";
 }
 
-function montarUsuarioSistema(user) {
+function paginaPermitidaParaRestrito() {
+    const pagina = paginaAtualNome();
+
+    const permitidas = [
+        "solicitacoes.html",
+        "agenda.html",
+        "cadastro-funcionario.html",
+        "cadastro-local.html"
+    ];
+
+    return permitidas.includes(pagina);
+}
+
+/* ==========================================
+   FIRESTORE - FUNCIONÁRIO
+========================================== */
+
+async function buscarFuncionarioNoFirestore(user) {
+
+    if (!user) return null;
+
+    try {
+
+        if (user.uid) {
+            const funcionarioPorUid =
+            await buscarDocumentoPorId(
+                "funcionariosSistema",
+                user.uid
+            );
+
+            if (funcionarioPorUid) {
+                return funcionarioPorUid;
+            }
+        }
+
+        const funcionarios =
+        await listarDocumentos("funcionariosSistema");
+
+        salvarLista(
+            "funcionariosSistema",
+            funcionarios
+        );
+
+        const funcionarioPorEmail =
+        funcionarios.find(funcionario =>
+            funcionario.email &&
+            funcionario.email.toLowerCase() === String(user.email || "").toLowerCase()
+        );
+
+        return funcionarioPorEmail || null;
+
+    } catch (error) {
+
+        console.log(
+            "Erro ao buscar funcionário no Firestore:",
+            error
+        );
+
+        return null;
+    }
+}
+
+/* ==========================================
+   MONTAR USUÁRIO DO SISTEMA
+========================================== */
+
+async function montarUsuarioSistema(user) {
 
     const usuarioAntigo =
     buscarUsuarioLocal();
 
     const funcionarioSalvo =
-    buscarFuncionarioPorEmail(user.email);
-
-    const cadastroFuncionarioCompleto =
-    Boolean(
-        usuarioAntigo.cadastroFuncionarioCompleto ||
-        funcionarioSalvo?.cadastroFuncionarioCompleto
-    );
+    await buscarFuncionarioNoFirestore(user);
 
     const tipoAcesso =
     funcionarioSalvo?.tipoAcesso ||
@@ -130,18 +202,30 @@ function montarUsuarioSistema(user) {
     funcionarioSalvo?.equipeMidia === true ||
     usuarioAntigo.equipeMidia === true;
 
+    const cadastroFuncionarioCompleto =
+    Boolean(
+        funcionarioSalvo?.cadastroFuncionarioCompleto ||
+        usuarioAntigo.cadastroFuncionarioCompleto
+    );
+
     const cadastroLocalCompleto =
     ehEquipeMidia
     ? true
     : Boolean(
-        usuarioAntigo.cadastroLocalCompleto ||
-        funcionarioSalvo?.cadastroLocalCompleto
+        funcionarioSalvo?.cadastroLocalCompleto ||
+        usuarioAntigo.cadastroLocalCompleto
     );
 
     return {
         ...usuarioAntigo,
 
-        uid: user.uid,
+        uid:
+        user.uid,
+
+        idFirebase:
+        funcionarioSalvo?.idFirebase ||
+        funcionarioSalvo?.uid ||
+        user.uid,
 
         nome:
         funcionarioSalvo?.nome ||
@@ -151,6 +235,7 @@ function montarUsuarioSistema(user) {
 
         email:
         user.email ||
+        funcionarioSalvo?.email ||
         usuarioAntigo.email ||
         "",
 
@@ -159,7 +244,8 @@ function montarUsuarioSistema(user) {
         usuarioAntigo.foto ||
         caminhoFotoPadrao(),
 
-        login: true,
+        login:
+        true,
 
         codigoFuncionario:
         funcionarioSalvo?.codigoFuncionario ||
@@ -202,19 +288,27 @@ function montarUsuarioSistema(user) {
         "",
 
         localId:
-        usuarioAntigo.localId ||
         funcionarioSalvo?.localId ||
+        usuarioAntigo.localId ||
+        "",
+
+        localFirebaseId:
+        funcionarioSalvo?.localFirebaseId ||
+        usuarioAntigo.localFirebaseId ||
         "",
 
         codigoLocal:
+        funcionarioSalvo?.codigoLocal ||
         usuarioAntigo.codigoLocal ||
         "",
 
         localVinculado:
+        funcionarioSalvo?.localVinculado ||
         usuarioAntigo.localVinculado ||
         "",
 
         unidadeVinculada:
+        funcionarioSalvo?.unidadeVinculada ||
         usuarioAntigo.unidadeVinculada ||
         "",
 
@@ -222,6 +316,10 @@ function montarUsuarioSistema(user) {
         cadastroLocalCompleto
     };
 }
+
+/* ==========================================
+   CONTROLE DE FLUXO
+========================================== */
 
 function controlarFluxo(usuario) {
 
@@ -233,7 +331,8 @@ function controlarFluxo(usuario) {
         !usuario.cadastroFuncionarioCompleto &&
         !paginaCadastroFuncionario()
     ) {
-        window.location.href = caminhoCadastroFuncionario();
+        window.location.href =
+        caminhoCadastroFuncionario();
         return;
     }
 
@@ -243,7 +342,8 @@ function controlarFluxo(usuario) {
         !perfilEquipeMidia(usuario.tipoAcesso) &&
         !paginaCadastroLocal()
     ) {
-        window.location.href = caminhoCadastroLocal();
+        window.location.href =
+        caminhoCadastroLocal();
         return;
     }
 
@@ -256,13 +356,31 @@ function controlarFluxo(usuario) {
         )
     ) {
         if (perfilRestrito(usuario.tipoAcesso)) {
-            window.location.href = caminhoSolicitacoes();
+            window.location.href =
+            caminhoSolicitacoes();
             return;
         }
 
-        window.location.href = caminhoDashboard();
+        window.location.href =
+        caminhoDashboard();
+        return;
+    }
+
+    if (
+        usuario.cadastroFuncionarioCompleto &&
+        usuario.cadastroLocalCompleto &&
+        perfilRestrito(usuario.tipoAcesso) &&
+        !paginaPermitidaParaRestrito()
+    ) {
+        window.location.href =
+        caminhoSolicitacoes();
+        return;
     }
 }
+
+/* ==========================================
+   ATUALIZAR DADOS NA TELA
+========================================== */
 
 function atualizarUsuarioNaTela(usuario) {
 
@@ -299,19 +417,24 @@ function atualizarUsuarioNaTela(usuario) {
     }
 }
 
-onAuthStateChanged(auth, (user) => {
+/* ==========================================
+   INICIALIZAÇÃO AUTH
+========================================== */
+
+onAuthStateChanged(auth, async (user) => {
 
     if (!user) {
 
         if (!paginaLivre()) {
-            window.location.href = caminhoLogin();
+            window.location.href =
+            caminhoLogin();
         }
 
         return;
     }
 
     const usuario =
-    montarUsuarioSistema(user);
+    await montarUsuarioSistema(user);
 
     salvarUsuarioLocal(usuario);
 
@@ -320,6 +443,10 @@ onAuthStateChanged(auth, (user) => {
     controlarFluxo(usuario);
 });
 
+/* ==========================================
+   LOGOUT
+========================================== */
+
 window.logout = function () {
 
     signOut(auth)
@@ -327,7 +454,8 @@ window.logout = function () {
 
         localStorage.removeItem("usuarioLogado");
 
-        window.location.href = caminhoLogin();
+        window.location.href =
+        caminhoLogin();
     })
     .catch((error) => {
 
