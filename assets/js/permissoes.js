@@ -211,5 +211,21 @@ function iniciarPermissoes() {
    e montar o usuarioLogado.
 */
 document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(iniciarPermissoes, 1200);
+
+    const intervalo =
+    setInterval(() => {
+
+        const authPronto =
+        sessionStorage.getItem("authPronto");
+
+        if (authPronto === "true") {
+            clearInterval(intervalo);
+            iniciarPermissoes();
+        }
+
+    }, 300);
+
+    setTimeout(() => {
+        clearInterval(intervalo);
+    }, 5000);
 });

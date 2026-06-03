@@ -7,12 +7,13 @@ import {
 
 import {
     buscarDocumentoPorId,
-    listarDocumentos
+    listarDocumentos,
+    salvarDocumentoComId
 } from "./db.js";
 
 /* ==========================================
    AUTH - SGDM
-   Proteção + integração com Firestore
+   Reconhece usuário pelo Gmail no Firestore
 ========================================== */
 
 function estaNaPastaPages() {
@@ -49,12 +50,6 @@ function caminhoSolicitacoes() {
         : "pages/solicitacoes.html";
 }
 
-function caminhoAgenda() {
-    return estaNaPastaPages()
-        ? "agenda.html"
-        : "pages/agenda.html";
-}
-
 function caminhoFotoPadrao() {
     return estaNaPastaPages()
         ? "../assets/img/user.png"
@@ -66,22 +61,28 @@ function buscarUsuarioLocal() {
 }
 
 function salvarUsuarioLocal(usuario) {
-    localStorage.setItem(
-        "usuarioLogado",
-        JSON.stringify(usuario)
-    );
+    localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
 }
 
 function salvarLista(chave, lista) {
-    localStorage.setItem(
-        chave,
-        JSON.stringify(lista)
-    );
+    localStorage.setItem(chave, JSON.stringify(lista));
+}
+
+function normalizarEmail(email) {
+    return String(email || "").trim().toLowerCase();
+}
+
+function gerarIdPorEmail(email) {
+    return normalizarEmail(email).replace(/[^a-z0-9]/g, "_");
 }
 
 /* ==========================================
-   PÁGINAS E PERFIS
+   PERFIS
 ========================================== */
+
+function perfilEquipeMidia(tipoAcesso) {
+    return tipoAcesso === "Equipe de Mídia";
+}
 
 function perfilRestrito(tipoAcesso) {
     const perfisRestritos = [
@@ -93,10 +94,6 @@ function perfilRestrito(tipoAcesso) {
     ];
 
     return perfisRestritos.includes(tipoAcesso);
-}
-
-function perfilEquipeMidia(tipoAcesso) {
-    return tipoAcesso === "Equipe de Mídia";
 }
 
 function paginaLivre() {
@@ -132,16 +129,23 @@ function paginaPermitidaParaRestrito() {
 }
 
 /* ==========================================
-   FIRESTORE - FUNCIONÁRIO
+   BUSCAR FUNCIONÁRIO NO FIRESTORE
 ========================================== */
 
 async function buscarFuncionarioNoFirestore(user) {
 
     if (!user) return null;
 
+    const emailLogin =
+    normalizarEmail(user.email);
+
     try {
 
+        /*
+           1. Primeiro tenta pelo UID do Firebase.
+        */
         if (user.uid) {
+
             const funcionarioPorUid =
             await buscarDocumentoPorId(
                 "funcionariosSistema",
@@ -153,6 +157,29 @@ async function buscarFuncionarioNoFirestore(user) {
             }
         }
 
+        /*
+           2. Depois tenta pelo ID gerado a partir do e-mail.
+        */
+        if (emailLogin) {
+
+            const idEmail =
+            gerarIdPorEmail(emailLogin);
+
+            const funcionarioPorEmailId =
+            await buscarDocumentoPorId(
+                "funcionariosSistema",
+                idEmail
+            );
+
+            if (funcionarioPorEmailId) {
+                return funcionarioPorEmailId;
+            }
+        }
+
+        /*
+           3. Por último lista todos e procura pelo campo email.
+           Isso corrige cadastros antigos que foram salvos com outro ID.
+        */
         const funcionarios =
         await listarDocumentos("funcionariosSistema");
 
@@ -163,11 +190,14 @@ async function buscarFuncionarioNoFirestore(user) {
 
         const funcionarioPorEmail =
         funcionarios.find(funcionario =>
-            funcionario.email &&
-            funcionario.email.toLowerCase() === String(user.email || "").toLowerCase()
+            normalizarEmail(funcionario.email) === emailLogin
         );
 
-        return funcionarioPorEmail || null;
+        if (funcionarioPorEmail) {
+            return funcionarioPorEmail;
+        }
+
+        return null;
 
     } catch (error) {
 
@@ -177,6 +207,65 @@ async function buscarFuncionarioNoFirestore(user) {
         );
 
         return null;
+    }
+}
+
+/* ==========================================
+   CORRIGIR / SINCRONIZAR CADASTRO
+========================================== */
+
+async function sincronizarFuncionarioComUid(user, funcionario) {
+
+    if (!user || !funcionario) return;
+
+    try {
+
+        const ehEquipeMidia =
+        funcionario.tipoAcesso === "Equipe de Mídia" ||
+        funcionario.equipeMidia === true;
+
+        const funcionarioCorrigido = {
+            ...funcionario,
+
+            uid: user.uid,
+            idFirebase: user.uid,
+
+            email:
+            normalizarEmail(funcionario.email || user.email),
+
+            nome:
+            funcionario.nome || user.displayName || "Usuário",
+
+            foto:
+            user.photoURL || funcionario.foto || "",
+
+            cadastroFuncionarioCompleto:
+            true,
+
+            cadastroLocalCompleto:
+            ehEquipeMidia
+            ? true
+            : Boolean(funcionario.cadastroLocalCompleto),
+
+            equipeMidia:
+            ehEquipeMidia,
+
+            atualizadoEm:
+            new Date().toLocaleString("pt-BR")
+        };
+
+        await salvarDocumentoComId(
+            "funcionariosSistema",
+            user.uid,
+            funcionarioCorrigido
+        );
+
+    } catch (error) {
+
+        console.log(
+            "Não foi possível sincronizar funcionário com UID:",
+            error
+        );
     }
 }
 
@@ -192,6 +281,13 @@ async function montarUsuarioSistema(user) {
     const funcionarioSalvo =
     await buscarFuncionarioNoFirestore(user);
 
+    /*
+       Se encontrou funcionário pelo Gmail, o sistema considera
+       que o cadastro funcional existe.
+    */
+    const encontrouCadastro =
+    Boolean(funcionarioSalvo);
+
     const tipoAcesso =
     funcionarioSalvo?.tipoAcesso ||
     usuarioAntigo.tipoAcesso ||
@@ -203,10 +299,9 @@ async function montarUsuarioSistema(user) {
     usuarioAntigo.equipeMidia === true;
 
     const cadastroFuncionarioCompleto =
-    Boolean(
-        funcionarioSalvo?.cadastroFuncionarioCompleto ||
-        usuarioAntigo.cadastroFuncionarioCompleto
-    );
+    encontrouCadastro
+    ? true
+    : Boolean(usuarioAntigo.cadastroFuncionarioCompleto);
 
     const cadastroLocalCompleto =
     ehEquipeMidia
@@ -216,7 +311,7 @@ async function montarUsuarioSistema(user) {
         usuarioAntigo.cadastroLocalCompleto
     );
 
-    return {
+    const usuarioSistema = {
         ...usuarioAntigo,
 
         uid:
@@ -234,10 +329,11 @@ async function montarUsuarioSistema(user) {
         "Usuário",
 
         email:
-        user.email ||
-        funcionarioSalvo?.email ||
-        usuarioAntigo.email ||
-        "",
+        normalizarEmail(
+            user.email ||
+            funcionarioSalvo?.email ||
+            usuarioAntigo.email
+        ),
 
         foto:
         user.photoURL ||
@@ -315,6 +411,19 @@ async function montarUsuarioSistema(user) {
         cadastroFuncionarioCompleto,
         cadastroLocalCompleto
     };
+
+    /*
+       Se achou cadastro pelo e-mail, salva uma cópia pelo UID.
+       Assim no próximo login fica mais rápido e não perde reconhecimento.
+    */
+    if (funcionarioSalvo) {
+        await sincronizarFuncionarioComUid(
+            user,
+            usuarioSistema
+        );
+    }
+
+    return usuarioSistema;
 }
 
 /* ==========================================
@@ -327,6 +436,10 @@ function controlarFluxo(usuario) {
 
     if (paginaLivre()) return;
 
+    /*
+       Só manda para cadastro funcionário se realmente
+       não encontrou cadastro nenhum.
+    */
     if (
         !usuario.cadastroFuncionarioCompleto &&
         !paginaCadastroFuncionario()
@@ -336,6 +449,9 @@ function controlarFluxo(usuario) {
         return;
     }
 
+    /*
+       Equipe de Mídia não precisa cadastro local.
+    */
     if (
         usuario.cadastroFuncionarioCompleto &&
         !usuario.cadastroLocalCompleto &&
@@ -347,6 +463,10 @@ function controlarFluxo(usuario) {
         return;
     }
 
+    /*
+       Se entrou em cadastro mesmo já estando completo,
+       joga para a página correta.
+    */
     if (
         usuario.cadastroFuncionarioCompleto &&
         usuario.cadastroLocalCompleto &&
@@ -366,6 +486,9 @@ function controlarFluxo(usuario) {
         return;
     }
 
+    /*
+       Perfis restritos só acessam Solicitações e Agenda.
+    */
     if (
         usuario.cadastroFuncionarioCompleto &&
         usuario.cadastroLocalCompleto &&
@@ -379,7 +502,7 @@ function controlarFluxo(usuario) {
 }
 
 /* ==========================================
-   ATUALIZAR DADOS NA TELA
+   ATUALIZAR USUÁRIO NA TELA
 ========================================== */
 
 function atualizarUsuarioNaTela(usuario) {
@@ -425,6 +548,8 @@ onAuthStateChanged(auth, async (user) => {
 
     if (!user) {
 
+        sessionStorage.removeItem("authPronto");
+
         if (!paginaLivre()) {
             window.location.href =
             caminhoLogin();
@@ -433,12 +558,16 @@ onAuthStateChanged(auth, async (user) => {
         return;
     }
 
+    sessionStorage.removeItem("authPronto");
+
     const usuario =
     await montarUsuarioSistema(user);
 
     salvarUsuarioLocal(usuario);
 
     atualizarUsuarioNaTela(usuario);
+
+    sessionStorage.setItem("authPronto", "true");
 
     controlarFluxo(usuario);
 });
@@ -453,6 +582,7 @@ window.logout = function () {
     .then(() => {
 
         localStorage.removeItem("usuarioLogado");
+        sessionStorage.removeItem("authPronto");
 
         window.location.href =
         caminhoLogin();
